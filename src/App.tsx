@@ -8,9 +8,12 @@ import { ChordGrid } from "./components/ChordGrid";
 import { QualitySelector } from "./components/QualitySelector";
 import { AdminPage } from "./components/AdminPage";
 import { useAuth } from "./hooks/useAuth";
+import { useClickSound } from "./hooks/useClickSound";
 import { useIndexedChordImages } from "./hooks/useIndexedChordImages";
 
 function App() {
+  useClickSound();
+
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedQualityId, setSelectedQualityId] = useState<ChordQualityId | null>(null);
   const [selectedChordId, setSelectedChordId] = useState<string | null>(null);
