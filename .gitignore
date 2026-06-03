@@ -1,0 +1,12 @@
+node_modules/
+dist/
+screenshots/
+vite-dev.log
+*.tsbuildinfo
+
+# Local source dump used to prepare public/chords. The app commits normalized assets instead.
+코드 Source/
+
+.env
+.env.*
+!.env.example
