@@ -23,7 +23,7 @@ src/styles/globals.css      16:9 풀스크린 셸과 이미지 contain 규칙
 
 ## 이미지 규칙
 
-기본 이미지는 `/public/chords/{quality}/{root}.png` 규칙을 사용합니다. 예시는 `/chords/major/c.png`, `/chords/minor7/c-sharp.png`, `/chords/minor7-flat5/a.png`입니다. 모든 원본 이미지는 `object-fit: contain`, `max-width: 100%`, `max-height: 100%`, `width: auto`, `height: auto`로만 표시해 늘어남과 잘림을 막습니다.
+기본 이미지는 `/public/chords/{quality}/{root}.png` 규칙을 사용합니다. 예시는 `chords/major/c.png`, `chords/minor7/c-sharp.png`, `chords/minor7-flat5/a.png`입니다. GitHub Pages 배포에서는 Vite `base`가 `/Ukulele_Chord_Viewer/`로 설정되어 이미지와 JS/CSS가 저장소 하위 경로에서 로드됩니다. 모든 원본 이미지는 `object-fit: contain`, `max-width: 100%`, `max-height: 100%`, `width: auto`, `height: auto`로만 표시해 늘어남과 잘림을 막습니다.
 
 이미지 표시 우선순위는 IndexedDB 업로드 이미지, 정적 원본 이미지, 동적 SVG 폴백 순서입니다.
 
@@ -38,3 +38,5 @@ src/styles/globals.css      16:9 풀스크린 셸과 이미지 contain 규칙
 ## 배포
 
 백엔드 없이 정적 사이트로 동작하므로 Vercel, Netlify, GitHub Pages에 배포할 수 있습니다. 원본 이미지 라이선스가 명확한지 확인한 뒤 배포하세요.
+
+GitHub Pages는 `.github/workflows/deploy.yml`에서 `npm run build` 후 `dist`를 배포합니다.

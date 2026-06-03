@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const PLACEHOLDER_SRC = "/chords/placeholders/chord-placeholder.svg";
+const PLACEHOLDER_SRC = `${import.meta.env.BASE_URL}chords/placeholders/chord-placeholder.svg`;
 
 interface ChordImageProps {
   src: string;

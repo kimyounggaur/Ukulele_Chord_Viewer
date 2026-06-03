@@ -11,6 +11,7 @@ import { rootToSlug } from "../lib/slug";
 const NATURAL_ROOTS = ["C", "D", "E", "F", "G", "A", "B"] as const;
 const MINOR7_ROOTS = ["A", "B", "C", "C#", "D", "E", "F#", "G", "G#"] as const;
 const STRING_ORDER = [4, 3, 2, 1] as const satisfies readonly UkuleleString[];
+const PUBLIC_BASE = import.meta.env.BASE_URL;
 
 type FretTuple = readonly [FretMark, FretMark, FretMark, FretMark];
 type FingerTuple = readonly [
@@ -54,7 +55,7 @@ function positionsFromGCEA(pattern: Pattern): ChordShape["positions"] {
 }
 
 function imagePath(quality: string, root: string): string {
-  return `/chords/${quality}/${rootToSlug(root)}.png`;
+  return `${PUBLIC_BASE}chords/${quality}/${rootToSlug(root)}.png`;
 }
 
 function buildChord(config: QualityBuildConfig, root: string): ChordShape {
