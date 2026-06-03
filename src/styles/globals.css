@@ -209,23 +209,144 @@ button {
   filter: drop-shadow(5px 8px 8px rgba(170, 118, 142, 0.16));
 }
 
+.chord-grid-board {
+  position: relative;
+  border-radius: 8px;
+  padding: clamp(10px, 1.4vw, 18px);
+  background:
+    linear-gradient(rgba(244, 114, 182, 0.13) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14, 165, 233, 0.1) 1px, transparent 1px),
+    rgba(255, 255, 255, 0.32);
+  background-size: 28px 28px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.74),
+    inset 0 0 0 2px rgba(244, 114, 182, 0.08);
+}
+
 .chord-card,
 .related-chord-card {
+  position: relative;
+  isolation: isolate;
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(120, 113, 108, 0.16);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(255, 248, 251, 0.9)),
+    #ffffff;
   box-shadow:
-    9px 9px 18px rgba(31, 41, 55, 0.1),
-    -9px -9px 18px rgba(255, 255, 255, 0.96);
-  transition: transform 180ms ease, box-shadow 180ms ease;
+    0 1px 0 rgba(255, 255, 255, 0.96) inset,
+    0 0 0 1px rgba(255, 255, 255, 0.72) inset,
+    10px 12px 22px rgba(38, 33, 36, 0.12),
+    -8px -8px 18px rgba(255, 255, 255, 0.98);
+  transform: translateZ(0);
+  transition:
+    transform 320ms cubic-bezier(0.2, 0.9, 0.18, 1.18),
+    box-shadow 320ms ease,
+    border-color 320ms ease,
+    filter 320ms ease;
+}
+
+.chord-card::before,
+.related-chord-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background:
+    linear-gradient(120deg, transparent 10%, rgba(255, 255, 255, 0.86) 38%, transparent 62%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.48), transparent 55%);
+  opacity: 0;
+  transform: translateX(-72%) skewX(-18deg);
+  transition:
+    opacity 240ms ease,
+    transform 620ms cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.chord-card::after,
+.related-chord-card::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  z-index: -1;
+  border-radius: 6px;
+  border: 1px solid rgba(244, 114, 182, 0.12);
+  opacity: 0.72;
+  pointer-events: none;
+  transition: opacity 280ms ease, transform 280ms ease;
 }
 
 .chord-card:hover,
-.related-chord-card:hover {
-  transform: translateY(-2px) scale(1.015);
+.related-chord-card:hover,
+.chord-card:focus-visible,
+.related-chord-card:focus-visible {
+  transform: translateY(-9px) scale(1.035) rotateX(2deg) rotateZ(-0.4deg);
+  border-color: rgba(244, 114, 182, 0.48);
   box-shadow:
-    12px 12px 24px rgba(31, 41, 55, 0.12),
-    -10px -10px 20px rgba(255, 255, 255, 0.96);
+    0 1px 0 rgba(255, 255, 255, 0.98) inset,
+    0 0 0 2px rgba(255, 255, 255, 0.88) inset,
+    0 20px 34px rgba(38, 33, 36, 0.18),
+    0 8px 16px rgba(244, 114, 182, 0.14);
+  filter: saturate(1.06);
+  animation: chord-card-pop 620ms cubic-bezier(0.2, 0.9, 0.18, 1.18);
+}
+
+.chord-card:hover::before,
+.related-chord-card:hover::before,
+.chord-card:focus-visible::before,
+.related-chord-card:focus-visible::before {
+  opacity: 1;
+  transform: translateX(72%) skewX(-18deg);
+}
+
+.chord-card:hover::after,
+.related-chord-card:hover::after,
+.chord-card:focus-visible::after,
+.related-chord-card:focus-visible::after {
+  opacity: 1;
+  transform: scale(0.985);
+}
+
+.chord-card .chord-image-frame,
+.related-chord-card .chord-image-frame {
+  border: 1px solid rgba(214, 211, 209, 0.72);
+  transition:
+    transform 360ms cubic-bezier(0.2, 0.9, 0.2, 1),
+    box-shadow 360ms ease,
+    border-color 360ms ease,
+    background-color 360ms ease;
+}
+
+.chord-card:hover .chord-image-frame,
+.related-chord-card:hover .chord-image-frame,
+.chord-card:focus-visible .chord-image-frame,
+.related-chord-card:focus-visible .chord-image-frame {
+  transform: translateY(-3px) scale(1.026);
+  border-color: rgba(244, 114, 182, 0.42);
+  background-color: #ffffff;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.95),
+    0 10px 18px rgba(68, 64, 60, 0.1);
+}
+
+.chord-card.is-featured {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.98) inset,
+    0 0 0 1px rgba(255, 255, 255, 0.78) inset,
+    14px 16px 28px rgba(38, 33, 36, 0.14),
+    -9px -9px 20px rgba(255, 255, 255, 0.98);
+}
+
+@keyframes chord-card-pop {
+  0% {
+    transform: translateY(0) scale(1) rotateX(0) rotateZ(0);
+  }
+  42% {
+    transform: translateY(-12px) scale(1.045) rotateX(3deg) rotateZ(-0.7deg);
+  }
+  100% {
+    transform: translateY(-9px) scale(1.035) rotateX(2deg) rotateZ(-0.4deg);
+  }
 }
 
 @media (min-width: 640px) {

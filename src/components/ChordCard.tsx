@@ -32,6 +32,7 @@ export function ChordCard({
       onClick={onSelect}
       className={[
         related ? "related-chord-card" : "chord-card",
+        featured ? "is-featured" : "",
         "group flex h-full flex-col text-left focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-100",
         related ? "w-[180px] shrink-0 p-2 lg:w-full" : "gap-[clamp(12px,1.4vh,20px)] p-[clamp(14px,1.5vw,24px)]",
         minHeightClass,

@@ -44,9 +44,9 @@ export function ChordGrid({
         </span>
       </div>
 
-      <div className="mx-auto w-full max-w-[1140px]">
+      <div className="chord-grid-board mx-auto w-full max-w-[1140px]">
         {filteredChords.length > 0 ? (
-          <div className="grid grid-cols-1 gap-[clamp(18px,2.3vw,28px)] sm:grid-cols-4">
+          <div className="grid grid-cols-1 gap-[clamp(20px,2.5vw,32px)] sm:grid-cols-4">
             {filteredChords.map((chord, index) => (
               <ChordCard
                 key={chord.id}
