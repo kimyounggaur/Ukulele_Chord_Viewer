@@ -47,12 +47,6 @@ export function ChordCard({
         >
           {displayTitle}
         </span>
-        <span
-          className="rounded-full px-2 py-1 text-xs font-extrabold"
-          style={{ color: quality.color, backgroundColor: quality.softColor }}
-        >
-          {quality.shortLabel}
-        </span>
       </div>
       <div className="min-h-0 flex-1">
         <ChordDiagram shape={chord} size="thumb" uploadedImageUrl={uploadedImageUrl} />
