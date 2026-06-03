@@ -9,7 +9,7 @@ interface QualitySelectorProps {
 
 export function QualitySelector({ selectedQualityId, onSelectQuality }: QualitySelectorProps) {
   return (
-    <section className="screen-panel">
+    <section className="screen-panel quality-selector-screen">
       <div className="quality-selector-grid">
         {MAIN_QUALITY_IDS.map((qualityId) => {
           const quality = qualityById[qualityId];
@@ -23,6 +23,14 @@ export function QualitySelector({ selectedQualityId, onSelectQuality }: QualityS
           );
         })}
       </div>
+      <figure className="main-footer-image-wrap">
+        <img
+          src={`${import.meta.env.BASE_URL}assets/main-footer-authors.jpg`}
+          alt="칼림바 연주곡집 공동 저자 소개"
+          className="main-footer-image"
+          loading="lazy"
+        />
+      </figure>
     </section>
   );
 }
