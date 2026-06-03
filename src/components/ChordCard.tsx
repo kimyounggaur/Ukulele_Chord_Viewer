@@ -21,7 +21,7 @@ export function ChordCard({
   const quality = qualityById[chord.quality];
   const displayTitle = getChordDisplayTitle(chord);
   const minHeightClass = related
-    ? "min-h-[190px]"
+    ? ""
     : featured
       ? "min-h-[clamp(300px,43vh,520px)] sm:col-span-2"
       : "min-h-[clamp(220px,28vh,360px)]";
@@ -33,8 +33,9 @@ export function ChordCard({
       className={[
         related ? "related-chord-card" : "chord-card",
         featured ? "is-featured" : "",
-        "group flex h-full flex-col text-left focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-100",
-        related ? "w-[180px] shrink-0 p-2 lg:w-full" : "gap-[clamp(12px,1.4vh,20px)] p-[clamp(14px,1.5vw,24px)]",
+        related
+          ? "group flex h-[184px] w-[180px] shrink-0 flex-col p-2 text-left focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-100 lg:h-[156px] lg:w-full"
+          : "group flex h-full flex-col gap-[clamp(12px,1.4vh,20px)] p-[clamp(14px,1.5vw,24px)] text-left focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-100",
         minHeightClass,
       ].join(" ")}
       style={{ borderTop: `4px solid ${quality.color}` }}
@@ -49,7 +50,7 @@ export function ChordCard({
           {displayTitle}
         </span>
       </div>
-      <div className="min-h-0 flex-1">
+      <div className={related ? "related-chord-diagram min-h-0 flex-1" : "min-h-0 flex-1"}>
         <ChordDiagram shape={chord} size="thumb" uploadedImageUrl={uploadedImageUrl} />
       </div>
     </button>

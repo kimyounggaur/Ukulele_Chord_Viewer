@@ -80,7 +80,7 @@ export function ChordDetail({
                 onDelete={onDeleteImage}
               />
             ) : null}
-            <div className="flex gap-3 overflow-x-auto pb-2 thin-scrollbar lg:flex-col lg:overflow-x-visible">
+            <div className="related-chords-panel flex gap-3 overflow-x-auto pb-2 thin-scrollbar lg:flex-col">
               {relatedChords.map((relatedChord) => (
                 <ChordCard
                   key={relatedChord.id}

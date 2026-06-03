@@ -301,6 +301,20 @@ button {
   object-fit: contain;
 }
 
+.related-chords-panel {
+  min-height: 0;
+  max-width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .related-chords-panel {
+    max-height: clamp(430px, 65vh, 620px);
+    overflow-y: auto;
+    overflow-x: visible;
+    padding: 6px 10px 10px 2px;
+  }
+}
+
 .thin-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: #f4a5c5 transparent;
@@ -678,6 +692,24 @@ button {
 .related-chord-card {
   overflow: hidden;
   transform-origin: 50% 78%;
+}
+
+.related-chord-card .flex.items-center {
+  min-height: 22px;
+}
+
+.related-chord-diagram {
+  height: 100%;
+  overflow: hidden;
+}
+
+.related-chord-card .chord-image-frame {
+  min-height: 0;
+  padding: 6px;
+}
+
+.related-chord-card .chord-image {
+  max-height: 100%;
 }
 
 .related-chord-card::before {
