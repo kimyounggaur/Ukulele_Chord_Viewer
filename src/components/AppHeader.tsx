@@ -11,38 +11,80 @@ function HeaderMascot() {
   return (
     <svg
       className="header-mascot"
-      viewBox="0 0 142 70"
+      viewBox="0 0 260 76"
       role="img"
-      aria-label="Lesson Designer ukulele mark"
+      aria-label="우쿨렐레를 연주하는 캐릭터"
     >
-      <g className="mascot-shadow">
-        <ellipse cx="71" cy="62" rx="32" ry="5" fill="#6b5c64" />
+      <path
+        className="mascot-path"
+        d="M16 60c40-11 72-11 112 0s73 11 116-1"
+        fill="none"
+        stroke="#ffe4ef"
+        strokeLinecap="round"
+        strokeWidth="3"
+      />
+      <g className="music-note note-one">
+        <circle cx="190" cy="22" r="3" fill="#f472b6" />
+        <path d="M193 21V8l9 3" fill="none" stroke="#f472b6" strokeLinecap="round" strokeWidth="2" />
       </g>
-      <g className="mascot-body">
-        <path
-          d="M32 43c-10-9-10-24 1-32 13-10 33-1 35 15 9-10 27-8 34 4 7 11 2 27-11 32-13 5-25-2-29-13-8 8-21 7-30-6Z"
-          fill="#fff8fb"
-          stroke="#f5a9c8"
-          strokeWidth="3"
-        />
-        <circle cx="52" cy="31" r="4" fill="#ef7fae" />
-        <circle cx="83" cy="31" r="4" fill="#ef7fae" />
-        <path
-          d="M60 43c5 4 12 4 17 0"
-          fill="none"
-          stroke="#d76d9d"
-          strokeLinecap="round"
-          strokeWidth="3"
-        />
-        <path
-          d="M101 19l22-11c5-2 10 3 8 8l-7 21"
-          fill="#fff8fb"
-          stroke="#f5a9c8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="3"
-        />
-        <path d="M113 15l14 10M108 25l14 10" stroke="#f5a9c8" strokeLinecap="round" strokeWidth="2" />
+      <g className="music-note note-two">
+        <circle cx="221" cy="36" r="3" fill="#38bdf8" />
+        <path d="M224 35V20l10 4" fill="none" stroke="#38bdf8" strokeLinecap="round" strokeWidth="2" />
+      </g>
+      <g className="header-mascot-character">
+        <ellipse className="mascot-shadow" cx="64" cy="66" rx="26" ry="4.5" fill="#6b5c64" />
+        <g className="mascot-body">
+          <circle cx="60" cy="28" r="17" fill="#fff8fb" stroke="#f5a9c8" strokeWidth="3" />
+          <path
+            d="M48 19c4-12 25-11 31 0-2-13-19-20-31-11-7 5-10 13-8 21 2-4 5-7 8-10Z"
+            fill="#ffd6e8"
+            stroke="#f5a9c8"
+            strokeLinejoin="round"
+            strokeWidth="2"
+          />
+          <circle cx="54" cy="29" r="2.3" fill="#6d6670" />
+          <circle cx="67" cy="29" r="2.3" fill="#6d6670" />
+          <path
+            d="M57 36c3 2.5 8 2.5 11 0"
+            fill="none"
+            stroke="#d76d9d"
+            strokeLinecap="round"
+            strokeWidth="2.4"
+          />
+          <path
+            d="M44 47c7-9 29-9 37 0l4 18H40Z"
+            fill="#fff1f7"
+            stroke="#f5a9c8"
+            strokeLinejoin="round"
+            strokeWidth="3"
+          />
+          <path className="mascot-leg left-leg" d="M52 63l-7 7" stroke="#d76d9d" strokeLinecap="round" strokeWidth="4" />
+          <path className="mascot-leg right-leg" d="M69 63l7 7" stroke="#d76d9d" strokeLinecap="round" strokeWidth="4" />
+          <g className="ukulele">
+            <ellipse cx="82" cy="46" rx="12" ry="10" fill="#f7c56f" stroke="#b97832" strokeWidth="2.5" />
+            <ellipse cx="94" cy="43" rx="10" ry="8" fill="#f9d889" stroke="#b97832" strokeWidth="2.5" />
+            <circle cx="88" cy="45" r="3" fill="#8a5627" />
+            <path d="M101 40l28-11" stroke="#8a5627" strokeLinecap="round" strokeWidth="4" />
+            <path d="M124 27l10-4" stroke="#8a5627" strokeLinecap="round" strokeWidth="6" />
+            <path d="M79 43l35-13M80 47l36-13M81 51l37-14" stroke="#fff8dc" strokeLinecap="round" strokeWidth="1.2" />
+          </g>
+          <path
+            className="mascot-arm fretting-arm"
+            d="M75 44c9-8 18-12 28-13"
+            fill="none"
+            stroke="#f5a9c8"
+            strokeLinecap="round"
+            strokeWidth="5"
+          />
+          <path
+            className="mascot-arm strum-arm"
+            d="M47 47c13 4 23 5 36 2"
+            fill="none"
+            stroke="#f5a9c8"
+            strokeLinecap="round"
+            strokeWidth="5"
+          />
+        </g>
       </g>
     </svg>
   );
