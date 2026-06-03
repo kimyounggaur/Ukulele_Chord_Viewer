@@ -1,11 +1,28 @@
-import { Home, Search } from "lucide-react";
+import { FormEvent, useState } from "react";
+import { Home, Lock, LogIn, LogOut, Search, ShieldCheck, UserPlus } from "lucide-react";
+import type { AuthResult, AuthUser } from "../hooks/useAuth";
 
 interface AppHeaderProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
   onHome: () => void;
   onOpenAdmin: () => void;
+  canSearch: boolean;
+  canManage: boolean;
+  currentUser: AuthUser | null;
+  onSignUp: (username: string, password: string) => AuthResult;
+  onMemberLogin: (username: string, password: string) => AuthResult;
+  onAdminLogin: (username: string, password: string) => AuthResult;
+  onLogout: () => void;
 }
+
+type AuthMode = "signup" | "member-login" | "admin-login";
+
+const AUTH_LABELS: Record<AuthMode, string> = {
+  signup: "회원가입",
+  "member-login": "회원 로그인",
+  "admin-login": "관리자 로그인",
+};
 
 function HeaderMascot() {
   return (
@@ -95,7 +112,60 @@ export function AppHeader({
   onSearchChange,
   onHome,
   onOpenAdmin,
+  canSearch,
+  canManage,
+  currentUser,
+  onSignUp,
+  onMemberLogin,
+  onAdminLogin,
+  onLogout,
 }: AppHeaderProps) {
+  const [authMode, setAuthMode] = useState<AuthMode | null>(null);
+  const [authMessage, setAuthMessage] = useState<string | null>(null);
+
+  const handleOpenAuth = (mode: AuthMode) => {
+    setAuthMode(mode);
+    setAuthMessage(null);
+  };
+
+  const handleCloseAuth = () => {
+    setAuthMode(null);
+    setAuthMessage(null);
+  };
+
+  const handleAuthSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!authMode) {
+      return;
+    }
+
+    const formData = new FormData(event.currentTarget);
+    const username = String(formData.get("username") ?? "");
+    const password = String(formData.get("password") ?? "");
+    const result =
+      authMode === "signup"
+        ? onSignUp(username, password)
+        : authMode === "member-login"
+          ? onMemberLogin(username, password)
+          : onAdminLogin(username, password);
+
+    setAuthMessage(result.message);
+
+    if (result.ok) {
+      window.setTimeout(handleCloseAuth, 420);
+    }
+  };
+
+  const handleAdminClick = () => {
+    if (canManage) {
+      onOpenAdmin();
+      return;
+    }
+
+    handleOpenAuth("admin-login");
+  };
+
   return (
     <>
       <div className="flex min-w-0 flex-1 items-center gap-3">
@@ -118,10 +188,17 @@ export function AppHeader({
             type="search"
           value={searchTerm}
           onChange={(event) => onSearchChange(event.target.value)}
+            disabled={!canSearch}
             aria-label="Search ukulele chords"
-            className="h-12 w-full rounded-full border-2 border-rose-100 bg-white/90 pl-12 pr-5 text-base font-semibold text-stone-700 shadow-neumorphic-inset outline-none transition placeholder:text-stone-300 focus:border-rose-200 focus:ring-4 focus:ring-rose-100"
-            placeholder="코드 검색"
+            className="h-12 w-full rounded-full border-2 border-rose-100 bg-white/90 pl-12 pr-5 text-base font-semibold text-stone-700 shadow-neumorphic-inset outline-none transition placeholder:text-stone-300 focus:border-rose-200 focus:ring-4 focus:ring-rose-100 disabled:cursor-not-allowed disabled:bg-stone-50 disabled:text-stone-300"
+            placeholder={canSearch ? "코드 검색" : "로그인 후 검색"}
         />
+          {!canSearch ? (
+            <span className="search-lock-hint">
+              <Lock size={13} aria-hidden="true" />
+              로그인 필요
+            </span>
+          ) : null}
       </label>
       </div>
 
@@ -129,13 +206,58 @@ export function AppHeader({
         <HeaderMascot />
       </div>
 
-      <div className="flex shrink-0 items-center gap-3">
+      <div className="header-right-actions">
+        <div className="auth-actions">
+          {currentUser ? (
+            <>
+              <span className={["auth-badge", currentUser.role === "admin" ? "is-admin" : ""].join(" ")}>
+                {currentUser.role === "admin" ? (
+                  <ShieldCheck size={15} aria-hidden="true" />
+                ) : (
+                  <LogIn size={15} aria-hidden="true" />
+                )}
+                {currentUser.role === "admin" ? "관리자" : "회원"} {currentUser.username}
+              </span>
+              <button type="button" className="auth-chip-button" onClick={onLogout}>
+                <LogOut size={14} aria-hidden="true" />
+                로그아웃
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                className="auth-chip-button"
+                onClick={() => handleOpenAuth("signup")}
+              >
+                <UserPlus size={14} aria-hidden="true" />
+                회원가입
+              </button>
+              <button
+                type="button"
+                className="auth-chip-button"
+                onClick={() => handleOpenAuth("member-login")}
+              >
+                <LogIn size={14} aria-hidden="true" />
+                회원 로그인
+              </button>
+              <button
+                type="button"
+                className="auth-chip-button is-admin"
+                onClick={() => handleOpenAuth("admin-login")}
+              >
+                <ShieldCheck size={14} aria-hidden="true" />
+                관리자 로그인
+              </button>
+            </>
+          )}
+        </div>
         <div className="admin-access">
           <button
             type="button"
-            aria-label="관리자 페이지 열기"
-            onClick={onOpenAdmin}
-            className="admin-header-button"
+            aria-label={canManage ? "관리자 페이지 열기" : "관리자 로그인 열기"}
+            onClick={handleAdminClick}
+            className={["admin-header-button", canManage ? "" : "is-locked"].join(" ")}
           >
             관리자 페이지
           </button>
@@ -148,6 +270,52 @@ export function AppHeader({
         Lesson Designer
         </button>
       </div>
+
+      {authMode ? (
+        <div className="auth-modal-backdrop" role="presentation" onMouseDown={handleCloseAuth}>
+          <form
+            className="auth-modal"
+            onSubmit={handleAuthSubmit}
+            onMouseDown={(event) => event.stopPropagation()}
+          >
+            <div className="auth-modal-header">
+              <h2>{AUTH_LABELS[authMode]}</h2>
+              <button type="button" onClick={handleCloseAuth} aria-label="로그인 창 닫기">
+                닫기
+              </button>
+            </div>
+            <label>
+              아이디
+              <input
+                name="username"
+                autoComplete="username"
+                placeholder={authMode === "admin-login" ? "admin" : "회원 아이디"}
+                defaultValue={authMode === "admin-login" ? "admin" : ""}
+                required
+              />
+            </label>
+            <label>
+              비밀번호
+              <input
+                name="password"
+                type="password"
+                autoComplete={authMode === "signup" ? "new-password" : "current-password"}
+                placeholder={authMode === "admin-login" ? "admin1234" : "비밀번호"}
+                required
+              />
+            </label>
+            {authMode === "admin-login" ? (
+              <p className="auth-modal-note">기본 관리자 계정: admin / admin1234</p>
+            ) : (
+              <p className="auth-modal-note">회원 로그인 후 검색 기능을 사용할 수 있습니다.</p>
+            )}
+            {authMessage ? <p className="auth-modal-message">{authMessage}</p> : null}
+            <button type="submit" className="auth-submit-button">
+              {AUTH_LABELS[authMode]}
+            </button>
+          </form>
+        </div>
+      ) : null}
     </>
   );
 }

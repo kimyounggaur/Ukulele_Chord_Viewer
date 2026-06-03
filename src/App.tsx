@@ -7,6 +7,7 @@ import { ChordDetail } from "./components/ChordDetail";
 import { ChordGrid } from "./components/ChordGrid";
 import { QualitySelector } from "./components/QualitySelector";
 import { AdminPage } from "./components/AdminPage";
+import { useAuth } from "./hooks/useAuth";
 import { useIndexedChordImages } from "./hooks/useIndexedChordImages";
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
   const [selectedQualityId, setSelectedQualityId] = useState<ChordQualityId | null>(null);
   const [selectedChordId, setSelectedChordId] = useState<string | null>(null);
   const [adminPageOpen, setAdminPageOpen] = useState(false);
+  const auth = useAuth();
   const uploadedImages = useIndexedChordImages();
 
   const selectedChord = useMemo(
@@ -37,13 +39,17 @@ function App() {
   }, []);
 
   const handleSearchChange = useCallback((value: string) => {
+    if (!auth.canSearch) {
+      return;
+    }
+
     setSearchTerm(value);
     if (value.trim()) {
       setSelectedChordId(null);
       setSelectedQualityId(null);
       setAdminPageOpen(false);
     }
-  }, []);
+  }, [auth.canSearch]);
 
   const handleSelectQuality = useCallback((qualityId: ChordQualityId) => {
     setSelectedQualityId(qualityId);
@@ -65,11 +71,15 @@ function App() {
   }, []);
 
   const handleOpenAdminPage = useCallback(() => {
+    if (!auth.isAdmin) {
+      return;
+    }
+
     setSelectedChordId(null);
     setSelectedQualityId(null);
     setSearchTerm("");
     setAdminPageOpen(true);
-  }, []);
+  }, [auth.isAdmin]);
 
   const shouldShowGrid = Boolean(searchTerm.trim()) || selectedQualityId !== null;
 
@@ -81,10 +91,17 @@ function App() {
           onSearchChange={handleSearchChange}
           onHome={handleHome}
           onOpenAdmin={handleOpenAdminPage}
+          canSearch={auth.canSearch}
+          canManage={auth.isAdmin}
+          currentUser={auth.currentUser}
+          onSignUp={auth.signUp}
+          onMemberLogin={auth.loginMember}
+          onAdminLogin={auth.loginAdmin}
+          onLogout={auth.logout}
         />
       }
     >
-      {adminPageOpen ? (
+      {adminPageOpen && auth.isAdmin ? (
         <AdminPage
           chords={staticChords}
           getUploadedImageUrl={uploadedImages.getImageUrl}
@@ -101,7 +118,7 @@ function App() {
           getUploadedImageUrl={uploadedImages.getImageUrl}
           onUploadImage={uploadedImages.uploadImage}
           onDeleteImage={uploadedImages.deleteImage}
-          adminMode={false}
+          adminMode={auth.isAdmin}
         />
       ) : shouldShowGrid ? (
         <ChordGrid
