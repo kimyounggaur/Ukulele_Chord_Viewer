@@ -12,6 +12,7 @@ function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedQualityId, setSelectedQualityId] = useState<ChordQualityId | null>(null);
   const [selectedChordId, setSelectedChordId] = useState<string | null>(null);
+  const [adminMode, setAdminMode] = useState(false);
   const uploadedImages = useIndexedChordImages();
 
   const selectedChord = useMemo(
@@ -53,6 +54,12 @@ function App() {
     setSelectedChordId(null);
   }, []);
 
+  const handleBackFromGrid = useCallback(() => {
+    setSelectedChordId(null);
+    setSelectedQualityId(null);
+    setSearchTerm("");
+  }, []);
+
   const shouldShowGrid = Boolean(searchTerm.trim()) || selectedQualityId !== null;
 
   return (
@@ -62,6 +69,8 @@ function App() {
           searchTerm={searchTerm}
           onSearchChange={handleSearchChange}
           onHome={handleHome}
+          adminMode={adminMode}
+          onToggleAdmin={() => setAdminMode((current) => !current)}
         />
       }
     >
@@ -74,6 +83,7 @@ function App() {
           getUploadedImageUrl={uploadedImages.getImageUrl}
           onUploadImage={uploadedImages.uploadImage}
           onDeleteImage={uploadedImages.deleteImage}
+          adminMode={adminMode}
         />
       ) : shouldShowGrid ? (
         <ChordGrid
@@ -82,6 +92,7 @@ function App() {
           searchTerm={searchTerm}
           onSelectChord={handleSelectChord}
           getUploadedImageUrl={uploadedImages.getImageUrl}
+          onBack={handleBackFromGrid}
         />
       ) : (
         <QualitySelector

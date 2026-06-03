@@ -3,6 +3,7 @@ import { qualityById } from "../data/chordQualities";
 import { useChordSearch } from "../hooks/useChordSearch";
 import { ChordCard } from "./ChordCard";
 import { EmptyState } from "./EmptyState";
+import { ArrowLeft } from "lucide-react";
 
 interface ChordGridProps {
   chords: readonly ChordShape[];
@@ -10,6 +11,7 @@ interface ChordGridProps {
   searchTerm: string;
   onSelectChord: (chordId: string) => void;
   getUploadedImageUrl: (chordId: string) => string | undefined;
+  onBack: () => void;
 }
 
 export function ChordGrid({
@@ -18,30 +20,40 @@ export function ChordGrid({
   searchTerm,
   onSelectChord,
   getUploadedImageUrl,
+  onBack,
 }: ChordGridProps) {
   const filteredChords = useChordSearch(chords, searchTerm, selectedQualityId);
   const title = selectedQualityId ? qualityById[selectedQualityId].label : "All Chords";
 
   return (
-    <section className="screen-panel flex flex-1 flex-col gap-3 overflow-hidden">
-      <div className="flex flex-wrap items-end justify-between gap-2 px-1">
-        <h1 className="font-display text-[clamp(24px,4vh,44px)] font-semibold text-zinc-800">
+    <section className="screen-panel px-[clamp(24px,5vw,84px)] pb-[clamp(28px,5vh,72px)]">
+      <div className="mx-auto flex w-full max-w-[1140px] flex-wrap items-center gap-3 py-3">
+        <button
+          type="button"
+          onClick={onBack}
+          className="inline-flex h-11 shrink-0 items-center gap-2 rounded-full border border-rose-100 bg-white px-4 font-bold text-stone-500 shadow-neumorphic transition hover:scale-105 focus:outline-none focus-visible:ring-4 focus-visible:ring-rose-100"
+        >
+          <ArrowLeft size={18} aria-hidden="true" />
+          뒤로
+        </button>
+        <h1 className="min-w-0 font-display text-3xl font-extrabold text-stone-700 sm:text-4xl">
           {title}
         </h1>
-        <span className="font-display text-[clamp(14px,2vh,18px)] font-semibold text-pink-300">
-          {filteredChords.length}
+        <span className="font-display text-lg font-extrabold text-rose-300">
+          {filteredChords.length} chords
         </span>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto pr-1 thin-scrollbar">
+      <div className="mx-auto w-full max-w-[1140px]">
         {filteredChords.length > 0 ? (
-          <div className="grid min-h-full grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-4 pb-1">
-            {filteredChords.map((chord) => (
+          <div className="grid grid-cols-1 gap-[clamp(18px,2.3vw,28px)] sm:grid-cols-4">
+            {filteredChords.map((chord, index) => (
               <ChordCard
                 key={chord.id}
                 chord={chord}
                 uploadedImageUrl={getUploadedImageUrl(chord.id)}
                 onSelect={() => onSelectChord(chord.id)}
+                featured={index === 0 && filteredChords.length > 2}
               />
             ))}
           </div>

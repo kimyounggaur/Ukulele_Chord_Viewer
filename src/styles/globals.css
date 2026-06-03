@@ -23,9 +23,9 @@ html,
 body,
 #root {
   width: 100%;
-  height: 100%;
+  min-height: 100%;
   margin: 0;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 button,
@@ -38,30 +38,23 @@ button {
 }
 
 #app-root {
-  width: 100dvw;
-  height: 100dvh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  width: 100%;
+  min-height: 100dvh;
+  overflow-x: hidden;
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(252, 253, 255, 0.94)),
     #fbfbfb;
-  padding:
-    max(14px, env(safe-area-inset-top))
-    max(18px, env(safe-area-inset-right))
-    max(16px, env(safe-area-inset-bottom))
-    max(18px, env(safe-area-inset-left));
+  color: #2f2b31;
 }
 
 #app-header {
-  flex: 0 0 auto;
+  position: relative;
+  z-index: 20;
 }
 
 #app-main {
-  flex: 1 1 auto;
-  min-height: 0;
-  display: flex;
   width: 100%;
+  min-height: calc(100dvh - clamp(76px, 9vh, 112px));
 }
 
 .stage-16x9 {
@@ -74,7 +67,7 @@ button {
 
 .screen-panel {
   width: 100%;
-  min-height: 0;
+  min-height: calc(100dvh - clamp(76px, 9vh, 112px));
   animation: screen-enter 220ms ease-out both;
 }
 
@@ -91,14 +84,19 @@ button {
 
 .quality-selector-grid {
   display: grid;
-  grid-template-columns: repeat(6, clamp(96px, 12vh, 140px));
-  gap: clamp(18px, 2.6vh, 32px) clamp(22px, 3.8vw, 58px);
-  align-items: center;
-  justify-content: center;
+  width: 100%;
+  max-width: 1500px;
+  min-height: calc(100dvh - clamp(76px, 9vh, 112px));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(22px, 5vh, 72px) clamp(16px, 3vw, 56px);
+  align-content: center;
+  justify-items: center;
+  padding: clamp(24px, 5vh, 72px) clamp(24px, 5vw, 84px);
+  margin: 0 auto;
 }
 
 .quality-bubble-size {
-  width: clamp(96px, 12vh, 140px);
+  width: 86px;
   aspect-ratio: 1 / 1;
 }
 
@@ -125,11 +123,11 @@ button {
 
 .detail-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(240px, 320px);
-  gap: clamp(12px, 1.7vw, 22px);
-  height: 100%;
-  min-height: 0;
+  grid-template-columns: minmax(0, 1fr) minmax(210px, 240px);
+  gap: clamp(18px, 2.4vw, 36px);
   width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
 }
 
 .detail-image-frame {
@@ -164,16 +162,103 @@ button {
   border-radius: 999px;
 }
 
-@media (max-width: 920px) {
-  #app-root {
-    padding: 10px;
+.admin-header-button {
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid #ffe1ec;
+  background: #ffffff;
+  padding: 0 16px;
+  color: #ee7fab;
+  font-weight: 800;
+  box-shadow:
+    7px 7px 14px rgba(31, 41, 55, 0.08),
+    -7px -7px 14px rgba(255, 255, 255, 0.96);
+  transition: transform 180ms ease, color 180ms ease;
+}
+
+.admin-header-button:hover {
+  transform: scale(1.04);
+  color: #df5c94;
+}
+
+.admin-header-button.is-active {
+  background: #fff1f7;
+  color: #d94683;
+}
+
+.header-mascot-stage {
+  display: none;
+  flex: 1 1 300px;
+  min-width: 220px;
+  height: 58px;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-mascot {
+  width: 142px;
+  height: 70px;
+  overflow: visible;
+}
+
+.mascot-shadow {
+  opacity: 0.16;
+}
+
+.mascot-body {
+  filter: drop-shadow(5px 8px 8px rgba(170, 118, 142, 0.16));
+}
+
+.chord-card,
+.related-chord-card {
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow:
+    9px 9px 18px rgba(31, 41, 55, 0.1),
+    -9px -9px 18px rgba(255, 255, 255, 0.96);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.chord-card:hover,
+.related-chord-card:hover {
+  transform: translateY(-2px) scale(1.015);
+  box-shadow:
+    12px 12px 24px rgba(31, 41, 55, 0.12),
+    -10px -10px 20px rgba(255, 255, 255, 0.96);
+}
+
+@media (min-width: 640px) {
+  .quality-selector-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
+  .quality-bubble-size {
+    width: 112px;
+  }
+}
+
+@media (min-width: 768px) {
+  .quality-selector-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .header-mascot-stage {
+    display: flex;
+  }
+}
+
+@media (min-width: 1024px) {
+  .quality-bubble-size {
+    width: 128px;
+  }
+}
+
+@media (max-width: 920px) {
   .quality-selector-grid {
     grid-template-columns: repeat(auto-fit, minmax(86px, 1fr));
-    gap: 14px;
-    width: 100%;
-    max-width: 620px;
+    gap: 18px;
+    padding: 24px;
   }
 
   .quality-bubble-size {
@@ -182,7 +267,6 @@ button {
 
   .detail-grid {
     grid-template-columns: 1fr;
-    grid-template-rows: minmax(0, 1fr) auto;
   }
 }
 

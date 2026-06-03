@@ -9,7 +9,7 @@ interface QualitySelectorProps {
 
 export function QualitySelector({ selectedQualityId, onSelectQuality }: QualitySelectorProps) {
   return (
-    <section className="screen-panel flex flex-1 items-center justify-center overflow-hidden px-2 py-4">
+    <section className="screen-panel">
       <div className="quality-selector-grid">
         {MAIN_QUALITY_IDS.map((qualityId) => {
           const quality = qualityById[qualityId];
