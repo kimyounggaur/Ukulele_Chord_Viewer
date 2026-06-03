@@ -6,13 +6,14 @@ import { AppShell } from "./components/AppShell";
 import { ChordDetail } from "./components/ChordDetail";
 import { ChordGrid } from "./components/ChordGrid";
 import { QualitySelector } from "./components/QualitySelector";
+import { AdminPage } from "./components/AdminPage";
 import { useIndexedChordImages } from "./hooks/useIndexedChordImages";
 
 function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedQualityId, setSelectedQualityId] = useState<ChordQualityId | null>(null);
   const [selectedChordId, setSelectedChordId] = useState<string | null>(null);
-  const [adminMode, setAdminMode] = useState(false);
+  const [adminPageOpen, setAdminPageOpen] = useState(false);
   const uploadedImages = useIndexedChordImages();
 
   const selectedChord = useMemo(
@@ -32,6 +33,7 @@ function App() {
     setSearchTerm("");
     setSelectedQualityId(null);
     setSelectedChordId(null);
+    setAdminPageOpen(false);
   }, []);
 
   const handleSearchChange = useCallback((value: string) => {
@@ -60,6 +62,13 @@ function App() {
     setSearchTerm("");
   }, []);
 
+  const handleOpenAdminPage = useCallback(() => {
+    setSelectedChordId(null);
+    setSelectedQualityId(null);
+    setSearchTerm("");
+    setAdminPageOpen(true);
+  }, []);
+
   const shouldShowGrid = Boolean(searchTerm.trim()) || selectedQualityId !== null;
 
   return (
@@ -69,12 +78,19 @@ function App() {
           searchTerm={searchTerm}
           onSearchChange={handleSearchChange}
           onHome={handleHome}
-          adminMode={adminMode}
-          onToggleAdmin={() => setAdminMode((current) => !current)}
+          onOpenAdmin={handleOpenAdminPage}
         />
       }
     >
-      {selectedChord ? (
+      {adminPageOpen ? (
+        <AdminPage
+          chords={staticChords}
+          getUploadedImageUrl={uploadedImages.getImageUrl}
+          onUploadImage={uploadedImages.uploadImage}
+          onDeleteImage={uploadedImages.deleteImage}
+          onBack={handleHome}
+        />
+      ) : selectedChord ? (
         <ChordDetail
           chord={selectedChord}
           relatedChords={relatedChords}
@@ -83,7 +99,7 @@ function App() {
           getUploadedImageUrl={uploadedImages.getImageUrl}
           onUploadImage={uploadedImages.uploadImage}
           onDeleteImage={uploadedImages.deleteImage}
-          adminMode={adminMode}
+          adminMode={false}
         />
       ) : shouldShowGrid ? (
         <ChordGrid

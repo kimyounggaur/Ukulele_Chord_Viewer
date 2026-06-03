@@ -4,8 +4,7 @@ interface AppHeaderProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
   onHome: () => void;
-  adminMode: boolean;
-  onToggleAdmin: () => void;
+  onOpenAdmin: () => void;
 }
 
 function HeaderMascot() {
@@ -53,8 +52,7 @@ export function AppHeader({
   searchTerm,
   onSearchChange,
   onHome,
-  adminMode,
-  onToggleAdmin,
+  onOpenAdmin,
 }: AppHeaderProps) {
   return (
     <>
@@ -93,11 +91,11 @@ export function AppHeader({
         <div className="admin-access">
           <button
             type="button"
-            aria-label="관리자 로그인"
-            onClick={onToggleAdmin}
-            className={`admin-header-button${adminMode ? " is-active" : ""}`}
+            aria-label="관리자 페이지 열기"
+            onClick={onOpenAdmin}
+            className="admin-header-button"
           >
-            {adminMode ? "관리자 모드" : "관리자 로그인"}
+            관리자 페이지
           </button>
         </div>
         <button
