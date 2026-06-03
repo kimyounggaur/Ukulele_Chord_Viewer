@@ -40,6 +40,8 @@ function App() {
     setSearchTerm(value);
     if (value.trim()) {
       setSelectedChordId(null);
+      setSelectedQualityId(null);
+      setAdminPageOpen(false);
     }
   }, []);
 
