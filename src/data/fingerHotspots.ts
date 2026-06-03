@@ -1,0 +1,483 @@
+import type { FingerNumber } from "./chordTypes";
+
+export interface FingerHotspot {
+  finger: FingerNumber;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export const FINGER_NAMES: Record<FingerNumber, string> = {
+  1: "검지",
+  2: "중지",
+  3: "약지",
+  4: "소지",
+};
+
+export const fingerHotspotsByChordId: Record<string, FingerHotspot[]> = {
+  "add9-a": [
+    { finger: 1, x: 18.41, y: 69.04, width: 14.78, height: 19.8 },
+    { finger: 2, x: 35.25, y: 89.48, width: 14.78, height: 19.8 },
+    { finger: 3, x: 47.48, y: 24.73, width: 14.78, height: 19.8 },
+  ],
+  "add9-b": [
+    { finger: 1, x: 42.86, y: 49.08, width: 14.78, height: 20.85 },
+    { finger: 2, x: 65.14, y: 71.89, width: 14.78, height: 20.85 },
+    { finger: 3, x: 85.76, y: 88.97, width: 14.78, height: 20.85 },
+    { finger: 4, x: 91.73, y: 25.88, width: 14.78, height: 20.85 },
+  ],
+  "add9-c": [
+    { finger: 1, x: 43.96, y: 76.22, width: 14.78, height: 22.13 },
+    { finger: 2, x: 64.2, y: 27.52, width: 14.78, height: 22.13 },
+  ],
+  "add9-d": [
+    { finger: 1, x: 34.95, y: 88.99, width: 14.78, height: 20.67 },
+    { finger: 2, x: 45.8, y: 67.94, width: 14.78, height: 20.67 },
+  ],
+  "add9-e": [
+    { finger: 1, x: 40.81, y: 22.01, width: 14.78, height: 20.93 },
+    { finger: 2, x: 40.81, y: 46.37, width: 14.78, height: 20.93 },
+    { finger: 3, x: 85.24, y: 88.86, width: 14.78, height: 20.93 },
+    { finger: 4, x: 92.97, y: 67.44, width: 14.78, height: 20.93 },
+  ],
+  "add9-f": [
+    { finger: 1, x: 18.73, y: 50.27, width: 14.78, height: 23.01 },
+  ],
+  "add9-g": [
+    { finger: 1, x: 44.31, y: 76.44, width: 14.78, height: 22.57 },
+    { finger: 2, x: 68.0, y: 49.85, width: 14.97, height: 22.57 },
+  ],
+  "major-a": [
+    { finger: 1, x: 18.22, y: 35.92, width: 13.94, height: 78.84 },
+    { finger: 2, x: 42.7, y: 51.46, width: 19.61, height: 90.42 },
+    { finger: 3, x: 52.94, y: 20.6, width: 14.05, height: 28.24 },
+    { finger: 4, x: 64.91, y: 18.05, width: 14.05, height: 28.08 },
+  ],
+  "major-b": [
+    { finger: 1, x: 46.09, y: 27.27, width: 13.6, height: 51.36 },
+    { finger: 2, x: 63.47, y: 38.07, width: 23.12, height: 74.39 },
+    { finger: 3, x: 83.44, y: 50.72, width: 30.26, height: 92.74 },
+    { finger: 4, x: 89.41, y: 14.33, width: 14.17, height: 28.66 },
+  ],
+  "major-c": [
+    { finger: 1, x: 42.12, y: 21.39, width: 13.37, height: 26.42 },
+    { finger: 2, x: 53.73, y: 21.4, width: 13.94, height: 26.42 },
+    { finger: 3, x: 66.38, y: 19.24, width: 17.23, height: 44.58 },
+    { finger: 4, x: 79.37, y: 21.39, width: 13.83, height: 26.42 },
+  ],
+  "major-d": [
+    { finger: 1, x: 20.72, y: 52.2, width: 30.37, height: 89.54 },
+    { finger: 2, x: 31.24, y: 36.21, width: 27.31, height: 79.68 },
+    { finger: 3, x: 43.16, y: 26.9, width: 20.85, height: 56.29 },
+  ],
+  "major-e": [
+    { finger: 1, x: 44.3, y: 13.69, width: 14.28, height: 31.73 },
+    { finger: 2, x: 66.53, y: 52.87, width: 30.37, height: 88.13 },
+    { finger: 3, x: 77.19, y: 37.2, width: 27.43, height: 78.43 },
+    { finger: 4, x: 89.11, y: 28.05, width: 20.85, height: 55.41 },
+  ],
+  "major-f": [
+    { finger: 1, x: 18.28, y: 24.96, width: 13.94, height: 55.85 },
+    { finger: 2, x: 42.65, y: 52.57, width: 19.49, height: 88.59 },
+    { finger: 3, x: 52.89, y: 22.37, width: 14.17, height: 27.62 },
+    { finger: 4, x: 64.86, y: 19.88, width: 14.05, height: 27.62 },
+  ],
+  "major-g": [
+    { finger: 1, x: 48.21, y: 46.57, width: 20.97, height: 70.09 },
+    { finger: 2, x: 55.3, y: 14.42, width: 13.83, height: 33.36 },
+    { finger: 3, x: 82.68, y: 27.54, width: 17.57, height: 52.22 },
+    { finger: 4, x: 92.97, y: 16.74, width: 13.6, height: 32.36 },
+  ],
+  "major7-a": [
+    { finger: 1, x: 7.8, y: 51.43, width: 15.75, height: 91.15 },
+    { finger: 2, x: 20.64, y: 35.89, width: 15.53, height: 78.81 },
+    { finger: 3, x: 32.8, y: 14.48, width: 12.24, height: 28.35 },
+    { finger: 4, x: 45.07, y: 14.49, width: 12.35, height: 28.35 },
+  ],
+  "major7-b": [
+    { finger: 1, x: 38.69, y: 30.02, width: 16.66, height: 47.67 },
+    { finger: 2, x: 55.99, y: 51.67, width: 23.91, height: 90.37 },
+    { finger: 3, x: 67.1, y: 35.19, width: 21.76, height: 78.22 },
+    { finger: 4, x: 78.29, y: 14.2, width: 12.35, height: 28.47 },
+  ],
+  "major7-c": [
+    { finger: 1, x: 28.07, y: 26.22, width: 13.94, height: 27.75 },
+    { finger: 2, x: 41.05, y: 18.96, width: 22.44, height: 43.34 },
+    { finger: 3, x: 59.09, y: 23.87, width: 12.47, height: 27.91 },
+    { finger: 4, x: 71.76, y: 26.22, width: 12.47, height: 27.75 },
+  ],
+  "major7-d": [
+    { finger: 1, x: 22.45, y: 51.39, width: 13.26, height: 77.07 },
+    { finger: 2, x: 53.38, y: 15.94, width: 14.96, height: 24.47 },
+    { finger: 3, x: 79.74, y: 17.01, width: 21.19, height: 37.27 },
+    { finger: 4, x: 92.45, y: 15.23, width: 14.85, height: 24.47 },
+  ],
+  "major7-e": [
+    { finger: 1, x: 20.2, y: 53.16, width: 15.75, height: 87.71 },
+    { finger: 2, x: 46.0, y: 15.32, width: 14.39, height: 33.41 },
+    { finger: 3, x: 64.51, y: 38.41, width: 21.31, height: 74.75 },
+    { finger: 4, x: 76.0, y: 13.55, width: 12.47, height: 27.15 },
+  ],
+  "major7-f": [
+    { finger: 1, x: 16.47, y: 19.23, width: 13.76, height: 24.07 },
+    { finger: 2, x: 34.64, y: 47.4, width: 24.42, height: 78.14 },
+    { finger: 3, x: 41.82, y: 15.66, width: 13.93, height: 23.86 },
+    { finger: 4, x: 53.89, y: 13.25, width: 13.93, height: 23.86 },
+  ],
+  "major7-g": [
+    { finger: 1, x: 45.25, y: 40.44, width: 14.85, height: 87.23 },
+    { finger: 2, x: 58.02, y: 19.19, width: 12.24, height: 31.24 },
+    { finger: 3, x: 70.16, y: 19.17, width: 12.24, height: 31.24 },
+    { finger: 4, x: 82.2, y: 19.19, width: 12.35, height: 31.24 },
+  ],
+  "minor-a": [
+    { finger: 1, x: 23.38, y: 15.05, width: 14.05, height: 26.91 },
+    { finger: 2, x: 41.12, y: 53.9, width: 22.33, height: 87.07 },
+    { finger: 3, x: 49.26, y: 14.04, width: 14.05, height: 26.91 },
+    { finger: 4, x: 61.71, y: 13.41, width: 14.05, height: 26.91 },
+  ],
+  "minor-b": [
+    { finger: 1, x: 23.39, y: 34.14, width: 13.6, height: 73.59 },
+    { finger: 2, x: 53.25, y: 18.5, width: 13.94, height: 28.67 },
+    { finger: 3, x: 79.02, y: 47.02, width: 27.31, height: 86.49 },
+    { finger: 4, x: 85.97, y: 17.28, width: 14.73, height: 28.51 },
+  ],
+  "minor-c": [
+    { finger: 1, x: 23.64, y: 37.3, width: 13.6, height: 75.56 },
+    { finger: 2, x: 36.69, y: 17.28, width: 13.71, height: 32.0 },
+    { finger: 3, x: 48.65, y: 15.85, width: 14.73, height: 31.82 },
+    { finger: 4, x: 60.92, y: 15.85, width: 14.73, height: 31.82 },
+  ],
+  "minor-d": [
+    { finger: 1, x: 21.64, y: 26.33, width: 16.55, height: 47.67 },
+    { finger: 2, x: 39.46, y: 50.75, width: 25.95, height: 91.43 },
+    { finger: 3, x: 49.97, y: 34.96, width: 22.78, height: 75.66 },
+    { finger: 4, x: 63.18, y: 14.8, width: 13.83, height: 29.24 },
+  ],
+  "minor-e": [
+    { finger: 1, x: 22.3, y: 13.48, width: 14.73, height: 27.88 },
+    { finger: 2, x: 51.73, y: 24.02, width: 18.59, height: 43.86 },
+    { finger: 3, x: 80.13, y: 33.18, width: 24.03, height: 70.18 },
+    { finger: 4, x: 89.75, y: 14.03, width: 14.39, height: 28.04 },
+  ],
+  "minor-f": [
+    { finger: 1, x: 14.27, y: 48.82, width: 12.81, height: 95.39 },
+    { finger: 2, x: 27.06, y: 24.67, width: 12.81, height: 50.91 },
+    { finger: 3, x: 70.5, y: 17.57, width: 11.33, height: 29.47 },
+    { finger: 4, x: 84.79, y: 13.25, width: 15.53, height: 29.65 },
+  ],
+  "minor-g": [
+    { finger: 1, x: 26.65, y: 14.76, width: 13.26, height: 33.78 },
+    { finger: 2, x: 51.42, y: 38.18, width: 22.78, height: 84.54 },
+    { finger: 3, x: 79.73, y: 28.08, width: 25.27, height: 54.52 },
+    { finger: 4, x: 92.77, y: 17.28, width: 13.94, height: 32.59 },
+  ],
+  "minor6-a": [
+    { finger: 1, x: 23.69, y: 49.42, width: 13.71, height: 95.14 },
+    { finger: 2, x: 53.09, y: 12.52, width: 15.64, height: 29.56 },
+    { finger: 3, x: 77.53, y: 36.73, width: 28.9, height: 74.07 },
+    { finger: 4, x: 85.56, y: 15.65, width: 15.75, height: 30.07 },
+  ],
+  "minor6-b": [
+    { finger: 1, x: 27.69, y: 49.18, width: 12.92, height: 94.86 },
+    { finger: 2, x: 39.38, y: 39.23, width: 17.45, height: 73.05 },
+    { finger: 3, x: 48.84, y: 25.18, width: 16.66, height: 50.0 },
+    { finger: 4, x: 58.58, y: 12.51, width: 13.49, height: 29.26 },
+  ],
+  "minor6-c": [
+    { finger: 1, x: 57.59, y: 49.18, width: 12.92, height: 94.86 },
+    { finger: 2, x: 69.28, y: 39.23, width: 17.45, height: 73.05 },
+    { finger: 3, x: 78.74, y: 25.18, width: 16.55, height: 50.0 },
+    { finger: 4, x: 88.48, y: 12.51, width: 13.49, height: 29.26 },
+  ],
+  "minor6-d": [
+    { finger: 1, x: 21.62, y: 26.33, width: 16.55, height: 47.68 },
+    { finger: 2, x: 39.44, y: 50.77, width: 26.07, height: 91.46 },
+    { finger: 3, x: 49.96, y: 34.97, width: 22.89, height: 75.86 },
+    { finger: 4, x: 57.36, y: 11.6, width: 13.15, height: 29.24 },
+  ],
+  "minor6-e": [
+    { finger: 1, x: 22.0, y: 46.63, width: 21.31, height: 70.24 },
+    { finger: 2, x: 54.57, y: 14.43, width: 14.05, height: 33.46 },
+    { finger: 3, x: 69.59, y: 16.76, width: 13.94, height: 32.28 },
+    { finger: 4, x: 81.8, y: 16.77, width: 13.94, height: 32.28 },
+  ],
+  "minor6-f": [
+    { finger: 1, x: 17.41, y: 52.91, width: 14.05, height: 88.93 },
+    { finger: 2, x: 41.11, y: 37.52, width: 21.31, height: 75.94 },
+    { finger: 3, x: 53.19, y: 16.28, width: 14.39, height: 33.87 },
+    { finger: 4, x: 67.07, y: 18.37, width: 16.09, height: 27.07 },
+  ],
+  "minor6-g": [
+    { finger: 1, x: 26.05, y: 14.45, width: 13.94, height: 33.25 },
+    { finger: 2, x: 52.37, y: 40.47, width: 21.31, height: 79.02 },
+    { finger: 3, x: 60.65, y: 16.77, width: 13.94, height: 32.27 },
+    { finger: 4, x: 72.41, y: 16.78, width: 13.83, height: 32.27 },
+  ],
+  "minor7-a": [
+    { finger: 1, x: 29.5, y: 13.14, width: 10.31, height: 26.08 },
+    { finger: 2, x: 39.81, y: 13.14, width: 10.31, height: 26.08 },
+    { finger: 3, x: 50.18, y: 13.13, width: 10.31, height: 26.08 },
+    { finger: 4, x: 60.54, y: 13.13, width: 10.31, height: 26.08 },
+  ],
+  "minor7-b": [
+    { finger: 1, x: 23.33, y: 43.69, width: 13.6, height: 89.3 },
+    { finger: 2, x: 36.83, y: 15.38, width: 13.94, height: 28.65 },
+    { finger: 3, x: 49.61, y: 14.15, width: 14.73, height: 28.49 },
+    { finger: 4, x: 61.9, y: 14.16, width: 14.73, height: 28.49 },
+  ],
+  "minor7-c": [
+    { finger: 1, x: 23.8, y: 48.45, width: 13.71, height: 99.08 },
+    { finger: 2, x: 40.97, y: 17.06, width: 13.94, height: 31.79 },
+    { finger: 3, x: 53.74, y: 15.71, width: 14.73, height: 31.61 },
+    { finger: 4, x: 66.03, y: 15.72, width: 14.73, height: 31.61 },
+  ],
+  "minor7-c-sharp": [
+    { finger: 1, x: 23.8, y: 48.45, width: 13.71, height: 99.08 },
+    { finger: 2, x: 40.97, y: 17.06, width: 13.94, height: 31.79 },
+    { finger: 3, x: 53.74, y: 15.71, width: 14.73, height: 31.61 },
+    { finger: 4, x: 66.03, y: 15.72, width: 14.73, height: 31.61 },
+  ],
+  "minor7-d": [
+    { finger: 1, x: 25.99, y: 26.99, width: 15.19, height: 47.9 },
+    { finger: 2, x: 42.78, y: 48.75, width: 21.31, height: 95.62 },
+    { finger: 3, x: 53.8, y: 35.45, width: 19.49, height: 78.93 },
+    { finger: 4, x: 82.88, y: 14.97, width: 17.68, height: 28.3 },
+  ],
+  "minor7-e": [
+    { finger: 1, x: 32.41, y: 18.16, width: 13.03, height: 32.17 },
+    { finger: 2, x: 47.29, y: 37.93, width: 19.95, height: 84.1 },
+    { finger: 3, x: 56.75, y: 14.2, width: 13.15, height: 33.33 },
+    { finger: 4, x: 71.85, y: 18.16, width: 13.03, height: 32.17 },
+  ],
+  "minor7-f": [
+    { finger: 1, x: 27.19, y: 50.19, width: 12.92, height: 95.85 },
+    { finger: 2, x: 54.27, y: 20.65, width: 14.85, height: 29.56 },
+    { finger: 3, x: 78.55, y: 36.4, width: 27.65, height: 74.53 },
+    { finger: 4, x: 85.62, y: 13.27, width: 15.07, height: 30.28 },
+  ],
+  "minor7-f-sharp": [
+    { finger: 1, x: 23.7, y: 50.18, width: 13.71, height: 95.66 },
+    { finger: 2, x: 52.08, y: 20.66, width: 15.64, height: 29.55 },
+    { finger: 3, x: 77.53, y: 36.39, width: 28.9, height: 74.65 },
+    { finger: 4, x: 84.94, y: 13.27, width: 15.75, height: 30.24 },
+  ],
+  "minor7-flat5-a": [
+    { finger: 1, x: 37.28, y: 52.48, width: 12.58, height: 85.16 },
+    { finger: 2, x: 54.19, y: 35.5, width: 21.66, height: 71.12 },
+    { finger: 3, x: 63.85, y: 24.45, width: 14.67, height: 50.53 },
+    { finger: 4, x: 70.34, y: 12.41, width: 11.18, height: 31.82 },
+  ],
+  "minor7-flat5-b": [
+    { finger: 1, x: 15.65, y: 28.3, width: 19.04, height: 53.31 },
+    { finger: 2, x: 32.96, y: 54.07, width: 22.89, height: 86.41 },
+    { finger: 3, x: 42.77, y: 35.7, width: 21.42, height: 76.62 },
+    { finger: 4, x: 49.0, y: 12.65, width: 13.94, height: 34.19 },
+  ],
+  "minor7-flat5-c": [
+    { finger: 1, x: 38.32, y: 28.85, width: 17.59, height: 50.52 },
+    { finger: 2, x: 55.29, y: 52.78, width: 21.81, height: 81.98 },
+    { finger: 3, x: 65.07, y: 34.78, width: 19.7, height: 73.4 },
+    { finger: 4, x: 71.35, y: 12.99, width: 11.26, height: 31.46 },
+  ],
+  "minor7-flat5-d": [
+    { finger: 1, x: 15.37, y: 48.92, width: 12.58, height: 89.13 },
+    { finger: 2, x: 35.3, y: 35.47, width: 21.66, height: 75.26 },
+    { finger: 3, x: 59.18, y: 14.46, width: 15.37, height: 29.71 },
+    { finger: 4, x: 72.88, y: 15.11, width: 14.67, height: 26.74 },
+  ],
+  "minor7-flat5-e": [
+    { finger: 1, x: 18.91, y: 14.63, width: 13.27, height: 34.35 },
+    { finger: 2, x: 36.35, y: 39.84, width: 19.56, height: 80.14 },
+    { finger: 3, x: 46.2, y: 15.47, width: 12.58, height: 28.1 },
+    { finger: 4, x: 58.43, y: 15.55, width: 12.58, height: 28.1 },
+  ],
+  "minor7-flat5-f": [
+    { finger: 1, x: 15.36, y: 48.93, width: 12.58, height: 90.12 },
+    { finger: 2, x: 32.81, y: 13.71, width: 14.67, height: 28.72 },
+    { finger: 3, x: 54.73, y: 37.89, width: 29.34, height: 72.29 },
+    { finger: 4, x: 62.19, y: 16.43, width: 15.37, height: 26.74 },
+  ],
+  "minor7-flat5-g": [
+    { finger: 1, x: 16.93, y: 42.74, width: 12.66, height: 80.7 },
+    { finger: 2, x: 31.17, y: 15.76, width: 11.26, height: 28.02 },
+    { finger: 3, x: 43.5, y: 15.66, width: 11.26, height: 28.02 },
+    { finger: 4, x: 55.78, y: 15.56, width: 11.96, height: 28.02 },
+  ],
+  "minor7-g": [
+    { finger: 1, x: 25.62, y: 28.76, width: 15.64, height: 56.7 },
+    { finger: 2, x: 53.47, y: 39.81, width: 19.49, height: 88.2 },
+    { finger: 3, x: 63.33, y: 16.79, width: 13.03, height: 33.53 },
+    { finger: 4, x: 75.0, y: 16.79, width: 13.03, height: 33.53 },
+  ],
+  "minor7-g-sharp": [
+    { finger: 1, x: 27.52, y: 49.21, width: 12.81, height: 94.89 },
+    { finger: 2, x: 46.21, y: 25.21, width: 12.92, height: 50.55 },
+    { finger: 3, x: 57.84, y: 12.57, width: 11.67, height: 29.27 },
+    { finger: 4, x: 77.95, y: 36.22, width: 19.27, height: 73.08 },
+  ],
+  "seventh-a": [
+    { finger: 1, x: 16.65, y: 41.49, width: 14.17, height: 91.03 },
+    { finger: 2, x: 30.01, y: 18.28, width: 12.35, height: 32.6 },
+    { finger: 3, x: 42.32, y: 20.7, width: 12.35, height: 32.6 },
+    { finger: 4, x: 54.62, y: 22.4, width: 12.35, height: 32.6 },
+  ],
+  "seventh-b": [
+    { finger: 1, x: 46.1, y: 26.37, width: 13.71, height: 51.41 },
+    { finger: 2, x: 63.61, y: 38.05, width: 23.12, height: 74.46 },
+    { finger: 3, x: 83.67, y: 50.69, width: 30.37, height: 92.83 },
+    { finger: 4, x: 89.65, y: 14.29, width: 14.17, height: 28.69 },
+  ],
+  "seventh-c": [
+    { finger: 1, x: 17.07, y: 17.94, width: 14.28, height: 34.98 },
+    { finger: 2, x: 30.29, y: 15.18, width: 12.35, height: 30.52 },
+    { finger: 3, x: 42.42, y: 15.2, width: 12.35, height: 30.52 },
+    { finger: 4, x: 54.48, y: 15.23, width: 12.47, height: 30.52 },
+  ],
+  "seventh-d": [
+    { finger: 1, x: 10.88, y: 18.29, width: 17.0, height: 32.52 },
+    { finger: 2, x: 32.16, y: 50.99, width: 30.26, height: 91.73 },
+    { finger: 3, x: 41.03, y: 25.16, width: 22.55, height: 56.3 },
+    { finger: 4, x: 53.37, y: 18.26, width: 16.77, height: 32.52 },
+  ],
+  "seventh-e": [
+    { finger: 1, x: 15.86, y: 53.17, width: 15.87, height: 87.58 },
+    { finger: 2, x: 37.0, y: 38.48, width: 24.37, height: 74.0 },
+    { finger: 3, x: 46.75, y: 15.33, width: 15.87, height: 33.41 },
+    { finger: 4, x: 60.18, y: 13.53, width: 12.35, height: 27.16 },
+  ],
+  "seventh-f": [
+    { finger: 1, x: 18.22, y: 27.79, width: 13.83, height: 44.45 },
+    { finger: 2, x: 42.93, y: 49.51, width: 19.61, height: 94.35 },
+    { finger: 3, x: 62.69, y: 39.57, width: 24.93, height: 70.72 },
+    { finger: 4, x: 71.3, y: 14.65, width: 14.05, height: 29.41 },
+  ],
+  "seventh-g": [
+    { finger: 1, x: 25.51, y: 29.15, width: 15.19, height: 50.95 },
+    { finger: 2, x: 46.86, y: 40.29, width: 19.95, height: 83.88 },
+    { finger: 3, x: 56.36, y: 15.18, width: 13.03, height: 33.12 },
+    { finger: 4, x: 68.48, y: 16.45, width: 13.03, height: 33.12 },
+  ],
+  "seventh-sus4-a": [
+    { finger: 1, x: 23.37, y: 16.46, width: 13.94, height: 29.42 },
+    { finger: 2, x: 39.92, y: 49.22, width: 20.17, height: 74.38 },
+    { finger: 3, x: 49.26, y: 15.36, width: 14.05, height: 29.58 },
+    { finger: 4, x: 61.71, y: 14.68, width: 14.05, height: 29.42 },
+  ],
+  "seventh-sus4-b": [
+    { finger: 1, x: 23.25, y: 44.38, width: 13.71, height: 88.17 },
+    { finger: 2, x: 51.58, y: 19.13, width: 15.3, height: 27.98 },
+    { finger: 3, x: 76.68, y: 31.23, width: 28.56, height: 68.84 },
+    { finger: 4, x: 86.03, y: 15.27, width: 15.3, height: 27.98 },
+  ],
+  "seventh-sus4-c": [
+    { finger: 1, x: 26.97, y: 27.04, width: 13.03, height: 56.43 },
+  ],
+  "seventh-sus4-d": [
+    { finger: 1, x: 36.17, y: 35.01, width: 22.21, height: 75.75 },
+    { finger: 2, x: 51.63, y: 50.65, width: 23.57, height: 92.13 },
+    { finger: 3, x: 75.04, y: 25.56, width: 17.0, height: 45.98 },
+    { finger: 4, x: 85.23, y: 13.05, width: 14.51, height: 29.95 },
+  ],
+  "seventh-sus4-e": [
+    { finger: 1, x: 19.94, y: 23.84, width: 13.49, height: 30.67 },
+    { finger: 2, x: 37.44, y: 50.47, width: 25.16, height: 93.08 },
+    { finger: 3, x: 48.05, y: 35.82, width: 21.87, height: 77.21 },
+    { finger: 4, x: 56.95, y: 13.2, width: 13.6, height: 30.67 },
+  ],
+  "seventh-sus4-f": [
+    { finger: 1, x: 25.25, y: 27.78, width: 16.43, height: 46.88 },
+    { finger: 2, x: 66.45, y: 50.45, width: 25.16, height: 93.04 },
+    { finger: 3, x: 77.07, y: 35.81, width: 21.87, height: 77.18 },
+    { finger: 4, x: 85.99, y: 13.21, width: 13.49, height: 30.66 },
+  ],
+  "seventh-sus4-g": [
+    { finger: 1, x: 25.98, y: 29.13, width: 15.19, height: 50.94 },
+    { finger: 2, x: 53.22, y: 40.29, width: 20.06, height: 83.87 },
+    { finger: 3, x: 63.22, y: 19.9, width: 13.03, height: 31.96 },
+    { finger: 4, x: 86.37, y: 14.18, width: 13.15, height: 33.32 },
+  ],
+  "sixth-a": [
+    { finger: 1, x: 23.7, y: 50.18, width: 13.71, height: 95.66 },
+    { finger: 2, x: 52.08, y: 20.66, width: 15.64, height: 29.55 },
+    { finger: 3, x: 77.53, y: 36.39, width: 28.9, height: 74.65 },
+    { finger: 4, x: 84.94, y: 13.27, width: 15.75, height: 30.24 },
+  ],
+  "sixth-b": [
+    { finger: 1, x: 27.52, y: 49.21, width: 12.81, height: 94.89 },
+    { finger: 2, x: 46.21, y: 25.21, width: 12.92, height: 50.55 },
+    { finger: 3, x: 57.84, y: 12.57, width: 11.67, height: 29.27 },
+    { finger: 4, x: 77.95, y: 36.22, width: 19.27, height: 73.08 },
+  ],
+  "sixth-c": [
+    { finger: 1, x: 29.5, y: 13.14, width: 10.31, height: 26.08 },
+    { finger: 2, x: 39.81, y: 13.14, width: 10.31, height: 26.08 },
+    { finger: 3, x: 50.18, y: 13.13, width: 10.31, height: 26.08 },
+    { finger: 4, x: 60.54, y: 13.13, width: 10.31, height: 26.08 },
+  ],
+  "sixth-d": [
+    { finger: 1, x: 17.46, y: 43.66, width: 13.71, height: 89.3 },
+    { finger: 2, x: 34.63, y: 15.37, width: 13.94, height: 28.65 },
+    { finger: 3, x: 47.41, y: 14.16, width: 14.73, height: 28.49 },
+    { finger: 4, x: 59.7, y: 14.16, width: 14.73, height: 28.49 },
+  ],
+  "sixth-e": [
+    { finger: 1, x: 23.8, y: 48.45, width: 13.71, height: 99.08 },
+    { finger: 2, x: 40.97, y: 17.06, width: 13.94, height: 31.79 },
+    { finger: 3, x: 53.74, y: 15.71, width: 14.73, height: 31.61 },
+    { finger: 4, x: 66.03, y: 15.72, width: 14.73, height: 31.61 },
+  ],
+  "sixth-f": [
+    { finger: 1, x: 25.99, y: 26.99, width: 15.19, height: 47.9 },
+    { finger: 2, x: 42.78, y: 48.75, width: 21.31, height: 95.62 },
+    { finger: 3, x: 53.8, y: 35.45, width: 19.49, height: 78.93 },
+    { finger: 4, x: 82.88, y: 14.97, width: 17.68, height: 28.3 },
+  ],
+  "sixth-g": [
+    { finger: 1, x: 32.41, y: 18.16, width: 13.03, height: 32.17 },
+    { finger: 2, x: 47.29, y: 37.93, width: 19.95, height: 84.1 },
+    { finger: 3, x: 56.75, y: 14.2, width: 13.15, height: 33.33 },
+    { finger: 4, x: 71.85, y: 18.16, width: 13.03, height: 32.17 },
+  ],
+  "sus4-a": [
+    { finger: 1, x: 15.09, y: 20.32, width: 14.05, height: 28.34 },
+    { finger: 2, x: 31.07, y: 51.31, width: 19.49, height: 90.74 },
+    { finger: 3, x: 43.56, y: 35.74, width: 18.93, height: 78.48 },
+    { finger: 4, x: 54.99, y: 17.81, width: 13.94, height: 28.18 },
+  ],
+  "sus4-b": [
+    { finger: 1, x: 43.1, y: 27.27, width: 13.6, height: 51.36 },
+    { finger: 2, x: 56.52, y: 14.33, width: 14.17, height: 28.66 },
+    { finger: 3, x: 77.45, y: 50.71, width: 30.26, height: 92.74 },
+    { finger: 4, x: 87.66, y: 35.93, width: 23.8, height: 74.39 },
+  ],
+  "sus4-c": [
+    { finger: 1, x: 18.48, y: 31.91, width: 13.94, height: 55.86 },
+    { finger: 2, x: 33.66, y: 14.58, width: 12.47, height: 28.82 },
+    { finger: 3, x: 65.4, y: 16.82, width: 16.66, height: 39.34 },
+    { finger: 4, x: 80.53, y: 14.58, width: 12.35, height: 28.82 },
+  ],
+  "sus4-d": [
+    { finger: 1, x: 28.17, y: 52.2, width: 30.37, height: 89.54 },
+    { finger: 2, x: 38.68, y: 36.2, width: 27.31, height: 79.68 },
+    { finger: 3, x: 61.89, y: 27.26, width: 25.5, height: 53.79 },
+  ],
+  "sus4-e": [
+    { finger: 1, x: 23.84, y: 48.21, width: 31.62, height: 82.66 },
+    { finger: 2, x: 34.82, y: 33.46, width: 28.56, height: 73.64 },
+    { finger: 3, x: 59.05, y: 25.2, width: 26.63, height: 49.68 },
+  ],
+  "sus4-f": [
+    { finger: 1, x: 18.22, y: 24.16, width: 13.83, height: 54.84 },
+    { finger: 2, x: 46.9, y: 17.89, width: 12.47, height: 28.22 },
+    { finger: 3, x: 63.91, y: 51.61, width: 22.21, height: 91.34 },
+    { finger: 4, x: 71.99, y: 17.54, width: 12.35, height: 28.22 },
+  ],
+  "sus4-g": [
+    { finger: 1, x: 49.27, y: 46.6, width: 21.19, height: 70.24 },
+    { finger: 2, x: 56.93, y: 16.65, width: 14.05, height: 33.46 },
+    { finger: 3, x: 76.11, y: 27.55, width: 17.79, height: 52.24 },
+    { finger: 4, x: 86.16, y: 14.48, width: 13.94, height: 32.28 },
+  ],
+};
