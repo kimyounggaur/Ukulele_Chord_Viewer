@@ -26,12 +26,13 @@ export function ChordGrid({
   const title = selectedQualityId ? qualityById[selectedQualityId].label : "All Chords";
 
   return (
-    <section className="screen-panel px-[clamp(24px,5vw,84px)] pb-[clamp(28px,5vh,72px)]">
-      <div className="mx-auto flex w-full max-w-[1140px] flex-wrap items-center gap-3 py-3">
+    <section className="screen-panel relative px-[clamp(24px,5vw,84px)] pb-[clamp(28px,5vh,72px)]">
+      <div className="module-screen-toolbar sticky top-0 z-10 mx-auto flex w-full max-w-[1140px] flex-wrap items-center gap-3 py-3">
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex h-11 shrink-0 items-center gap-2 rounded-full border border-rose-100 bg-white px-4 font-bold text-stone-500 shadow-neumorphic transition hover:scale-105 focus:outline-none focus-visible:ring-4 focus-visible:ring-rose-100"
+          aria-label="코드 종류 선택 화면으로 돌아가기"
+          className="module-back-button inline-flex h-11 shrink-0 items-center gap-2 rounded-full border border-rose-100 bg-white px-4 font-bold text-stone-500 shadow-neumorphic transition hover:scale-105 focus:outline-none focus-visible:ring-4 focus-visible:ring-rose-100"
         >
           <ArrowLeft size={18} aria-hidden="true" />
           뒤로
@@ -61,6 +62,16 @@ export function ChordGrid({
           <EmptyState />
         )}
       </div>
+
+      <button
+        type="button"
+        onClick={onBack}
+        aria-label="코드 종류 선택 화면으로 돌아가기"
+        className="module-back-floating"
+      >
+        <ArrowLeft size={20} aria-hidden="true" />
+        <span>뒤로</span>
+      </button>
     </section>
   );
 }
