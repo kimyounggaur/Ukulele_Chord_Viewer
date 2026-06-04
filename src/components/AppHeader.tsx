@@ -175,7 +175,7 @@ export function AppHeader({
 
   return (
     <>
-      <div className="flex min-w-0 flex-1 items-center gap-3">
+      <div className="header-search-row flex min-w-0 flex-1 items-center gap-3">
       <button
         type="button"
         onClick={onHome}
@@ -214,65 +214,67 @@ export function AppHeader({
       </div>
 
       <div className="header-right-actions">
-        <div className="auth-actions">
-          {currentUser ? (
-            <>
-              <span className={["auth-badge", currentUser.role === "admin" ? "is-admin" : ""].join(" ")}>
-                {currentUser.role === "admin" ? (
-                  <ShieldCheck size={15} aria-hidden="true" />
-                ) : (
-                  <LogIn size={15} aria-hidden="true" />
-                )}
-                {currentUser.role === "admin" ? "관리자" : "회원"} {currentUser.username}
-              </span>
-              <button type="button" className="auth-chip-button" onClick={onLogout}>
-                <LogOut size={14} aria-hidden="true" />
-                로그아웃
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                type="button"
-                className="auth-chip-button"
-                onClick={() => handleOpenAuth("signup")}
-              >
-                <UserPlus size={14} aria-hidden="true" />
-                회원가입
-              </button>
-              <button
-                type="button"
-                className="auth-chip-button"
-                onClick={() => handleOpenAuth("member-login")}
-              >
-                <LogIn size={14} aria-hidden="true" />
-                회원 로그인
-              </button>
-              <button
-                type="button"
-                className="auth-chip-button is-admin"
-                onClick={() => handleOpenAuth("admin-login")}
-              >
-                <ShieldCheck size={14} aria-hidden="true" />
-                관리자 로그인
-              </button>
-            </>
-          )}
-        </div>
-        <div className="admin-access">
-          <button
-            type="button"
-            aria-label={canManage ? "관리자 페이지 열기" : "관리자 로그인 열기"}
-            onClick={handleAdminClick}
-            className={["admin-header-button", canManage ? "" : "is-locked"].join(" ")}
-          >
-            관리자 페이지
-          </button>
+        <div className="header-auth-controls">
+          <div className="auth-actions">
+            {currentUser ? (
+              <>
+                <span className={["auth-badge", currentUser.role === "admin" ? "is-admin" : ""].join(" ")}>
+                  {currentUser.role === "admin" ? (
+                    <ShieldCheck size={15} aria-hidden="true" />
+                  ) : (
+                    <LogIn size={15} aria-hidden="true" />
+                  )}
+                  {currentUser.role === "admin" ? "관리자" : "회원"} {currentUser.username}
+                </span>
+                <button type="button" className="auth-chip-button" onClick={onLogout}>
+                  <LogOut size={14} aria-hidden="true" />
+                  로그아웃
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  className="auth-chip-button"
+                  onClick={() => handleOpenAuth("signup")}
+                >
+                  <UserPlus size={14} aria-hidden="true" />
+                  회원가입
+                </button>
+                <button
+                  type="button"
+                  className="auth-chip-button"
+                  onClick={() => handleOpenAuth("member-login")}
+                >
+                  <LogIn size={14} aria-hidden="true" />
+                  회원 로그인
+                </button>
+                <button
+                  type="button"
+                  className="auth-chip-button is-admin"
+                  onClick={() => handleOpenAuth("admin-login")}
+                >
+                  <ShieldCheck size={14} aria-hidden="true" />
+                  관리자 로그인
+                </button>
+              </>
+            )}
+          </div>
+          <div className="admin-access">
+            <button
+              type="button"
+              aria-label={canManage ? "관리자 페이지 열기" : "관리자 로그인 열기"}
+              onClick={handleAdminClick}
+              className={["admin-header-button", canManage ? "" : "is-locked"].join(" ")}
+            >
+              관리자 페이지
+            </button>
+          </div>
         </div>
         <button
           type="button"
           onClick={onHome}
-          className="font-display text-xl font-extrabold tracking-[0.18em] text-rose-300 transition hover:text-rose-400 focus:outline-none focus-visible:rounded-full focus-visible:ring-4 focus-visible:ring-rose-100 sm:text-2xl"
+          className="header-brand-button font-display text-xl font-extrabold tracking-[0.18em] text-rose-300 transition hover:text-rose-400 focus:outline-none focus-visible:rounded-full focus-visible:ring-4 focus-visible:ring-rose-100 sm:text-2xl"
         >
         Lesson Designer
         </button>

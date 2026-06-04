@@ -354,6 +354,12 @@ button {
   gap: 10px;
 }
 
+.header-auth-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .auth-actions {
   display: flex;
   max-width: min(44vw, 520px);
@@ -435,6 +441,10 @@ button {
 .admin-header-button.is-active {
   background: #fff1f7;
   color: #d94683;
+}
+
+.header-brand-button {
+  white-space: nowrap;
 }
 
 .auth-modal-backdrop {
@@ -1204,6 +1214,158 @@ button {
 
   .detail-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  #app-header {
+    height: auto;
+    min-height: 0;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 10px;
+    padding: 12px 16px;
+  }
+
+  #app-main,
+  .screen-panel {
+    min-height: auto;
+  }
+
+  .header-search-row {
+    width: 100%;
+    flex: 0 0 auto;
+    gap: 8px;
+  }
+
+  .header-search-row > label {
+    min-width: 0;
+    max-width: none;
+  }
+
+  .header-search-row input {
+    height: 46px;
+    padding-right: 104px;
+    font-size: 14px;
+  }
+
+  .search-lock-hint {
+    right: 12px;
+    font-size: 11px;
+  }
+
+  .header-right-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .header-auth-controls {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .auth-actions,
+  .admin-access {
+    display: contents;
+  }
+
+  .auth-chip-button,
+  .auth-badge,
+  .admin-header-button {
+    width: 100%;
+    min-width: 0;
+    min-height: 40px;
+    justify-content: center;
+    padding: 0 8px;
+    font-size: 12px;
+    line-height: 1.15;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .auth-badge {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .admin-header-button {
+    height: auto;
+  }
+
+  .header-brand-button {
+    align-self: center;
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: 0.12em;
+  }
+
+  .auth-modal-backdrop {
+    align-items: flex-start;
+    padding: max(18px, env(safe-area-inset-top)) 14px 18px;
+  }
+
+  .auth-modal {
+    width: 100%;
+    max-width: 390px;
+    margin-top: 42px;
+    padding: 16px;
+  }
+
+  .screen-panel {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  .admin-page-shell {
+    padding: 12px;
+  }
+
+  .admin-page-header {
+    position: static;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .admin-page-header .module-back-button {
+    width: auto;
+    padding: 0 13px;
+  }
+
+  .admin-page-header h1 {
+    font-size: 24px;
+    line-height: 1.12;
+  }
+
+  .admin-page-header p {
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  .admin-page-stats {
+    grid-column: 1 / -1;
+    width: 100%;
+    margin-left: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-page-stats span {
+    justify-content: center;
+    padding: 8px 6px;
+    font-size: 12px;
+  }
+
+  .admin-card-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
   }
 }
 
