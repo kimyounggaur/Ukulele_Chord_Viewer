@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import type { ChordQuality } from "../data/chordQualities";
 
 interface QualityBubbleProps {
@@ -7,6 +8,11 @@ interface QualityBubbleProps {
 }
 
 export function QualityBubble({ quality, active, onClick }: QualityBubbleProps) {
+  const bubbleStyle = {
+    "--quality-color": quality.color,
+    "--quality-soft": quality.softColor,
+  } as CSSProperties;
+
   return (
     <button
       type="button"
@@ -17,13 +23,11 @@ export function QualityBubble({ quality, active, onClick }: QualityBubbleProps) 
         "flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-rose-100",
         active ? "scale-105 ring-4 ring-white" : "hover:scale-105",
       ].join(" ")}
-      style={{
-        border: `4px solid ${quality.color}`,
-        color: quality.color,
-        background: `linear-gradient(145deg, #ffffff, ${quality.softColor})`,
-      }}
+      style={bubbleStyle}
     >
-      <span className="max-w-[82%] leading-tight">{quality.label}</span>
+      <span className="quality-bubble-glow" aria-hidden="true" />
+      <span className="quality-bubble-accent" aria-hidden="true" />
+      <span className="quality-bubble-label max-w-[82%] leading-tight">{quality.label}</span>
     </button>
   );
 }

@@ -10,6 +10,13 @@ interface QualitySelectorProps {
 export function QualitySelector({ selectedQualityId, onSelectQuality }: QualitySelectorProps) {
   return (
     <section className="screen-panel quality-selector-screen">
+      <figure className="quality-selector-art" aria-hidden="true">
+        <img
+          src={`${import.meta.env.BASE_URL}assets/ukulele-style-icon.png`}
+          alt=""
+          className="quality-selector-art-image"
+        />
+      </figure>
       <div className="quality-selector-grid">
         {MAIN_QUALITY_IDS.map((qualityId) => {
           const quality = qualityById[qualityId];
