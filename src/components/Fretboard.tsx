@@ -1,3 +1,4 @@
+import type { MouseEvent } from "react";
 import type { ChordShape, UkuleleString } from "../data/chordTypes";
 import { UKULELE_TUNING } from "../data/chordTypes";
 
@@ -11,6 +12,10 @@ const STRING_X: Record<UkuleleString, number> = {
 interface FretboardProps {
   shape: ChordShape;
   size?: "thumb" | "large";
+}
+
+function preventImageContextMenu(event: MouseEvent) {
+  event.preventDefault();
 }
 
 export function Fretboard({ shape, size = "thumb" }: FretboardProps) {
@@ -27,6 +32,7 @@ export function Fretboard({ shape, size = "thumb" }: FretboardProps) {
 
   return (
     <div
+      onContextMenu={preventImageContextMenu}
       className={[
         "chord-image-frame rounded-lg bg-white",
         size === "large" ? "p-3 shadow-neo" : "p-2 shadow-neo-inset",
@@ -38,6 +44,7 @@ export function Fretboard({ shape, size = "thumb" }: FretboardProps) {
         aria-label={`${shape.title} 우쿨렐레 코드 다이어그램`}
         preserveAspectRatio="xMidYMid meet"
         className="max-h-full max-w-full"
+        onContextMenu={preventImageContextMenu}
       >
         <rect width="240" height="300" rx="8" fill="#ffffff" />
         <text

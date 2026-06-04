@@ -1,6 +1,6 @@
 import { FormEvent, useState } from "react";
 import { Home, Lock, LogIn, LogOut, Search, ShieldCheck, UserPlus } from "lucide-react";
-import type { AuthResult, AuthUser } from "../hooks/useAuth";
+import type { AuthAction, AuthUser } from "../hooks/useAuth";
 
 interface AppHeaderProps {
   searchTerm: string;
@@ -10,10 +10,10 @@ interface AppHeaderProps {
   canSearch: boolean;
   canManage: boolean;
   currentUser: AuthUser | null;
-  onSignUp: (username: string, password: string) => AuthResult;
-  onMemberLogin: (username: string, password: string) => AuthResult;
-  onAdminLogin: (username: string, password: string) => AuthResult;
-  onLogout: () => void;
+  onSignUp: AuthAction;
+  onMemberLogin: AuthAction;
+  onAdminLogin: AuthAction;
+  onLogout: () => Promise<void>;
 }
 
 type AuthMode = "signup" | "member-login" | "admin-login";
@@ -122,6 +122,7 @@ export function AppHeader({
 }: AppHeaderProps) {
   const [authMode, setAuthMode] = useState<AuthMode | null>(null);
   const [authMessage, setAuthMessage] = useState<string | null>(null);
+  const [authPending, setAuthPending] = useState(false);
 
   const handleOpenAuth = (mode: AuthMode) => {
     setAuthMode(mode);
@@ -133,27 +134,33 @@ export function AppHeader({
     setAuthMessage(null);
   };
 
-  const handleAuthSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleAuthSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!authMode) {
+    if (!authMode || authPending) {
       return;
     }
 
     const formData = new FormData(event.currentTarget);
-    const username = String(formData.get("username") ?? "");
+    const email = String(formData.get("email") ?? "");
     const password = String(formData.get("password") ?? "");
-    const result =
-      authMode === "signup"
-        ? onSignUp(username, password)
-        : authMode === "member-login"
-          ? onMemberLogin(username, password)
-          : onAdminLogin(username, password);
 
-    setAuthMessage(result.message);
+    setAuthPending(true);
+    try {
+      const result =
+        authMode === "signup"
+          ? await onSignUp(email, password)
+          : authMode === "member-login"
+            ? await onMemberLogin(email, password)
+            : await onAdminLogin(email, password);
 
-    if (result.ok) {
-      window.setTimeout(handleCloseAuth, 420);
+      setAuthMessage(result.message);
+
+      if (result.ok) {
+        window.setTimeout(handleCloseAuth, 420);
+      }
+    } finally {
+      setAuthPending(false);
     }
   };
 
@@ -285,12 +292,12 @@ export function AppHeader({
               </button>
             </div>
             <label>
-              아이디
+              이메일
               <input
-                name="username"
-                autoComplete="username"
-                placeholder={authMode === "admin-login" ? "admin" : "회원 아이디"}
-                defaultValue={authMode === "admin-login" ? "admin" : ""}
+                name="email"
+                type="email"
+                autoComplete="email"
+                placeholder={authMode === "admin-login" ? "admin@example.com" : "member@example.com"}
                 required
               />
             </label>
@@ -300,18 +307,18 @@ export function AppHeader({
                 name="password"
                 type="password"
                 autoComplete={authMode === "signup" ? "new-password" : "current-password"}
-                placeholder={authMode === "admin-login" ? "admin1234" : "비밀번호"}
+                placeholder="비밀번호"
                 required
               />
             </label>
             {authMode === "admin-login" ? (
-              <p className="auth-modal-note">기본 관리자 계정: admin / admin1234</p>
+              <p className="auth-modal-note">Supabase app_metadata role이 admin인 계정만 허용됩니다.</p>
             ) : (
               <p className="auth-modal-note">회원 로그인 후 검색 기능을 사용할 수 있습니다.</p>
             )}
             {authMessage ? <p className="auth-modal-message">{authMessage}</p> : null}
-            <button type="submit" className="auth-submit-button">
-              {AUTH_LABELS[authMode]}
+            <button type="submit" className="auth-submit-button" disabled={authPending}>
+              {authPending ? "처리 중..." : AUTH_LABELS[authMode]}
             </button>
           </form>
         </div>

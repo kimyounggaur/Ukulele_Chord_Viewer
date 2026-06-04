@@ -137,6 +137,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
+  user-select: none;
 }
 
 .chord-image {
@@ -147,6 +148,8 @@ button {
   object-fit: contain;
   object-position: center;
   display: block;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .chord-image-overlay,

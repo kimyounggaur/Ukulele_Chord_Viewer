@@ -1,4 +1,6 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import type { User } from "@supabase/supabase-js";
+import { isSupabaseConfigured, supabase } from "../lib/supabase";
 
 export type AuthRole = "member" | "admin";
 
@@ -7,129 +9,177 @@ export interface AuthUser {
   role: AuthRole;
 }
 
-interface StoredMember {
-  username: string;
-  password: string;
-}
-
 export interface AuthResult {
   ok: boolean;
   message: string;
 }
 
-const CURRENT_USER_KEY = "ukulele-auth-current-user";
-const MEMBERS_KEY = "ukulele-auth-members";
-const ADMIN_USERNAME = "admin";
-const ADMIN_PASSWORD = "admin1234";
+export type AuthAction = (email: string, password: string) => Promise<AuthResult>;
 
-function readJson<T>(key: string, fallback: T): T {
-  if (typeof window === "undefined") {
-    return fallback;
-  }
-
-  try {
-    const value = window.localStorage.getItem(key);
-    return value ? (JSON.parse(value) as T) : fallback;
-  } catch {
-    return fallback;
-  }
+function normalizeEmail(email: string) {
+  return email.trim().toLowerCase();
 }
 
-function writeJson<T>(key: string, value: T) {
-  window.localStorage.setItem(key, JSON.stringify(value));
+function getRole(user: User): AuthRole {
+  return user.app_metadata.role === "admin" ? "admin" : "member";
 }
 
-function normalizeUsername(username: string) {
-  return username.trim().toLowerCase();
+function getUsername(user: User) {
+  return user.user_metadata.display_name ?? user.email ?? "사용자";
+}
+
+function toAuthUser(user: User | null): AuthUser | null {
+  if (!user) {
+    return null;
+  }
+
+  return {
+    username: getUsername(user),
+    role: getRole(user),
+  };
+}
+
+function requireSupabase(): NonNullable<typeof supabase> | null {
+  return supabase;
 }
 
 export function useAuth() {
-  const [currentUser, setCurrentUser] = useState<AuthUser | null>(() =>
-    readJson<AuthUser | null>(CURRENT_USER_KEY, null),
-  );
-  const [members, setMembers] = useState<StoredMember[]>(() =>
-    readJson<StoredMember[]>(MEMBERS_KEY, []),
-  );
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const persistCurrentUser = useCallback((user: AuthUser | null) => {
-    setCurrentUser(user);
-    if (user) {
-      writeJson(CURRENT_USER_KEY, user);
-    } else {
-      window.localStorage.removeItem(CURRENT_USER_KEY);
+  useEffect(() => {
+    const client = requireSupabase();
+    if (!client) {
+      setLoading(false);
+      return undefined;
     }
+
+    let mounted = true;
+
+    client.auth.getSession().then(({ data }) => {
+      if (mounted) {
+        setCurrentUser(toAuthUser(data.session?.user ?? null));
+        setLoading(false);
+      }
+    });
+
+    const { data: listener } = client.auth.onAuthStateChange((_event, session) => {
+      setCurrentUser(toAuthUser(session?.user ?? null));
+      setLoading(false);
+    });
+
+    return () => {
+      mounted = false;
+      listener.subscription.unsubscribe();
+    };
   }, []);
 
-  const signUp = useCallback(
-    (username: string, password: string): AuthResult => {
-      const normalizedUsername = normalizeUsername(username);
+  const signUp = useCallback<AuthAction>(async (email, password) => {
+    const client = requireSupabase();
+    const normalizedEmail = normalizeEmail(email);
 
-      if (normalizedUsername.length < 3 || password.length < 4) {
-        return { ok: false, message: "아이디 3자 이상, 비밀번호 4자 이상으로 입력하세요." };
-      }
+    if (!client) {
+      return {
+        ok: false,
+        message: "Supabase 환경변수(VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY)를 설정하세요.",
+      };
+    }
 
-      if (normalizedUsername === ADMIN_USERNAME) {
-        return { ok: false, message: "admin은 관리자 전용 아이디입니다." };
-      }
+    if (!normalizedEmail || password.length < 6) {
+      return { ok: false, message: "이메일과 6자 이상의 비밀번호를 입력하세요." };
+    }
 
-      if (members.some((member) => member.username === normalizedUsername)) {
-        return { ok: false, message: "이미 가입된 회원 아이디입니다." };
-      }
+    const { data, error } = await client.auth.signUp({
+      email: normalizedEmail,
+      password,
+      options: {
+        data: {
+          role: "member",
+        },
+      },
+    });
 
-      const nextMembers = [...members, { username: normalizedUsername, password }];
-      setMembers(nextMembers);
-      writeJson(MEMBERS_KEY, nextMembers);
-      persistCurrentUser({ username: normalizedUsername, role: "member" });
+    if (error) {
+      return { ok: false, message: error.message };
+    }
 
-      return { ok: true, message: "회원가입 및 로그인 완료" };
-    },
-    [members, persistCurrentUser],
-  );
+    setCurrentUser(toAuthUser(data.user));
+    return { ok: true, message: "회원가입 완료. 이메일 확인이 필요할 수 있습니다." };
+  }, []);
 
-  const loginMember = useCallback(
-    (username: string, password: string): AuthResult => {
-      const normalizedUsername = normalizeUsername(username);
-      const member = members.find(
-        (storedMember) =>
-          storedMember.username === normalizedUsername && storedMember.password === password,
-      );
+  const loginMember = useCallback<AuthAction>(async (email, password) => {
+    const client = requireSupabase();
 
-      if (!member) {
-        return { ok: false, message: "회원 아이디 또는 비밀번호가 맞지 않습니다." };
-      }
+    if (!client) {
+      return {
+        ok: false,
+        message: "Supabase 환경변수(VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY)를 설정하세요.",
+      };
+    }
 
-      persistCurrentUser({ username: member.username, role: "member" });
-      return { ok: true, message: "회원 로그인 완료" };
-    },
-    [members, persistCurrentUser],
-  );
+    const { data, error } = await client.auth.signInWithPassword({
+      email: normalizeEmail(email),
+      password,
+    });
 
-  const loginAdmin = useCallback(
-    (username: string, password: string): AuthResult => {
-      if (normalizeUsername(username) !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {
-        return { ok: false, message: "관리자 계정 정보가 맞지 않습니다." };
-      }
+    if (error) {
+      return { ok: false, message: error.message };
+    }
 
-      persistCurrentUser({ username: ADMIN_USERNAME, role: "admin" });
-      return { ok: true, message: "관리자 로그인 완료" };
-    },
-    [persistCurrentUser],
-  );
+    setCurrentUser(toAuthUser(data.user));
+    return { ok: true, message: "회원 로그인 완료" };
+  }, []);
 
-  const logout = useCallback(() => {
-    persistCurrentUser(null);
-  }, [persistCurrentUser]);
+  const loginAdmin = useCallback<AuthAction>(async (email, password) => {
+    const client = requireSupabase();
+
+    if (!client) {
+      return {
+        ok: false,
+        message: "Supabase 환경변수(VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY)를 설정하세요.",
+      };
+    }
+
+    const { data, error } = await client.auth.signInWithPassword({
+      email: normalizeEmail(email),
+      password,
+    });
+
+    if (error) {
+      return { ok: false, message: error.message };
+    }
+
+    const user = toAuthUser(data.user);
+    if (user?.role !== "admin") {
+      await client.auth.signOut();
+      setCurrentUser(null);
+      return { ok: false, message: "관리자 권한이 없는 계정입니다." };
+    }
+
+    setCurrentUser(user);
+    return { ok: true, message: "관리자 로그인 완료" };
+  }, []);
+
+  const logout = useCallback(async () => {
+    const client = requireSupabase();
+    if (client) {
+      await client.auth.signOut();
+    }
+    setCurrentUser(null);
+  }, []);
 
   return useMemo(
     () => ({
       currentUser,
+      loading,
       canSearch: currentUser !== null,
       isAdmin: currentUser?.role === "admin",
+      isSupabaseConfigured,
       signUp,
       loginMember,
       loginAdmin,
       logout,
     }),
-    [currentUser, loginAdmin, loginMember, logout, signUp],
+    [currentUser, loading, loginAdmin, loginMember, logout, signUp],
   );
 }

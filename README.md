@@ -10,6 +10,19 @@ npm run dev
 npm run build
 ```
 
+## Supabase 인증
+
+회원가입, 회원 로그인, 관리자 로그인은 Supabase Auth를 사용합니다. 로컬 실행과 배포 환경에 아래 환경변수를 설정하세요.
+
+```bash
+VITE_SUPABASE_URL=https://your-project-ref.supabase.co
+VITE_SUPABASE_ANON_KEY=your-public-anon-key
+```
+
+권한은 두 단계입니다. 로그인한 일반 회원은 검색 기능을 사용할 수 있고, Supabase 사용자 `app_metadata.role`이 `admin`인 계정은 관리자 페이지와 업로드/삭제 기능까지 사용할 수 있습니다.
+
+관리자 계정은 Supabase 대시보드에서 사용자를 만든 뒤 `app_metadata`에 `role: "admin"`을 설정하세요. 클라이언트 회원가입은 일반 회원으로만 생성됩니다.
+
 ## 구조
 
 ```txt

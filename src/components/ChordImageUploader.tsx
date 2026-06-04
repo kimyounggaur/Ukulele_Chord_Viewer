@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useId, useState } from "react";
+import { ChangeEvent, type MouseEvent, useEffect, useId, useState } from "react";
 import { ImagePlus, Save, Trash2 } from "lucide-react";
 import type { ChordShape } from "../data/chordTypes";
 import {
@@ -11,6 +11,10 @@ interface ChordImageUploaderProps {
   uploadedImageUrl?: string;
   onUpload: (chordId: string, file: File) => Promise<void>;
   onDelete: (chordId: string) => Promise<void>;
+}
+
+function preventImageContextMenu(event: MouseEvent) {
+  event.preventDefault();
 }
 
 export function ChordImageUploader({
@@ -109,6 +113,8 @@ export function ChordImageUploader({
             src={previewUrl ?? uploadedImageUrl}
             alt={`${chord.title} 업로드 미리보기`}
             className="chord-image h-full w-full p-2"
+            draggable={false}
+            onContextMenu={preventImageContextMenu}
           />
         ) : (
           <div className="flex h-full items-center justify-center text-pink-300">

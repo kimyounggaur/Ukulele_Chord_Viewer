@@ -1,4 +1,5 @@
 import {
+  type MouseEvent,
   type ReactNode,
   useCallback,
   useEffect,
@@ -21,6 +22,10 @@ interface ImageBox {
   top: number;
   width: number;
   height: number;
+}
+
+function preventImageContextMenu(event: MouseEvent) {
+  event.preventDefault();
 }
 
 export function ChordImage({ src, alt, size = "thumb", overlay }: ChordImageProps) {
@@ -105,6 +110,7 @@ export function ChordImage({ src, alt, size = "thumb", overlay }: ChordImageProp
   return (
     <div
       ref={frameRef}
+      onContextMenu={preventImageContextMenu}
       className={[
         "chord-image-frame rounded-lg bg-white",
         size === "large" ? "p-3 shadow-neo" : "p-2 shadow-neo-inset",
@@ -116,6 +122,8 @@ export function ChordImage({ src, alt, size = "thumb", overlay }: ChordImageProp
         alt={alt}
         loading="lazy"
         className="chord-image"
+        draggable={false}
+        onContextMenu={preventImageContextMenu}
         onLoad={updateImageBox}
         onError={() => {
           if (currentSrc !== PLACEHOLDER_SRC) {
