@@ -62,7 +62,7 @@ export function ChordDetail({
             >
               {displayTitle}
             </h1>
-            <div className="detail-image-frame min-h-[clamp(430px,65vh,620px)] rounded-lg border border-white bg-white/90 p-[clamp(10px,1.4vw,18px)] shadow-neumorphic">
+            <div className="detail-image-frame rounded-lg border border-white bg-white/90 p-[clamp(10px,1.4vw,18px)] shadow-neumorphic">
               <ChordDiagram
                 shape={chord}
                 size="large"
