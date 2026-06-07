@@ -247,7 +247,7 @@ export function AppHeader({
                   onClick={() => handleOpenAuth("member-login")}
                 >
                   <LogIn size={14} aria-hidden="true" />
-                  회원 로그인
+                  회원로그인
                 </button>
                 <button
                   type="button"
@@ -255,7 +255,7 @@ export function AppHeader({
                   onClick={() => handleOpenAuth("admin-login")}
                 >
                   <ShieldCheck size={14} aria-hidden="true" />
-                  관리자 로그인
+                  관리자로그인
                 </button>
               </>
             )}

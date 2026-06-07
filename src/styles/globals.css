@@ -477,8 +477,9 @@ button {
 
 .auth-actions {
   display: flex;
-  max-width: min(44vw, 520px);
+  max-width: min(52vw, 680px);
   flex-wrap: wrap;
+  align-items: center;
   justify-content: flex-end;
   gap: 6px;
 }
@@ -487,7 +488,9 @@ button {
 .auth-badge {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
+  flex: 0 0 auto;
   min-height: 34px;
   border-radius: 999px;
   border: 1px solid rgba(255, 225, 236, 0.96);
@@ -496,6 +499,7 @@ button {
   color: #df6f9f;
   font-size: 12px;
   font-weight: 900;
+  white-space: nowrap;
   box-shadow:
     5px 6px 12px rgba(31, 41, 55, 0.07),
     -5px -5px 12px rgba(255, 255, 255, 0.92);
@@ -527,12 +531,14 @@ button {
 }
 
 .admin-header-button {
+  flex: 0 0 auto;
   height: 40px;
   border-radius: 999px;
   border: 1px solid #ffe1ec;
   background: #ffffff;
   padding: 0 16px;
   color: #ee7fab;
+  white-space: nowrap;
   font-weight: 800;
   box-shadow:
     7px 7px 14px rgba(31, 41, 55, 0.08),
@@ -1355,6 +1361,7 @@ button {
   }
 
   .header-search-row {
+    order: 2;
     width: 100%;
     flex: 0 0 auto;
     gap: 8px;
@@ -1377,6 +1384,7 @@ button {
   }
 
   .header-right-actions {
+    order: 1;
     width: 100%;
     flex-direction: column;
     align-items: stretch;
@@ -1386,8 +1394,8 @@ button {
   .header-auth-controls {
     display: grid;
     width: 100%;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
   }
 
   .auth-actions,
@@ -1400,13 +1408,17 @@ button {
   .admin-header-button {
     width: 100%;
     min-width: 0;
-    min-height: 40px;
+    min-height: 30px;
     justify-content: center;
-    padding: 0 8px;
-    font-size: 12px;
-    line-height: 1.15;
+    padding: 0 4px;
+    font-size: 10.5px;
+    line-height: 1;
     text-align: center;
     white-space: nowrap;
+  }
+
+  .header-auth-controls svg {
+    display: none;
   }
 
   .auth-badge {
@@ -1419,10 +1431,7 @@ button {
   }
 
   .header-brand-button {
-    align-self: center;
-    font-size: 14px;
-    line-height: 1.2;
-    letter-spacing: 0.12em;
+    display: none;
   }
 
   .auth-modal-backdrop {
