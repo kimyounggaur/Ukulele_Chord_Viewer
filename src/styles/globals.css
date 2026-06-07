@@ -1370,8 +1370,8 @@ button {
     flex-direction: column;
     align-items: stretch;
     justify-content: flex-start;
-    gap: 10px;
-    padding: 12px 16px;
+    gap: 12px;
+    padding: 14px 16px 12px;
   }
 
   #app-main,
@@ -1383,7 +1383,7 @@ button {
     order: 1;
     width: 100%;
     flex: 0 0 auto;
-    gap: 8px;
+    gap: 12px;
   }
 
   .header-search-row > label {
@@ -1392,9 +1392,9 @@ button {
   }
 
   .header-search-row input {
-    height: 46px;
+    height: clamp(48px, 13vw, 58px);
     padding-right: 104px;
-    font-size: 14px;
+    font-size: clamp(15px, 4.5vw, 20px);
   }
 
   .detail-image-frame {
@@ -1421,7 +1421,7 @@ button {
     width: 100%;
     flex-direction: row;
     align-items: center;
-    gap: 14px;
+    gap: clamp(16px, 4vw, 28px);
     overflow: hidden;
   }
 
@@ -1429,8 +1429,8 @@ button {
     display: grid;
     flex: 0 0 auto;
     width: auto;
-    grid-template-columns: repeat(4, clamp(48px, 13vw, 56px));
-    gap: clamp(8px, 2.2vw, 14px);
+    grid-template-columns: repeat(4, clamp(52px, 13.6vw, 62px));
+    gap: clamp(9px, 2.4vw, 16px);
   }
 
   .auth-actions,
@@ -1440,8 +1440,8 @@ button {
 
   .auth-chip-button,
   .admin-header-button {
-    width: clamp(48px, 13vw, 56px);
-    height: clamp(48px, 13vw, 56px);
+    width: clamp(52px, 13.6vw, 62px);
+    height: clamp(52px, 13.6vw, 62px);
     min-width: 0;
     min-height: 0;
     aspect-ratio: 1 / 1;
@@ -1460,8 +1460,8 @@ button {
 
   .header-auth-controls.is-guest svg {
     display: block;
-    width: clamp(22px, 6vw, 26px);
-    height: clamp(22px, 6vw, 26px);
+    width: clamp(23px, 6.2vw, 28px);
+    height: clamp(23px, 6.2vw, 28px);
     stroke-width: 2.4;
   }
 
