@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import { Home, Lock, LogIn, LogOut, Search, ShieldCheck, UserPlus } from "lucide-react";
+import { Home, LayoutGrid, Lock, LogIn, LogOut, Search, ShieldCheck, UserPlus } from "lucide-react";
 import type { AuthAction, AuthUser } from "../hooks/useAuth";
 
 interface AppHeaderProps {
@@ -214,7 +214,7 @@ export function AppHeader({
       </div>
 
       <div className="header-right-actions">
-        <div className="header-auth-controls">
+        <div className={["header-auth-controls", currentUser ? "is-authenticated" : "is-guest"].join(" ")}>
           <div className="auth-actions">
             {currentUser ? (
               <>
@@ -235,27 +235,21 @@ export function AppHeader({
               <>
                 <button
                   type="button"
-                  className="auth-chip-button"
+                  className="auth-chip-button is-member-action"
+                  aria-label="회원가입"
                   onClick={() => handleOpenAuth("signup")}
                 >
                   <UserPlus size={14} aria-hidden="true" />
-                  회원가입
+                  <span className="auth-action-label">회원가입</span>
                 </button>
                 <button
                   type="button"
-                  className="auth-chip-button"
+                  className="auth-chip-button is-member-action"
+                  aria-label="회원로그인"
                   onClick={() => handleOpenAuth("member-login")}
                 >
                   <LogIn size={14} aria-hidden="true" />
-                  회원로그인
-                </button>
-                <button
-                  type="button"
-                  className="auth-chip-button is-admin"
-                  onClick={() => handleOpenAuth("admin-login")}
-                >
-                  <ShieldCheck size={14} aria-hidden="true" />
-                  관리자로그인
+                  <span className="auth-action-label">회원로그인</span>
                 </button>
               </>
             )}
@@ -267,9 +261,21 @@ export function AppHeader({
               onClick={handleAdminClick}
               className={["admin-header-button", canManage ? "" : "is-locked"].join(" ")}
             >
-              관리자 페이지
+              <LayoutGrid size={14} aria-hidden="true" />
+              <span className="auth-action-label">관리자 페이지</span>
             </button>
           </div>
+          {!currentUser ? (
+            <button
+              type="button"
+              className="auth-chip-button admin-login-button"
+              aria-label="관리자 로그인"
+              onClick={() => handleOpenAuth("admin-login")}
+            >
+              <Lock size={14} aria-hidden="true" />
+              <span className="auth-action-label">관리자 로그인</span>
+            </button>
+          ) : null}
         </div>
         <button
           type="button"

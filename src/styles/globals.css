@@ -543,6 +543,10 @@ button {
 }
 
 .admin-header-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   flex: 0 0 auto;
   height: 40px;
   border-radius: 999px;
@@ -1377,7 +1381,7 @@ button {
   }
 
   .header-search-row {
-    order: 2;
+    order: 1;
     width: 100%;
     flex: 0 0 auto;
     gap: 8px;
@@ -1414,18 +1418,20 @@ button {
   }
 
   .header-right-actions {
-    order: 1;
+    order: 2;
     width: 100%;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+    overflow: hidden;
   }
 
   .header-auth-controls {
     display: grid;
-    width: 100%;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 4px;
+    flex: 0 0 auto;
+    width: auto;
+    grid-template-columns: repeat(4, clamp(48px, 13vw, 56px));
+    gap: clamp(8px, 2.2vw, 14px);
   }
 
   .auth-actions,
@@ -1434,21 +1440,40 @@ button {
   }
 
   .auth-chip-button,
-  .auth-badge,
   .admin-header-button {
-    width: 100%;
+    width: clamp(48px, 13vw, 56px);
+    height: clamp(48px, 13vw, 56px);
     min-width: 0;
-    min-height: 30px;
+    min-height: 0;
+    aspect-ratio: 1 / 1;
     justify-content: center;
-    padding: 0 4px;
-    font-size: 10.5px;
-    line-height: 1;
-    text-align: center;
-    white-space: nowrap;
+    gap: 0;
+    border-radius: 999px;
+    padding: 0;
+    box-shadow:
+      8px 12px 22px rgba(31, 41, 55, 0.12),
+      -7px -7px 16px rgba(255, 255, 255, 0.96);
   }
 
-  .header-auth-controls svg {
+  .header-auth-controls.is-guest .auth-action-label {
     display: none;
+  }
+
+  .header-auth-controls.is-guest svg {
+    display: block;
+    width: clamp(22px, 6vw, 26px);
+    height: clamp(22px, 6vw, 26px);
+    stroke-width: 2.4;
+  }
+
+  .header-auth-controls.is-guest .is-member-action {
+    border-color: rgba(20, 184, 166, 0.18);
+    color: #0f9f8e;
+  }
+
+  .header-auth-controls.is-guest .admin-login-button {
+    border-color: rgba(244, 114, 182, 0.2);
+    color: #df6f9f;
   }
 
   .auth-badge {
@@ -1457,11 +1482,19 @@ button {
   }
 
   .admin-header-button {
-    height: auto;
+    color: #df6f9f;
   }
 
   .header-brand-button {
-    display: none;
+    display: block;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-align: left;
+    font-size: clamp(24px, 7vw, 34px);
+    line-height: 1;
+    letter-spacing: 0.18em;
   }
 
   .auth-modal-backdrop {
