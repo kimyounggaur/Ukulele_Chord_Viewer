@@ -124,6 +124,7 @@ for (const asset of [
   "pwa-maskable-512x512.png",
   "apple-touch-icon.png",
   "favicon.svg",
+  "og-image.png",
 ]) {
   assert.ok(serviceWorker.includes(asset), `${asset}가 서비스 워커 precache에 필요합니다.`);
 }

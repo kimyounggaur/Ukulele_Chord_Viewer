@@ -4,6 +4,7 @@ import type { Chord, ChordQuality } from "../data/types";
 import { MAIN_QUALITY_IDS, qualityById } from "../data/chordQualities";
 import { QualityBubble } from "./QualityBubble";
 import type { GridFocusRequest } from "../hooks/useRovingChordGrid";
+import { asset } from "../lib/asset";
 import { RecentChordStrip } from "./RecentChordStrip";
 
 interface QualitySelectorProps {
@@ -49,11 +50,11 @@ export function QualitySelector({
       <figure className="quality-selector-art" aria-hidden="true">
         <picture>
           <source
-            srcSet={`${import.meta.env.BASE_URL}assets/ukulele-style-icon.webp`}
+            srcSet={asset("assets/ukulele-style-icon.webp")}
             type="image/webp"
           />
           <img
-            src={`${import.meta.env.BASE_URL}assets/ukulele-style-icon.png`}
+            src={asset("assets/ukulele-style-icon.png")}
             alt=""
             width="512"
             height="512"
@@ -88,11 +89,11 @@ export function QualitySelector({
       <figure className="main-footer-image-wrap">
         <picture>
           <source
-            srcSet={`${import.meta.env.BASE_URL}assets/main-footer-authors.webp`}
+            srcSet={asset("assets/main-footer-authors.webp")}
             type="image/webp"
           />
           <img
-            src={`${import.meta.env.BASE_URL}assets/main-footer-authors.jpg`}
+            src={asset("assets/main-footer-authors.jpg")}
             alt="칼림바 연주곡집 공동 저자 소개"
             width="979"
             height="144"
