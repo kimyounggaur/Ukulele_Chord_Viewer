@@ -12,6 +12,7 @@ import {
   Search,
   ShieldCheck,
   UserPlus,
+  WifiOff,
 } from "lucide-react";
 import type { AuthAction, AuthUser } from "../hooks/useAuth";
 
@@ -32,6 +33,7 @@ interface AppHeaderProps {
   onOpenLessonSets: () => void;
   onOpenQuiz: () => void;
   currentSection: "chords" | "sets" | "quiz";
+  isOnline: boolean;
 }
 
 type AuthMode = "signup" | "member-login" | "admin-login";
@@ -142,6 +144,7 @@ export function AppHeader({
   onOpenLessonSets,
   onOpenQuiz,
   currentSection,
+  isOnline,
 }: AppHeaderProps) {
   const [authMode, setAuthMode] = useState<AuthMode | null>(null);
   const [authMessage, setAuthMessage] = useState<string | null>(null);
@@ -281,6 +284,12 @@ export function AppHeader({
 
       <div className="header-right-actions">
         <div className="header-utility-actions">
+          {!isOnline ? (
+            <span className="offline-status-badge" role="status" aria-label="현재 오프라인 상태">
+              <WifiOff size={15} aria-hidden="true" />
+              <span>오프라인</span>
+            </span>
+          ) : null}
           <nav className="header-feature-nav" aria-label="수업 도구">
             <button
               type="button"

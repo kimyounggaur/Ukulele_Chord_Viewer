@@ -39,6 +39,8 @@ import { SharedLessonSetImportPage } from "./components/lesson/SharedLessonSetIm
 import { QuizPage } from "./components/quiz/QuizPage";
 import { encodeLessonSetShareData } from "./lessonSets/shareCodec";
 import type { LessonSetSharePayload } from "./lessonSets/shareCodec";
+import { PwaUpdateBanner } from "./components/PwaUpdateBanner";
+import { useOnlineStatus } from "./hooks/useOnlineStatus";
 
 interface AppRouteState {
   fromApp?: boolean;
@@ -93,6 +95,7 @@ function App() {
   const { isFavorite, toggleFavorite } = useFavorites();
   const { recentChordIds, addRecentChord } = useRecentChords();
   const lessonSetsState = useLessonSets();
+  const isOnline = useOnlineStatus();
 
   const chordMatch = matchPath({ path: "/c/:chordId", end: true }, location.pathname);
   const qualityMatch = matchPath({ path: "/q/:quality", end: true }, location.pathname);
@@ -391,6 +394,7 @@ function App() {
           onOpenLessonSets={handleOpenLessonSets}
           onOpenQuiz={handleOpenQuiz}
           currentSection={currentSection}
+          isOnline={isOnline}
         />
       )}
     >
@@ -549,6 +553,7 @@ function App() {
       <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {lessonAnnouncement}
       </p>
+      <PwaUpdateBanner />
     </AppShell>
   );
 }
