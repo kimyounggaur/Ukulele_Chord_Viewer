@@ -98,7 +98,7 @@ export function useClickSound() {
       }
 
       const soundTarget = target.closest(CLICK_SOUND_SELECTOR);
-      if (!soundTarget || isDisabledTarget(soundTarget)) {
+      if (!soundTarget || target.closest("[data-chord-audio]") || isDisabledTarget(soundTarget)) {
         return;
       }
 

@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { useState, type FormEvent, type ReactNode } from "react";
 import { Home, LayoutGrid, Lock, LogIn, LogOut, Search, ShieldCheck, UserPlus } from "lucide-react";
 import type { AuthAction, AuthUser } from "../hooks/useAuth";
 
@@ -14,6 +14,7 @@ interface AppHeaderProps {
   onMemberLogin: AuthAction;
   onAdminLogin: AuthAction;
   onLogout: () => Promise<void>;
+  tools?: ReactNode;
 }
 
 type AuthMode = "signup" | "member-login" | "admin-login";
@@ -119,6 +120,7 @@ export function AppHeader({
   onMemberLogin,
   onAdminLogin,
   onLogout,
+  tools,
 }: AppHeaderProps) {
   const [authMode, setAuthMode] = useState<AuthMode | null>(null);
   const [authMessage, setAuthMessage] = useState<string | null>(null);
@@ -214,6 +216,7 @@ export function AppHeader({
       </div>
 
       <div className="header-right-actions">
+        {tools}
         <div className={["header-auth-controls", currentUser ? "is-authenticated" : "is-guest"].join(" ")}>
           <div className="auth-actions">
             {currentUser ? (

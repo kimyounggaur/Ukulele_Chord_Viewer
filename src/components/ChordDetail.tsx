@@ -7,6 +7,7 @@ import { ChordCard } from "./ChordCard";
 import { ChordDiagram } from "./ChordDiagram";
 import { ChordImageUploader } from "./ChordImageUploader";
 import { chordStorageKey } from "../lib/chordIdentity";
+import { ChordPlayButton } from "./ChordPlayButton";
 
 interface ChordDetailProps {
   chord: Chord;
@@ -57,12 +58,15 @@ export function ChordDetail({
 
         <div className="detail-grid">
           <div className="min-w-0">
-            <h1
-              className="mx-auto mb-5 w-fit rounded-lg border-4 bg-white px-8 py-3 text-center font-display text-4xl font-extrabold text-stone-700 shadow-neumorphic sm:text-5xl"
-              style={{ borderColor: quality.color }}
-            >
-              {displayTitle}
-            </h1>
+            <div className="detail-title-row">
+              <h1
+                className="w-fit rounded-lg border-4 bg-white px-8 py-3 text-center font-display text-4xl font-extrabold text-stone-700 shadow-neumorphic sm:text-5xl"
+                style={{ borderColor: quality.color }}
+              >
+                {displayTitle}
+              </h1>
+              <ChordPlayButton chord={chord} />
+            </div>
             <div className="detail-image-frame rounded-lg border border-white bg-white/90 p-[clamp(10px,1.4vw,18px)] shadow-neumorphic">
               <ChordDiagram
                 chord={chord}

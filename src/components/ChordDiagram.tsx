@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import type { Chord } from "../data/types";
 import { fingerHotspotsByChordId } from "../data/fingerHotspots";
 import { asset } from "../lib/asset";
 import { ChordImage } from "./ChordImage";
 import { ChordSvg } from "./ChordSvg";
 import { FingerHintLayer } from "./FingerHintLayer";
+import { useChordAudio } from "../audio/ChordAudioProvider";
 
 export interface ChordDiagramProps {
   chord: Chord;
@@ -44,6 +45,8 @@ export function ChordDiagram({
   const [sourceIndex, setSourceIndex] = useState(0);
   const useSvg = forcePrimitive || queryForcesSvg() || sourceIndex >= sources.length;
   const fingerHotspots = fingerHotspotsByChordId[chord.legacyId ?? chord.id] ?? [];
+  const { playingChordId, activeStrings } = useChordAudio();
+  const isPlaying = playingChordId === chord.id;
 
   useEffect(() => {
     setSourceIndex(0);
@@ -68,6 +71,17 @@ export function ChordDiagram({
           overlay={<FingerHintLayer hotspots={fingerHotspots} size={size === "lg" ? "large" : "thumb"} />}
         />
       )}
+      {isPlaying ? (
+        <div className="chord-string-feedback" aria-hidden="true">
+          {[0, 1, 2, 3].map((stringIndex) => (
+            <span
+              key={stringIndex}
+              className={activeStrings.includes(stringIndex) ? "is-active" : ""}
+              style={{ "--string-index": stringIndex } as CSSProperties}
+            />
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }

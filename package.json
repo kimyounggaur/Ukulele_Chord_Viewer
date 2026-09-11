@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview --host 127.0.0.1",
     "verify": "tsx scripts/verify-chords.ts",
-    "check:images": "tsx scripts/check-images.ts"
+    "check:images": "tsx scripts/check-images.ts",
+    "check:audio": "tsx scripts/check-audio.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.107.0",

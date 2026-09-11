@@ -10,6 +10,7 @@ import { AdminPage } from "./components/AdminPage";
 import { useAuth } from "./hooks/useAuth";
 import { useClickSound } from "./hooks/useClickSound";
 import { useIndexedChordImages } from "./hooks/useIndexedChordImages";
+import { AudioSettingsControl } from "./components/AudioSettingsControl";
 
 function App() {
   useClickSound();
@@ -101,6 +102,7 @@ function App() {
           onMemberLogin={auth.loginMember}
           onAdminLogin={auth.loginAdmin}
           onLogout={auth.logout}
+          tools={<AudioSettingsControl />}
         />
       }
     >
