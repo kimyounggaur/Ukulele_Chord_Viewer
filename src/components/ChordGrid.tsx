@@ -1,13 +1,14 @@
-import { useMemo } from "react";
+import { useMemo, useRef, useState } from "react";
 import type { Chord, ChordQuality } from "../data/types";
 import { qualityById } from "../data/chordQualities";
 import { useChordSearch } from "../hooks/useChordSearch";
 import { ChordCard } from "./ChordCard";
 import { EmptyState } from "./EmptyState";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Star } from "lucide-react";
 import { chordStorageKey } from "../lib/chordIdentity";
 import { LAYOUT_COLUMNS, type LayoutMode } from "../hooks/useLayoutMode";
 import { useRovingChordGrid, type GridFocusRequest } from "../hooks/useRovingChordGrid";
+import { useRouteScrollMemory } from "../routing/useRouteScrollMemory";
 
 interface ChordGridProps {
   chords: readonly Chord[];
@@ -18,6 +19,13 @@ interface ChordGridProps {
   onBack: () => void;
   layoutMode: LayoutMode;
   focusRequest?: GridFocusRequest | null;
+  onFocusRequestHandled?: (request: GridFocusRequest) => void;
+  locationKey: string;
+  visitToken: object;
+  favoritesOnly: boolean;
+  onToggleFavoritesOnly: () => void;
+  isFavorite: (chordId: string) => boolean;
+  onToggleFavorite: (chordId: string) => void;
 }
 
 export function ChordGrid({
@@ -29,15 +37,47 @@ export function ChordGrid({
   onBack,
   layoutMode,
   focusRequest,
+  onFocusRequestHandled,
+  locationKey,
+  visitToken,
+  favoritesOnly,
+  onToggleFavoritesOnly,
+  isFavorite,
+  onToggleFavorite,
 }: ChordGridProps) {
-  const filteredChords = useChordSearch(chords, searchTerm, selectedQualityId);
-  const title = selectedQualityId ? qualityById[selectedQualityId].label : "All Chords";
+  const matchingChords = useChordSearch(chords, searchTerm, selectedQualityId);
+  const filteredChords = useMemo(
+    () => favoritesOnly ? matchingChords.filter((chord) => isFavorite(chord.id)) : matchingChords,
+    [favoritesOnly, isFavorite, matchingChords],
+  );
+  const title = searchTerm.trim()
+    ? `“${searchTerm.trim()}” 검색 결과`
+    : selectedQualityId
+      ? qualityById[selectedQualityId].label
+      : "All Chords";
   const columns = LAYOUT_COLUMNS[layoutMode];
+  const favoritesFilterRef = useRef<HTMLButtonElement>(null);
+  const [favoriteRemovalStatus, setFavoriteRemovalStatus] = useState("");
+  const { scrollContainerRef, hasSnapshot, restoredSelectedCardId, rememberSelectedCard } = useRouteScrollMemory<HTMLDivElement>({ locationKey, visitToken });
+  const restoredFocusRequest = useMemo<GridFocusRequest | null>(
+    () => restoredSelectedCardId ? { id: restoredSelectedCardId, nonce: `route:${locationKey}` } : null,
+    [locationKey, restoredSelectedCardId],
+  );
   const chordIds = useMemo(() => filteredChords.map((chord) => chord.id), [filteredChords]);
+  const effectiveFocusRequest = restoredFocusRequest ?? (hasSnapshot ? null : focusRequest);
   const { activeId, setActiveId, registerButton, handleKeyDown } = useRovingChordGrid(
     chordIds,
     columns,
-    focusRequest,
+    effectiveFocusRequest,
+    (handledRequest) => {
+      if (
+        focusRequest
+        && handledRequest.id === focusRequest.id
+        && handledRequest.nonce === focusRequest.nonce
+      ) {
+        onFocusRequestHandled?.(handledRequest);
+      }
+    },
   );
   const rows = useMemo(
     () => Array.from(
@@ -46,6 +86,14 @@ export function ChordGrid({
     ),
     [columns, filteredChords],
   );
+  const toggleFavoriteFromCard = (chordId: string) => {
+    const removesVisibleCard = favoritesOnly && isFavorite(chordId);
+    onToggleFavorite(chordId);
+    if (removesVisibleCard) {
+      setFavoriteRemovalStatus(`${chordId} 코드를 즐겨찾기에서 제거했습니다.`);
+      window.requestAnimationFrame(() => favoritesFilterRef.current?.focus());
+    }
+  };
 
   return (
     <section className="screen-panel chord-grid-screen relative" data-grid-mode={layoutMode}>
@@ -53,7 +101,7 @@ export function ChordGrid({
         <button
           type="button"
           onClick={onBack}
-          aria-label="코드 종류 선택 화면으로 돌아가기"
+          aria-label="뒤로, 코드 종류 선택 화면으로 돌아가기"
           className="module-back-button inline-flex h-11 shrink-0 items-center gap-2 rounded-full border border-rose-100 bg-white px-4 font-bold text-stone-500 shadow-neumorphic transition hover:scale-105 focus:outline-none focus-visible:ring-4 focus-visible:ring-rose-100"
         >
           <ArrowLeft size={18} aria-hidden="true" />
@@ -65,9 +113,22 @@ export function ChordGrid({
         <span className="font-display text-lg font-extrabold text-rose-300">
           {filteredChords.length} chords
         </span>
+        <button
+          ref={favoritesFilterRef}
+          type="button"
+          className="favorites-filter-button"
+          aria-pressed={favoritesOnly}
+          onClick={onToggleFavoritesOnly}
+        >
+          <Star size={16} fill={favoritesOnly ? "currentColor" : "none"} aria-hidden="true" />
+          즐겨찾기만 보기
+        </button>
       </div>
+      <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {favoriteRemovalStatus}
+      </p>
 
-      <div className="chord-gallery-scroll thin-scrollbar">
+      <div ref={scrollContainerRef} className="chord-gallery-scroll thin-scrollbar">
         <div className="chord-grid-board mx-auto w-full max-w-[1140px]">
           {filteredChords.length > 0 ? (
           <div
@@ -89,9 +150,15 @@ export function ChordGrid({
                     <ChordCard
                       chord={chord}
                       uploadedImageUrl={getUploadedImageUrl(chordStorageKey(chord))}
-                      onSelect={() => onSelectChord(chord.id)}
+                      onSelect={() => {
+                        rememberSelectedCard(chord.id);
+                        onSelectChord(chord.id);
+                      }}
                       selectionTabIndex={activeId === chord.id ? 0 : -1}
                       audioTabIndex={-1}
+                      favorite={isFavorite(chord.id)}
+                      onToggleFavorite={() => toggleFavoriteFromCard(chord.id)}
+                      favoriteTabIndex={-1}
                       selectionButtonRef={(button) => registerButton(chord.id, button)}
                       onSelectionFocus={() => setActiveId(chord.id)}
                       onSelectionKeyDown={(event) => handleKeyDown(event, chord.id)}
@@ -102,7 +169,10 @@ export function ChordGrid({
             ))}
           </div>
           ) : (
-            <EmptyState />
+            <EmptyState
+              title={favoritesOnly ? "조건에 맞는 즐겨찾기가 없습니다" : "검색 결과가 없습니다"}
+              description={favoritesOnly ? "별 버튼으로 코드를 즐겨찾기에 추가해 보세요." : "다른 검색어나 코드 종류를 시도해 보세요."}
+            />
           )}
         </div>
       </div>

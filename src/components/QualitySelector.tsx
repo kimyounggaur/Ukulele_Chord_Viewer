@@ -1,21 +1,44 @@
 import { useLayoutEffect, useRef } from "react";
-import type { ChordQuality } from "../data/types";
+import type { Chord, ChordQuality } from "../data/types";
 import { MAIN_QUALITY_IDS, qualityById } from "../data/chordQualities";
 import { QualityBubble } from "./QualityBubble";
 import type { GridFocusRequest } from "../hooks/useRovingChordGrid";
+import { RecentChordStrip } from "./RecentChordStrip";
 
 interface QualitySelectorProps {
   selectedQualityId: ChordQuality | null;
   onSelectQuality: (qualityId: ChordQuality) => void;
   focusRequest?: GridFocusRequest | null;
+  onFocusRequestHandled?: (request: GridFocusRequest) => void;
+  recentChords?: readonly Chord[];
+  onSelectRecent?: (chordId: string) => void;
 }
 
-export function QualitySelector({ selectedQualityId, onSelectQuality, focusRequest }: QualitySelectorProps) {
+const EMPTY_RECENT_CHORDS: readonly Chord[] = [];
+
+export function QualitySelector({
+  selectedQualityId,
+  onSelectQuality,
+  focusRequest,
+  onFocusRequestHandled,
+  recentChords = EMPTY_RECENT_CHORDS,
+  onSelectRecent,
+}: QualitySelectorProps) {
   const buttonsRef = useRef(new Map<ChordQuality, HTMLButtonElement>());
+  const handledFocusRequestRef = useRef<string | null>(null);
+  const handledCallbackRef = useRef(onFocusRequestHandled);
+  handledCallbackRef.current = onFocusRequestHandled;
 
   useLayoutEffect(() => {
     if (!focusRequest) return undefined;
-    const frame = window.requestAnimationFrame(() => buttonsRef.current.get(focusRequest.id as ChordQuality)?.focus());
+    const requestKey = `${focusRequest.id}:${focusRequest.nonce}`;
+    if (handledFocusRequestRef.current === requestKey) return undefined;
+    const frame = window.requestAnimationFrame(() => {
+      if (handledFocusRequestRef.current === requestKey) return;
+      handledFocusRequestRef.current = requestKey;
+      buttonsRef.current.get(focusRequest.id as ChordQuality)?.focus();
+      handledCallbackRef.current?.(focusRequest);
+    });
     return () => window.cancelAnimationFrame(frame);
   }, [focusRequest]);
 
@@ -29,6 +52,7 @@ export function QualitySelector({ selectedQualityId, onSelectQuality, focusReque
           className="quality-selector-art-image"
         />
       </figure>
+      {onSelectRecent ? <RecentChordStrip chords={recentChords} onSelect={onSelectRecent} /> : null}
       <nav aria-labelledby="quality-selector-heading">
         <ul className="quality-selector-grid">
           {MAIN_QUALITY_IDS.map((qualityId) => {

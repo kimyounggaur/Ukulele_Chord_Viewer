@@ -4,7 +4,10 @@ import type { Chord, ChordQuality, ChordVoicing, Finger, StringIndex } from "./t
 import { rootToSlug } from "../lib/slug";
 
 const NATURAL_ROOTS = ["C", "D", "E", "F", "G", "A", "B"] as const;
-const MIN7_ROOTS = ["A", "B", "C", "C#", "D", "E", "F#", "G", "G#"] as const;
+const CHROMATIC_ROOTS = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] as const;
+const MIN7_IMAGE_ROOTS = ["A", "B", "C", "C#", "D", "E", "F", "F#", "G", "G#"] as const;
+const MIN7_ROOTS = [...MIN7_IMAGE_ROOTS, "A#"] as const;
+const APPENDIX_B_FLAT_ROOTS = [...NATURAL_ROOTS, "A#"] as const;
 
 type FretTuple = readonly [number, number, number, number];
 type FingerTuple = readonly [Finger, Finger, Finger, Finger];
@@ -129,31 +132,46 @@ function buildChord(config: QualityBuildConfig, root: string): Chord {
 
 const majorPatterns: Record<string, Pattern> = {
   C: { frets: [0, 0, 0, 3], fingers: [0, 0, 0, 3] },
+  "C#": { frets: [1, 1, 1, 4], fingers: [1, 1, 1, 4] },
   D: { frets: [2, 2, 2, 0], fingers: [1, 2, 3, 0] },
+  "D#": { frets: [0, 3, 3, 1], fingers: [0, 2, 3, 1] },
   E: { frets: [4, 4, 4, 2], fingers: [2, 3, 4, 1] },
   F: { frets: [2, 0, 1, 0], fingers: [2, 0, 1, 0] },
+  "F#": { frets: [3, 1, 2, 1], fingers: [3, 1, 2, 1] },
   G: { frets: [0, 2, 3, 2], fingers: [0, 1, 3, 2] },
+  "G#": { frets: [5, 3, 4, 3], fingers: [3, 1, 2, 1] },
   A: { frets: [2, 1, 0, 0], fingers: [2, 1, 0, 0] },
+  "A#": { frets: [3, 2, 1, 1], fingers: [3, 2, 1, 1] },
   B: { frets: [4, 3, 2, 2], fingers: [4, 3, 1, 1] },
 };
 
 const dom7Patterns: Record<string, Pattern> = {
   C: { frets: [0, 0, 0, 1], fingers: [0, 0, 0, 1] },
+  "C#": { frets: [1, 1, 1, 2], fingers: [1, 1, 1, 2] },
   D: { frets: [2, 2, 2, 3], fingers: [1, 1, 1, 3] },
+  "D#": { frets: [3, 3, 3, 4], fingers: [1, 1, 1, 4] },
   E: { frets: [1, 2, 0, 2], fingers: [1, 2, 0, 3] },
   F: { frets: [2, 3, 1, 3], fingers: [2, 3, 1, 4] },
+  "F#": { frets: [3, 4, 2, 4], fingers: [2, 3, 1, 4] },
   G: { frets: [0, 2, 1, 2], fingers: [0, 2, 1, 3] },
+  "G#": { frets: [1, 3, 2, 3], fingers: [1, 3, 2, 4] },
   A: { frets: [0, 1, 0, 0], fingers: [0, 1, 0, 0] },
+  "A#": { frets: [1, 2, 1, 1], fingers: [1, 2, 1, 1] },
   B: { frets: [2, 3, 2, 2], fingers: [1, 3, 1, 1] },
 };
 
 const minorPatterns: Record<string, Pattern> = {
   C: { frets: [0, 3, 3, 3], fingers: [0, 1, 2, 3] },
+  "C#": { frets: [1, 1, 0, 4], fingers: [1, 1, 0, 4] },
   D: { frets: [2, 2, 1, 0], fingers: [2, 3, 1, 0] },
+  "D#": { frets: [3, 3, 2, 1], fingers: [3, 4, 2, 1] },
   E: { frets: [0, 4, 3, 2], fingers: [0, 3, 2, 1] },
   F: { frets: [1, 0, 1, 3], fingers: [1, 0, 2, 4] },
+  "F#": { frets: [2, 1, 2, 0], fingers: [2, 1, 3, 0] },
   G: { frets: [0, 2, 3, 1], fingers: [0, 2, 3, 1] },
+  "G#": { frets: [4, 3, 4, 2], fingers: [3, 1, 4, 2] },
   A: { frets: [2, 0, 0, 0], fingers: [2, 0, 0, 0] },
+  "A#": { frets: [3, 1, 1, 1], fingers: [3, 1, 1, 1] },
   B: { frets: [4, 2, 2, 2], fingers: [3, 1, 1, 1] },
 };
 
@@ -164,9 +182,11 @@ const min7Patterns: Record<string, Pattern> = {
   "C#": { frets: [4, 4, 4, 4], fingers: [1, 1, 1, 1] },
   D: { frets: [2, 2, 1, 3], fingers: [2, 3, 1, 4] },
   E: { frets: [0, 2, 0, 2], fingers: [0, 1, 0, 2] },
+  F: { frets: [1, 3, 1, 3], fingers: [1, 3, 1, 4] },
   "F#": { frets: [2, 4, 2, 4], fingers: [1, 3, 1, 4] },
   G: { frets: [0, 2, 1, 1], fingers: [0, 2, 1, 1] },
   "G#": { frets: [1, 3, 2, 2], fingers: [1, 3, 2, 2] },
+  "A#": { frets: [1, 1, 1, 1], fingers: [1, 1, 1, 1] },
 };
 
 const sus4Patterns: Record<string, Pattern> = {
@@ -176,6 +196,7 @@ const sus4Patterns: Record<string, Pattern> = {
   F: { frets: [3, 0, 1, 1], fingers: [3, 0, 1, 1] },
   G: { frets: [0, 2, 3, 3], fingers: [0, 1, 2, 3] },
   A: { frets: [2, 2, 0, 0], fingers: [1, 2, 0, 0] },
+  "A#": { frets: [3, 3, 1, 1], fingers: [3, 4, 1, 1] },
   B: { frets: [4, 4, 2, 2], fingers: [3, 4, 1, 1] },
 };
 
@@ -186,6 +207,7 @@ const maj7Patterns: Record<string, Pattern> = {
   F: { frets: [2, 4, 1, 3], fingers: [2, 4, 1, 3] },
   G: { frets: [0, 2, 2, 2], fingers: [0, 1, 1, 1] },
   A: { frets: [1, 1, 0, 0], fingers: [1, 2, 0, 0] },
+  "A#": { frets: [3, 2, 1, 0], fingers: [3, 2, 1, 0] },
   B: { frets: [3, 3, 2, 2], fingers: [2, 3, 1, 1] },
 };
 
@@ -260,12 +282,12 @@ const minor6Patterns: Record<string, Pattern> = {
 };
 
 const qualityConfigs: QualityBuildConfig[] = [
-  { quality: "major", idSuffix: "", displaySuffix: "", legacyQuality: "major", imageDirectory: "major", roots: NATURAL_ROOTS, imageRoots: NATURAL_ROOTS, patterns: majorPatterns },
-  { quality: "dom7", idSuffix: "7", displaySuffix: "7", legacyQuality: "seventh", imageDirectory: "seventh", roots: NATURAL_ROOTS, imageRoots: NATURAL_ROOTS, patterns: dom7Patterns },
-  { quality: "minor", idSuffix: "m", displaySuffix: "m", legacyQuality: "minor", imageDirectory: "minor", roots: NATURAL_ROOTS, imageRoots: NATURAL_ROOTS, patterns: minorPatterns },
-  { quality: "min7", idSuffix: "m7", displaySuffix: "m7", legacyQuality: "minor7", imageDirectory: "minor7", roots: MIN7_ROOTS, imageRoots: MIN7_ROOTS, patterns: min7Patterns },
-  { quality: "sus4", idSuffix: "sus4", displaySuffix: "sus4", legacyQuality: "sus4", imageDirectory: "sus4", roots: NATURAL_ROOTS, imageRoots: NATURAL_ROOTS, patterns: sus4Patterns },
-  { quality: "maj7", idSuffix: "maj7", displaySuffix: "M7", legacyQuality: "major7", imageDirectory: "major7", roots: NATURAL_ROOTS, imageRoots: NATURAL_ROOTS, patterns: maj7Patterns, aliases: ["maj7"] },
+  { quality: "major", idSuffix: "", displaySuffix: "", legacyQuality: "major", imageDirectory: "major", roots: CHROMATIC_ROOTS, imageRoots: NATURAL_ROOTS, patterns: majorPatterns },
+  { quality: "dom7", idSuffix: "7", displaySuffix: "7", legacyQuality: "seventh", imageDirectory: "seventh", roots: CHROMATIC_ROOTS, imageRoots: NATURAL_ROOTS, patterns: dom7Patterns },
+  { quality: "minor", idSuffix: "m", displaySuffix: "m", legacyQuality: "minor", imageDirectory: "minor", roots: CHROMATIC_ROOTS, imageRoots: NATURAL_ROOTS, patterns: minorPatterns },
+  { quality: "min7", idSuffix: "m7", displaySuffix: "m7", legacyQuality: "minor7", imageDirectory: "minor7", roots: MIN7_ROOTS, imageRoots: MIN7_IMAGE_ROOTS, patterns: min7Patterns },
+  { quality: "sus4", idSuffix: "sus4", displaySuffix: "sus4", legacyQuality: "sus4", imageDirectory: "sus4", roots: APPENDIX_B_FLAT_ROOTS, imageRoots: NATURAL_ROOTS, patterns: sus4Patterns },
+  { quality: "maj7", idSuffix: "maj7", displaySuffix: "M7", legacyQuality: "major7", imageDirectory: "major7", roots: APPENDIX_B_FLAT_ROOTS, imageRoots: NATURAL_ROOTS, patterns: maj7Patterns, aliases: ["maj7"] },
   { quality: "sixth", idSuffix: "6", displaySuffix: "6", legacyQuality: "sixth", imageDirectory: "sixth", roots: NATURAL_ROOTS, imageRoots: NATURAL_ROOTS, patterns: sixthPatterns },
   { quality: "dom7sus4", idSuffix: "7sus4", displaySuffix: "7sus4", legacyQuality: "seventh-sus4", imageDirectory: "seventh-sus4", roots: NATURAL_ROOTS, imageRoots: NATURAL_ROOTS, patterns: dom7Sus4Patterns },
   { quality: "add9", idSuffix: "add9", displaySuffix: "add9", legacyQuality: "add9", imageDirectory: "add9", roots: NATURAL_ROOTS, imageRoots: NATURAL_ROOTS, patterns: add9Patterns, aliases: ["add2"] },

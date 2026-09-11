@@ -31,7 +31,7 @@ export function AdminPage({
             type="button"
             onClick={onBack}
             className="module-back-button inline-flex h-11 shrink-0 items-center gap-2 rounded-full border border-rose-100 bg-white px-4 font-bold text-stone-500 shadow-neumorphic transition hover:scale-105 focus:outline-none focus-visible:ring-4 focus-visible:ring-rose-100"
-            aria-label="이전 화면으로 돌아가기"
+            aria-label="뒤로, 이전 화면으로 돌아가기"
           >
             <ArrowLeft size={18} aria-hidden="true" />
             뒤로

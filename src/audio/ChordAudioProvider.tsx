@@ -23,7 +23,7 @@ interface ChordAudioValue {
   available: boolean;
   settings: ChordAudioSettings;
   updateSettings: (patch: Partial<ChordAudioSettings>) => void;
-  playChord: (chord: Chord, mode?: "strum" | "arpeggio") => Promise<void>;
+  playChord: (chord: Chord, mode?: "strum" | "arpeggio", voicingIndex?: number) => Promise<void>;
   playingChordId: string | null;
   activeStrings: number[];
 }
@@ -72,8 +72,12 @@ export function ChordAudioProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const playChord = useCallback(async (chord: Chord, mode: "strum" | "arpeggio" = "strum") => {
-    const voicing = chord.voicings[0];
+  const playChord = useCallback(async (
+    chord: Chord,
+    mode: "strum" | "arpeggio" = "strum",
+    voicingIndex = 0,
+  ) => {
+    const voicing = chord.voicings[voicingIndex] ?? chord.voicings[0];
     const notes = voicingToMidi(voicing, settings.lowG);
     visualTimers.current.forEach(window.clearTimeout);
     visualTimers.current = [];

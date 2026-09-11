@@ -1,4 +1,4 @@
-import { useId, type KeyboardEvent, type Ref } from "react";
+import { useId, useState, type KeyboardEvent, type Ref } from "react";
 import type { Chord } from "../data/types";
 import { qualityById } from "../data/chordQualities";
 import { getChordDisplayTitle } from "../lib/chordDisplay";
@@ -6,6 +6,7 @@ import { ChordDiagram } from "./ChordDiagram";
 import { ChordPlayButton } from "./ChordPlayButton";
 import { describeVoicing } from "../a11y/describeVoicing";
 import { useChordAudio } from "../audio/ChordAudioProvider";
+import { FavoriteButton } from "./FavoriteButton";
 
 interface ChordCardProps {
   chord: Chord;
@@ -18,6 +19,9 @@ interface ChordCardProps {
   selectionButtonRef?: Ref<HTMLButtonElement>;
   onSelectionFocus?: () => void;
   onSelectionKeyDown?: (event: KeyboardEvent<HTMLButtonElement>) => void;
+  favorite?: boolean;
+  onToggleFavorite?: () => void;
+  favoriteTabIndex?: number;
 }
 
 export function ChordCard({
@@ -31,9 +35,13 @@ export function ChordCard({
   selectionButtonRef,
   onSelectionFocus,
   onSelectionKeyDown,
+  favorite = false,
+  onToggleFavorite,
+  favoriteTabIndex,
 }: ChordCardProps) {
   const { available: audioAvailable, playChord } = useChordAudio();
   const shortcutHelpId = useId();
+  const [favoriteShortcutStatus, setFavoriteShortcutStatus] = useState("");
   const quality = qualityById[chord.quality];
   const displayTitle = getChordDisplayTitle(chord);
   const description = describeVoicing(chord);
@@ -64,6 +72,22 @@ export function ChordCard({
             && !event.ctrlKey
             && !event.metaKey
             && event.key.toLowerCase() === "p";
+          const isFavoriteShortcut = Boolean(onToggleFavorite)
+            && !event.altKey
+            && !event.ctrlKey
+            && !event.metaKey
+            && !event.repeat
+            && event.key.toLowerCase() === "f";
+          if (isFavoriteShortcut) {
+            event.preventDefault();
+            setFavoriteShortcutStatus(
+              favorite
+                ? `${displayTitle} 코드를 즐겨찾기에서 제거했습니다.`
+                : `${displayTitle} 코드를 즐겨찾기에 추가했습니다.`,
+            );
+            onToggleFavorite?.();
+            return;
+          }
           if (audioAvailable && (isArpeggioShortcut || isStrumShortcut)) {
             event.preventDefault();
             void playChord(chord, isArpeggioShortcut ? "arpeggio" : "strum");
@@ -72,7 +96,7 @@ export function ChordCard({
           onSelectionKeyDown?.(event);
         }}
         tabIndex={selectionTabIndex}
-        aria-label={description}
+        aria-label={`${displayTitle}. ${description}`}
         aria-describedby={shortcutHelpId}
         data-chord-id={chord.id}
         className={[
@@ -84,7 +108,7 @@ export function ChordCard({
         ].join(" ")}
         style={{ borderTop: `4px solid ${quality.color}` }}
       >
-        <div className="flex items-center justify-between gap-2 pr-9">
+        <div className="chord-card-title-row flex items-center justify-between gap-2">
           <span
             className={[
               "font-display font-extrabold text-stone-800",
@@ -94,13 +118,30 @@ export function ChordCard({
             {displayTitle}
           </span>
         </div>
-        <div className={related ? "related-chord-diagram min-h-0 flex-1" : "min-h-0 flex-1"}>
+        <div
+          className={related ? "related-chord-diagram min-h-0 flex-1" : "min-h-0 flex-1"}
+          aria-hidden="true"
+        >
           <ChordDiagram chord={chord} size="sm" uploadedImageUrl={uploadedImageUrl} />
         </div>
       </button>
       <span id={shortcutHelpId} className="sr-only">
         P 키는 스트럼 재생, Shift+Enter 또는 Shift+Space는 아르페지오 재생입니다.
+        {onToggleFavorite ? " F 키는 즐겨찾기 전환입니다." : ""}
       </span>
+      <span className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {favoriteShortcutStatus}
+      </span>
+      {onToggleFavorite ? (
+        <FavoriteButton
+          chordName={displayTitle}
+          active={favorite}
+          onToggle={onToggleFavorite}
+          compact
+          tabIndex={favoriteTabIndex}
+          className="chord-card-favorite"
+        />
+      ) : null}
       <ChordPlayButton chord={chord} compact className="chord-card-audio" tabIndex={audioTabIndex} />
     </article>
   );

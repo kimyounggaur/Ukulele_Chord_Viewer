@@ -9,16 +9,20 @@ import {
 
 export interface GridFocusRequest {
   id: string;
-  nonce: number;
+  nonce: number | string;
 }
 
 export function useRovingChordGrid(
   chordIds: readonly string[],
   columns: number,
   focusRequest?: GridFocusRequest | null,
+  onFocusRequestHandled?: (request: GridFocusRequest) => void,
 ) {
   const [activeId, setActiveId] = useState<string | null>(chordIds[0] ?? null);
   const buttonsRef = useRef(new Map<string, HTMLButtonElement>());
+  const handledFocusRequestRef = useRef<string | null>(null);
+  const handledCallbackRef = useRef(onFocusRequestHandled);
+  handledCallbackRef.current = onFocusRequestHandled;
 
   useEffect(() => {
     if (!activeId || !chordIds.includes(activeId)) setActiveId(chordIds[0] ?? null);
@@ -33,8 +37,15 @@ export function useRovingChordGrid(
 
   useLayoutEffect(() => {
     if (!focusRequest || !chordIds.includes(focusRequest.id)) return undefined;
+    const requestKey = `${focusRequest.id}:${focusRequest.nonce}`;
+    if (handledFocusRequestRef.current === requestKey) return undefined;
     setActiveId(focusRequest.id);
-    const frame = window.requestAnimationFrame(() => focusChord(focusRequest.id));
+    const frame = window.requestAnimationFrame(() => {
+      if (handledFocusRequestRef.current === requestKey) return;
+      handledFocusRequestRef.current = requestKey;
+      focusChord(focusRequest.id);
+      handledCallbackRef.current?.(focusRequest);
+    });
     return () => window.cancelAnimationFrame(frame);
   }, [chordIds, focusChord, focusRequest]);
 

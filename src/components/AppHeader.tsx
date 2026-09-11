@@ -7,7 +7,6 @@ interface AppHeaderProps {
   onSearchChange: (value: string) => void;
   onHome: () => void;
   onOpenAdmin: () => void;
-  canSearch: boolean;
   canManage: boolean;
   currentUser: AuthUser | null;
   onSignUp: AuthAction;
@@ -115,7 +114,6 @@ export function AppHeader({
   onSearchChange,
   onHome,
   onOpenAdmin,
-  canSearch,
   canManage,
   currentUser,
   onSignUp,
@@ -245,17 +243,16 @@ export function AppHeader({
             type="search"
           value={searchTerm}
           onChange={(event) => onSearchChange(event.target.value)}
-            disabled={!canSearch}
+            onKeyDown={(event) => {
+              if (event.key === "Escape" && searchTerm) {
+                event.preventDefault();
+                onSearchChange("");
+              }
+            }}
             aria-label="우쿨렐레 코드 검색"
-            className="h-12 w-full rounded-full border-2 border-rose-100 bg-white/90 pl-12 pr-5 text-base font-semibold text-stone-700 shadow-neumorphic-inset outline-none transition placeholder:text-stone-300 focus:border-rose-200 focus:ring-4 focus:ring-rose-100 disabled:cursor-not-allowed disabled:bg-stone-50 disabled:text-stone-300"
-            placeholder={canSearch ? "코드 검색" : "로그인 후 검색"}
+            className="h-12 w-full rounded-full border-2 border-rose-100 bg-white/90 pl-12 pr-5 text-base font-semibold text-stone-700 shadow-neumorphic-inset outline-none transition placeholder:text-stone-300 focus:border-rose-200 focus:ring-4 focus:ring-rose-100"
+            placeholder="코드 검색"
         />
-          {!canSearch ? (
-            <span className="search-lock-hint">
-              <Lock size={13} aria-hidden="true" />
-              로그인 필요
-            </span>
-          ) : null}
       </label>
       </div>
 
@@ -389,7 +386,7 @@ export function AppHeader({
             {authMode === "admin-login" ? (
               <p className="auth-modal-note">Supabase app_metadata role이 admin인 계정만 허용됩니다.</p>
             ) : (
-              <p className="auth-modal-note">회원 로그인 후 검색 기능을 사용할 수 있습니다.</p>
+              <p className="auth-modal-note">회원 계정으로 로그인하거나 새 계정을 만듭니다.</p>
             )}
             {authMessage ? (
               <p className="auth-modal-message" role="status" aria-live="polite">

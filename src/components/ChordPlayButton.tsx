@@ -9,11 +9,12 @@ interface ChordPlayButtonProps {
   compact?: boolean;
   className?: string;
   tabIndex?: number;
+  voicingIndex?: number;
 }
 
 const LONG_PRESS_MS = 500;
 
-export function ChordPlayButton({ chord, compact = false, className = "", tabIndex }: ChordPlayButtonProps) {
+export function ChordPlayButton({ chord, compact = false, className = "", tabIndex, voicingIndex = 0 }: ChordPlayButtonProps) {
   const { available, playChord, playingChordId } = useChordAudio();
   const timerRef = useRef<number | null>(null);
   const longPressRef = useRef(false);
@@ -37,7 +38,7 @@ export function ChordPlayButton({ chord, compact = false, className = "", tabInd
     timerRef.current = window.setTimeout(() => {
       timerRef.current = null;
       longPressRef.current = true;
-      void playChord(chord, "arpeggio");
+      void playChord(chord, "arpeggio", voicingIndex);
     }, LONG_PRESS_MS);
   };
 
@@ -46,7 +47,7 @@ export function ChordPlayButton({ chord, compact = false, className = "", tabInd
     if (!available || event.button !== 0) return;
     const wasLongPress = longPressRef.current;
     clearTimer();
-    if (!wasLongPress) void playChord(chord, "strum");
+    if (!wasLongPress) void playChord(chord, "strum", voicingIndex);
   };
 
   const handlePointerCancel = (event: PointerEvent<HTMLButtonElement>) => {
@@ -59,13 +60,13 @@ export function ChordPlayButton({ chord, compact = false, className = "", tabInd
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     // Pointer interaction is handled on pointerup so a keyboard-generated click is the only one handled here.
-    if (available && event.detail === 0) void playChord(chord, "strum");
+    if (available && event.detail === 0) void playChord(chord, "strum", voicingIndex);
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
     if (!available || !event.shiftKey || (event.key !== "Enter" && event.key !== " ")) return;
     event.preventDefault();
-    void playChord(chord, "arpeggio");
+    void playChord(chord, "arpeggio", voicingIndex);
   };
 
   return (
