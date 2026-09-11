@@ -1,5 +1,18 @@
 import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from "react";
-import { Home, LayoutGrid, Lock, LogIn, LogOut, Maximize2, Minimize2, Search, ShieldCheck, UserPlus } from "lucide-react";
+import {
+  BookOpenCheck,
+  GraduationCap,
+  Home,
+  LayoutGrid,
+  Lock,
+  LogIn,
+  LogOut,
+  Maximize2,
+  Minimize2,
+  Search,
+  ShieldCheck,
+  UserPlus,
+} from "lucide-react";
 import type { AuthAction, AuthUser } from "../hooks/useAuth";
 
 interface AppHeaderProps {
@@ -16,6 +29,9 @@ interface AppHeaderProps {
   tools?: ReactNode;
   stageMode: boolean;
   onToggleStage: () => Promise<void>;
+  onOpenLessonSets: () => void;
+  onOpenQuiz: () => void;
+  currentSection: "chords" | "sets" | "quiz";
 }
 
 type AuthMode = "signup" | "member-login" | "admin-login";
@@ -123,6 +139,9 @@ export function AppHeader({
   tools,
   stageMode,
   onToggleStage,
+  onOpenLessonSets,
+  onOpenQuiz,
+  currentSection,
 }: AppHeaderProps) {
   const [authMode, setAuthMode] = useState<AuthMode | null>(null);
   const [authMessage, setAuthMessage] = useState<string | null>(null);
@@ -262,6 +281,28 @@ export function AppHeader({
 
       <div className="header-right-actions">
         <div className="header-utility-actions">
+          <nav className="header-feature-nav" aria-label="수업 도구">
+            <button
+              type="button"
+              className="header-feature-button"
+              aria-label="수업 세트 열기"
+              aria-current={currentSection === "sets" ? "page" : undefined}
+              onClick={onOpenLessonSets}
+            >
+              <BookOpenCheck size={18} aria-hidden="true" />
+              <span>수업 세트</span>
+            </button>
+            <button
+              type="button"
+              className="header-feature-button"
+              aria-label="코드 퀴즈 열기"
+              aria-current={currentSection === "quiz" ? "page" : undefined}
+              onClick={onOpenQuiz}
+            >
+              <GraduationCap size={19} aria-hidden="true" />
+              <span>퀴즈</span>
+            </button>
+          </nav>
           {tools}
           <button
             type="button"

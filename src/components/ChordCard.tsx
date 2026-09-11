@@ -7,6 +7,7 @@ import { ChordPlayButton } from "./ChordPlayButton";
 import { describeVoicing } from "../a11y/describeVoicing";
 import { useChordAudio } from "../audio/ChordAudioProvider";
 import { FavoriteButton } from "./FavoriteButton";
+import { useLongPress } from "../hooks/useLongPress";
 
 interface ChordCardProps {
   chord: Chord;
@@ -22,6 +23,7 @@ interface ChordCardProps {
   favorite?: boolean;
   onToggleFavorite?: () => void;
   favoriteTabIndex?: number;
+  onRequestAddToSet?: (opener: HTMLButtonElement) => void;
 }
 
 export function ChordCard({
@@ -38,6 +40,7 @@ export function ChordCard({
   favorite = false,
   onToggleFavorite,
   favoriteTabIndex,
+  onRequestAddToSet,
 }: ChordCardProps) {
   const { available: audioAvailable, playChord } = useChordAudio();
   const shortcutHelpId = useId();
@@ -45,6 +48,9 @@ export function ChordCard({
   const quality = qualityById[chord.quality];
   const displayTitle = getChordDisplayTitle(chord);
   const description = describeVoicing(chord);
+  const { longPressHandlers, consumeSuppressedClick } = useLongPress<HTMLButtonElement>({
+    onLongPress: onRequestAddToSet,
+  });
   const minHeightClass = related
     ? ""
     : featured
@@ -64,7 +70,10 @@ export function ChordCard({
       <button
         ref={selectionButtonRef}
         type="button"
-        onClick={onSelect}
+        {...longPressHandlers}
+        onClick={(event) => {
+          if (!consumeSuppressedClick(event)) onSelect();
+        }}
         onFocus={onSelectionFocus}
         onKeyDown={(event) => {
           const isArpeggioShortcut = event.shiftKey && (event.key === "Enter" || event.key === " ");
@@ -78,6 +87,17 @@ export function ChordCard({
             && !event.metaKey
             && !event.repeat
             && event.key.toLowerCase() === "f";
+          const isAddToSetShortcut = Boolean(onRequestAddToSet)
+            && !event.altKey
+            && !event.ctrlKey
+            && !event.metaKey
+            && !event.repeat
+            && event.key.toLowerCase() === "s";
+          if (isAddToSetShortcut) {
+            event.preventDefault();
+            onRequestAddToSet?.(event.currentTarget);
+            return;
+          }
           if (isFavoriteShortcut) {
             event.preventDefault();
             setFavoriteShortcutStatus(
@@ -128,6 +148,7 @@ export function ChordCard({
       <span id={shortcutHelpId} className="sr-only">
         P 키는 스트럼 재생, Shift+Enter 또는 Shift+Space는 아르페지오 재생입니다.
         {onToggleFavorite ? " F 키는 즐겨찾기 전환입니다." : ""}
+        {onRequestAddToSet ? " 길게 누르거나 S 키를 누르면 수업 세트에 추가합니다." : ""}
       </span>
       <span className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {favoriteShortcutStatus}

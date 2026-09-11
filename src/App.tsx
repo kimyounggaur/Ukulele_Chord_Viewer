@@ -18,11 +18,31 @@ import { useStageMode } from "./hooks/useStageMode";
 import { useDebouncedValue } from "./hooks/useDebouncedValue";
 import { useFavorites } from "./hooks/useFavorites";
 import { useRecentChords } from "./hooks/useRecentChords";
+import { useLessonSets } from "./hooks/useLessonSets";
 import type { GridFocusRequest } from "./hooks/useRovingChordGrid";
-import { chordPath, qualityPath, readRouteSegment, readVoicingIndex } from "./routing/routes";
+import {
+  chordPath,
+  lessonSetPath,
+  lessonSetPlayPath,
+  lessonSetPrintPath,
+  qualityPath,
+  readRouteSegment,
+  readVoicingIndex,
+} from "./routing/routes";
+import { LessonSetListPage } from "./components/lesson/LessonSetListPage";
+import { LessonSetEditorPage } from "./components/lesson/LessonSetEditorPage";
+import { LessonSlideshowPage } from "./components/lesson/LessonSlideshowPage";
+import { LessonPrintPage } from "./components/lesson/LessonPrintPage";
+import { AddToLessonSetDialog } from "./components/lesson/AddToLessonSetDialog";
+import { LessonSetShareDialog } from "./components/lesson/LessonSetShareDialog";
+import { SharedLessonSetImportPage } from "./components/lesson/SharedLessonSetImportPage";
+import { QuizPage } from "./components/quiz/QuizPage";
+import { encodeLessonSetShareData } from "./lessonSets/shareCodec";
+import type { LessonSetSharePayload } from "./lessonSets/shareCodec";
 
 interface AppRouteState {
   fromApp?: boolean;
+  fromLessonSetId?: string;
 }
 
 function asQuality(value: string | undefined): ChordQuality | null {
@@ -56,8 +76,15 @@ function App() {
   const [adminPageOpen, setAdminPageOpen] = useState(false);
   const [gridFocusRequest, setGridFocusRequest] = useState<GridFocusRequest | null>(null);
   const [qualityFocusRequest, setQualityFocusRequest] = useState<GridFocusRequest | null>(null);
+  const [addToSetChordId, setAddToSetChordId] = useState<string | null>(null);
+  const [sharingSetId, setSharingSetId] = useState<string | null>(null);
+  const [lessonAnnouncement, setLessonAnnouncement] = useState("");
   const focusNonceRef = useRef(0);
   const focusSearchAfterGridRef = useRef(false);
+  const addToSetOpenerRef = useRef<HTMLButtonElement | null>(null);
+  const shareOpenerRef = useRef<HTMLButtonElement | null>(null);
+  const addToSetLocationKeyRef = useRef<string | null>(null);
+  const shareLocationKeyRef = useRef<string | null>(null);
   const auth = useAuth();
   const uploadedImages = useIndexedChordImages();
   const { stageMode, toggleStageMode } = useStageMode();
@@ -65,15 +92,38 @@ function App() {
   const debouncedSearchTerm = useDebouncedValue(searchTerm, 120);
   const { isFavorite, toggleFavorite } = useFavorites();
   const { recentChordIds, addRecentChord } = useRecentChords();
+  const lessonSetsState = useLessonSets();
 
   const chordMatch = matchPath({ path: "/c/:chordId", end: true }, location.pathname);
   const qualityMatch = matchPath({ path: "/q/:quality", end: true }, location.pathname);
+  const lessonSetPlayMatch = matchPath({ path: "/sets/:setId/play", end: true }, location.pathname);
+  const lessonSetPrintMatch = matchPath({ path: "/sets/:setId/print", end: true }, location.pathname);
+  const lessonSetEditorMatch = matchPath({ path: "/sets/:setId", end: true }, location.pathname);
+  const routeIsLessonSetList = location.pathname === "/sets";
+  const routeIsQuiz = location.pathname === "/quiz";
+  const routeIsSharedSet = location.pathname === "/set";
   const selectedQualityId = asQuality(qualityMatch?.params.quality);
   const routeChordId = readRouteSegment(chordMatch?.params.chordId);
   const selectedChord = useMemo(
     () => staticChords.find((chord) => chord.id === routeChordId || chord.legacyId === routeChordId) ?? null,
     [routeChordId],
   );
+  const routeLessonSetId = readRouteSegment(
+    lessonSetPlayMatch?.params.setId
+      ?? lessonSetPrintMatch?.params.setId
+      ?? lessonSetEditorMatch?.params.setId,
+  );
+  const selectedLessonSet = useMemo(
+    () => lessonSetsState.lessonSets.find((lessonSet) => lessonSet.id === routeLessonSetId) ?? null,
+    [lessonSetsState.lessonSets, routeLessonSetId],
+  );
+  const selectedLessonSetChords = useMemo(() => {
+    if (!selectedLessonSet) return [];
+    const chordsById = new Map(staticChords.map((chord) => [chord.id, chord]));
+    return selectedLessonSet.chordIds
+      .map((chordId) => chordsById.get(chordId))
+      .filter((chord): chord is (typeof staticChords)[number] => Boolean(chord));
+  }, [selectedLessonSet]);
   const voicingIndex = selectedChord
     ? readVoicingIndex(location.search, selectedChord.voicings.length)
     : 0;
@@ -98,6 +148,11 @@ function App() {
   useEffect(() => {
     if (location.pathname !== "/") setAdminPageOpen(false);
   }, [location.pathname]);
+
+  useEffect(() => {
+    setAddToSetChordId(null);
+    setSharingSetId(null);
+  }, [location.pathname, location.search]);
 
   const requestGridFocus = useCallback((chordId: string) => {
     focusNonceRef.current += 1;
@@ -196,13 +251,118 @@ function App() {
     setAdminPageOpen(true);
   }, [auth.isAdmin, location.pathname, navigate]);
 
+  const handleOpenLessonSets = useCallback(() => {
+    setSearchTerm("");
+    setFavoritesOnly(false);
+    setAdminPageOpen(false);
+    navigate("/sets");
+  }, [navigate]);
+
+  const handleOpenQuiz = useCallback(() => {
+    if (routeIsQuiz) return;
+    setSearchTerm("");
+    setFavoritesOnly(false);
+    setAdminPageOpen(false);
+    navigate("/quiz");
+  }, [navigate, routeIsQuiz]);
+
+  const handleCreateLessonSet = useCallback((title: string) => {
+    const lessonSet = lessonSetsState.createSet({ title });
+    navigate(lessonSetPath(lessonSet.id));
+  }, [lessonSetsState, navigate]);
+
+  const handleRequestAddToSet = useCallback((chordId: string, opener: HTMLButtonElement) => {
+    addToSetOpenerRef.current = opener;
+    addToSetLocationKeyRef.current = location.key;
+    setAddToSetChordId(chordId);
+  }, [location.key]);
+
+  const handleCloseAddToSet = useCallback(() => {
+    setAddToSetChordId(null);
+    addToSetLocationKeyRef.current = null;
+    window.requestAnimationFrame(() => addToSetOpenerRef.current?.focus());
+  }, []);
+
+  const handleOpenShare = useCallback((lessonSetId: string, opener: HTMLButtonElement) => {
+    shareOpenerRef.current = opener;
+    shareLocationKeyRef.current = location.key;
+    setSharingSetId(lessonSetId);
+  }, [location.key]);
+
+  const handleCloseShare = useCallback(() => {
+    setSharingSetId(null);
+    shareLocationKeyRef.current = null;
+    window.requestAnimationFrame(() => shareOpenerRef.current?.focus());
+  }, []);
+
+  const handleStartLessonSlideshow = useCallback((lessonSetId: string) => {
+    try {
+      const fullscreenRequest = document.documentElement.requestFullscreen?.();
+      void fullscreenRequest?.catch(() => {
+        // The route itself provides an immersive fallback when fullscreen is unavailable.
+      });
+    } catch {
+      // Keep presenting in the in-app immersive layout.
+    }
+    navigate(lessonSetPlayPath(lessonSetId), {
+      state: { fromLessonSetId: lessonSetId } satisfies AppRouteState,
+    });
+  }, [navigate]);
+
+  const addToSetChord = useMemo(
+    () => addToSetLocationKeyRef.current === location.key
+      ? staticChords.find((chord) => chord.id === addToSetChordId) ?? null
+      : null,
+    [addToSetChordId, location.key],
+  );
+  const sharingLessonSet = useMemo(
+    () => shareLocationKeyRef.current === location.key
+      ? lessonSetsState.lessonSets.find((lessonSet) => lessonSet.id === sharingSetId) ?? null
+      : null,
+    [lessonSetsState.lessonSets, location.key, sharingSetId],
+  );
+  const lessonSetShareUrl = useMemo(() => {
+    if (!sharingLessonSet) return "";
+    try {
+      const encoded = encodeLessonSetShareData(sharingLessonSet);
+      const pageUrl = window.location.href.split("#")[0];
+      return `${pageUrl}#/set?d=${encodeURIComponent(encoded)}`;
+    } catch {
+      return "";
+    }
+  }, [sharingLessonSet]);
+
+  const sharedLessonSetData = routeIsSharedSet
+    ? new URLSearchParams(location.search).get("d") ?? ""
+    : "";
+
   const routeIsHome = location.pathname === "/";
-  const routeIsInvalid = !routeIsHome
-    && (!chordMatch && !qualityMatch
-      || Boolean(chordMatch && !selectedChord)
-      || Boolean(qualityMatch && !selectedQualityId));
+  const isKnownRoute = routeIsHome
+    || Boolean(chordMatch)
+    || Boolean(qualityMatch)
+    || routeIsLessonSetList
+    || routeIsQuiz
+    || routeIsSharedSet
+    || Boolean(lessonSetPlayMatch)
+    || Boolean(lessonSetPrintMatch)
+    || Boolean(lessonSetEditorMatch);
+  const routeIsInvalid = !isKnownRoute
+    || Boolean(chordMatch && !selectedChord)
+    || Boolean(qualityMatch && !selectedQualityId)
+    || Boolean(
+      (lessonSetPlayMatch || lessonSetPrintMatch || lessonSetEditorMatch)
+      && !selectedLessonSet,
+    );
   const shouldShowGrid = Boolean(selectedQualityId)
     || (routeIsHome && Boolean(debouncedSearchTerm.trim()));
+  const routeIsImmersive = Boolean(
+    selectedLessonSet && (lessonSetPlayMatch || lessonSetPrintMatch),
+  );
+  const currentSection = routeIsQuiz
+    ? "quiz"
+    : routeIsLessonSetList || Boolean(routeLessonSetId) || routeIsSharedSet
+      ? "sets"
+      : "chords";
 
   useLayoutEffect(() => {
     if (shouldShowGrid || !focusSearchAfterGridRef.current) return;
@@ -213,7 +373,7 @@ function App() {
   return (
     <AppShell
       layoutMode={layoutMode}
-      header={
+      header={routeIsImmersive ? undefined : (
         <AppHeader
           searchTerm={searchTerm}
           onSearchChange={handleSearchChange}
@@ -228,8 +388,11 @@ function App() {
           tools={<AudioSettingsControl />}
           stageMode={stageMode}
           onToggleStage={toggleStageMode}
+          onOpenLessonSets={handleOpenLessonSets}
+          onOpenQuiz={handleOpenQuiz}
+          currentSection={currentSection}
         />
-      }
+      )}
     >
       {adminPageOpen && auth.isAdmin ? (
         <AdminPage
@@ -241,6 +404,74 @@ function App() {
         />
       ) : routeIsInvalid ? (
         <RouteError onHome={handleHome} />
+      ) : lessonSetPlayMatch && selectedLessonSet ? (
+        <LessonSlideshowPage
+          set={selectedLessonSet}
+          chords={selectedLessonSetChords}
+          onExit={() => {
+            const routeState = location.state as AppRouteState | null;
+            if (routeState?.fromLessonSetId === selectedLessonSet.id) navigate(-1);
+            else navigate(lessonSetPath(selectedLessonSet.id), { replace: true });
+          }}
+        />
+      ) : lessonSetPrintMatch && selectedLessonSet ? (
+        <LessonPrintPage
+          set={selectedLessonSet}
+          chords={selectedLessonSetChords}
+          onBack={() => {
+            const routeState = location.state as AppRouteState | null;
+            if (routeState?.fromLessonSetId === selectedLessonSet.id) navigate(-1);
+            else navigate(lessonSetPath(selectedLessonSet.id), { replace: true });
+          }}
+        />
+      ) : routeIsSharedSet ? (
+        <SharedLessonSetImportPage
+          data={sharedLessonSetData}
+          onImport={(payload: LessonSetSharePayload) => {
+            const imported = lessonSetsState.importSet({ title: payload.t, chordIds: payload.c });
+            setLessonAnnouncement(`${imported.title} 세트를 가져왔습니다.`);
+            navigate(lessonSetPath(imported.id), { replace: true });
+          }}
+          onCancel={handleOpenLessonSets}
+        />
+      ) : routeIsLessonSetList ? (
+        <LessonSetListPage
+          lessonSets={lessonSetsState.lessonSets}
+          onCreate={handleCreateLessonSet}
+          onOpen={(lessonSetId) => navigate(lessonSetPath(lessonSetId))}
+          onDelete={(lessonSetId) => lessonSetsState.deleteSet(lessonSetId)}
+          onBack={handleHome}
+        />
+      ) : lessonSetEditorMatch && selectedLessonSet ? (
+        <LessonSetEditorPage
+          lessonSet={selectedLessonSet}
+          chords={selectedLessonSetChords}
+          onBack={handleOpenLessonSets}
+          onRename={(title) => lessonSetsState.renameSet(selectedLessonSet.id, title)}
+          onUpdateNote={(note) => lessonSetsState.updateSetNote(selectedLessonSet.id, note)}
+          onMoveChord={(fromIndex, toIndex) => {
+            lessonSetsState.moveChordInSet(selectedLessonSet.id, fromIndex, toIndex);
+          }}
+          onRemoveChord={(chordId) => lessonSetsState.removeChordFromSet(selectedLessonSet.id, chordId)}
+          onPlay={() => handleStartLessonSlideshow(selectedLessonSet.id)}
+          onShare={(opener) => handleOpenShare(selectedLessonSet.id, opener)}
+          onPrint={() => navigate(lessonSetPrintPath(selectedLessonSet.id), {
+            state: { fromLessonSetId: selectedLessonSet.id } satisfies AppRouteState,
+          })}
+          onQuiz={() => navigate(`/quiz?set=${encodeURIComponent(selectedLessonSet.id)}`)}
+          onDelete={() => {
+            lessonSetsState.deleteSet(selectedLessonSet.id);
+            navigate("/sets", { replace: true });
+          }}
+        />
+      ) : routeIsQuiz ? (
+        <QuizPage
+          key={location.search}
+          chords={staticChords}
+          lessonSets={lessonSetsState.lessonSets}
+          onBack={handleHome}
+          initialLessonSetId={new URLSearchParams(location.search).get("set") ?? undefined}
+        />
       ) : selectedChord ? (
         <ChordDetail
           chord={selectedChord}
@@ -273,6 +504,7 @@ function App() {
           onToggleFavoritesOnly={() => setFavoritesOnly((current) => !current)}
           isFavorite={isFavorite}
           onToggleFavorite={(chordId) => toggleFavorite(chordId)}
+          onRequestAddToSet={handleRequestAddToSet}
         />
       ) : (
         <QualitySelector
@@ -284,6 +516,39 @@ function App() {
           onSelectRecent={handleSelectRecentChord}
         />
       )}
+      {addToSetChord ? (
+        <AddToLessonSetDialog
+          chord={addToSetChord}
+          lessonSets={lessonSetsState.lessonSets}
+          onAdd={(lessonSetId) => {
+            const lessonSet = lessonSetsState.lessonSets.find(({ id }) => id === lessonSetId);
+            if (lessonSet?.chordIds.includes(addToSetChord.id)) {
+              setLessonAnnouncement(`${addToSetChord.displayName} 코드는 이미 ${lessonSet.title}에 있습니다.`);
+              handleCloseAddToSet();
+              return;
+            }
+            lessonSetsState.addChordToSet(lessonSetId, addToSetChord.id);
+            setLessonAnnouncement(`${addToSetChord.displayName} 코드를 ${lessonSet?.title ?? "수업 세트"}에 추가했습니다.`);
+            handleCloseAddToSet();
+          }}
+          onCreateAndAdd={(title) => {
+            const lessonSet = lessonSetsState.createSet({ title, chordIds: [addToSetChord.id] });
+            setLessonAnnouncement(`${lessonSet.title} 세트를 만들고 ${addToSetChord.displayName} 코드를 추가했습니다.`);
+            handleCloseAddToSet();
+          }}
+          onClose={handleCloseAddToSet}
+        />
+      ) : null}
+      {sharingLessonSet ? (
+        <LessonSetShareDialog
+          lessonSet={sharingLessonSet}
+          shareUrl={lessonSetShareUrl}
+          onClose={handleCloseShare}
+        />
+      ) : null}
+      <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {lessonAnnouncement}
+      </p>
     </AppShell>
   );
 }

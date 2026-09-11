@@ -26,6 +26,7 @@ interface ChordGridProps {
   onToggleFavoritesOnly: () => void;
   isFavorite: (chordId: string) => boolean;
   onToggleFavorite: (chordId: string) => void;
+  onRequestAddToSet?: (chordId: string, opener: HTMLButtonElement) => void;
 }
 
 export function ChordGrid({
@@ -44,6 +45,7 @@ export function ChordGrid({
   onToggleFavoritesOnly,
   isFavorite,
   onToggleFavorite,
+  onRequestAddToSet,
 }: ChordGridProps) {
   const matchingChords = useChordSearch(chords, searchTerm, selectedQualityId);
   const filteredChords = useMemo(
@@ -158,6 +160,9 @@ export function ChordGrid({
                       audioTabIndex={-1}
                       favorite={isFavorite(chord.id)}
                       onToggleFavorite={() => toggleFavoriteFromCard(chord.id)}
+                      onRequestAddToSet={onRequestAddToSet
+                        ? (opener) => onRequestAddToSet(chord.id, opener)
+                        : undefined}
                       favoriteTabIndex={-1}
                       selectionButtonRef={(button) => registerButton(chord.id, button)}
                       onSelectionFocus={() => setActiveId(chord.id)}

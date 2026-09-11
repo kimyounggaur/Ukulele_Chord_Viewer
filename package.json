@@ -14,9 +14,15 @@
     "check:a11y": "tsx scripts/check-a11y.ts",
     "test:search": "tsx scripts/test-search.ts",
     "test:storage": "tsx scripts/test-storage.ts",
-    "test:routing": "tsx scripts/test-routing.ts"
+    "test:routing": "tsx scripts/test-routing.ts",
+    "test:lesson-sets": "tsx scripts/test-lesson-sets.ts",
+    "test:set-share": "tsx scripts/test-set-share.ts",
+    "test:quiz": "tsx scripts/test-quiz.ts"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@supabase/supabase-js": "^2.107.0",
     "@vitejs/plugin-react": "^4.3.4",
     "idb": "^8.0.2",

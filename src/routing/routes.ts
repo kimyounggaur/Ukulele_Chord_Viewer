@@ -9,6 +9,18 @@ export function qualityPath(quality: ChordQuality): string {
   return `/q/${quality}`;
 }
 
+export function lessonSetPath(setId: string): string {
+  return `/sets/${encodeURIComponent(setId)}`;
+}
+
+export function lessonSetPlayPath(setId: string): string {
+  return `${lessonSetPath(setId)}/play`;
+}
+
+export function lessonSetPrintPath(setId: string): string {
+  return `${lessonSetPath(setId)}/print`;
+}
+
 export function readRouteSegment(value: string | undefined): string | null {
   if (!value) return null;
   try {

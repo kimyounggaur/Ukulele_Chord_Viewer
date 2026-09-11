@@ -16,6 +16,7 @@ export interface ChordDiagramProps {
   uploadedImageUrl?: string;
   showNotes?: boolean;
   priority?: boolean;
+  ariaHidden?: boolean;
 }
 
 function queryForcesSvg(): boolean {
@@ -33,6 +34,7 @@ export function ChordDiagram({
   uploadedImageUrl,
   showNotes = true,
   priority = false,
+  ariaHidden = false,
 }: ChordDiagramProps) {
   const voicing = chord.voicings[voicingIndex] ?? chord.voicings[0];
   const sources = useMemo(
@@ -55,7 +57,11 @@ export function ChordDiagram({
   }, [chord.id, uploadedImageUrl]);
 
   return (
-    <div className={"chord-diagram chord-diagram-" + size} data-renderer={useSvg ? "svg" : "image"}>
+    <div
+      className={"chord-diagram chord-diagram-" + size}
+      data-renderer={useSvg ? "svg" : "image"}
+      aria-hidden={ariaHidden || undefined}
+    >
       {useSvg ? (
         <ChordSvg
           chord={chord}
