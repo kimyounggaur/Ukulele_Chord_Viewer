@@ -1,15 +1,16 @@
 import { useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
-import type { ChordShape } from "../data/chordTypes";
+import type { Chord } from "../data/types";
 import { qualityById } from "../data/chordQualities";
 import { getChordDisplayTitle } from "../lib/chordDisplay";
 import { ChordCard } from "./ChordCard";
 import { ChordDiagram } from "./ChordDiagram";
 import { ChordImageUploader } from "./ChordImageUploader";
+import { chordStorageKey } from "../lib/chordIdentity";
 
 interface ChordDetailProps {
-  chord: ChordShape;
-  relatedChords: readonly ChordShape[];
+  chord: Chord;
+  relatedChords: readonly Chord[];
   onSelectChord: (chordId: string) => void;
   onBack: () => void;
   getUploadedImageUrl: (chordId: string) => string | undefined;
@@ -66,7 +67,7 @@ export function ChordDetail({
               <ChordDiagram
                 shape={chord}
                 size="large"
-                uploadedImageUrl={getUploadedImageUrl(chord.id)}
+                uploadedImageUrl={getUploadedImageUrl(chordStorageKey(chord))}
               />
             </div>
           </div>
@@ -85,7 +86,7 @@ export function ChordDetail({
                 <ChordCard
                   key={relatedChord.id}
                   chord={relatedChord}
-                  uploadedImageUrl={getUploadedImageUrl(relatedChord.id)}
+                  uploadedImageUrl={getUploadedImageUrl(chordStorageKey(relatedChord))}
                   onSelect={() => onSelectChord(relatedChord.id)}
                   related
                 />

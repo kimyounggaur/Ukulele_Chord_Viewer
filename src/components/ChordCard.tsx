@@ -1,10 +1,10 @@
-import type { ChordShape } from "../data/chordTypes";
+import type { Chord } from "../data/types";
 import { qualityById } from "../data/chordQualities";
 import { getChordDisplayTitle } from "../lib/chordDisplay";
 import { ChordDiagram } from "./ChordDiagram";
 
 interface ChordCardProps {
-  chord: ChordShape;
+  chord: Chord;
   uploadedImageUrl?: string;
   onSelect: () => void;
   featured?: boolean;

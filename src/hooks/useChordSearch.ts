@@ -1,16 +1,17 @@
 import { useMemo } from "react";
-import type { ChordQualityId, ChordShape } from "../data/chordTypes";
+import type { Chord, ChordQuality } from "../data/types";
 import { MAIN_QUALITY_IDS, qualityById } from "../data/chordQualities";
 import { normalizeSearchText } from "../lib/slug";
 
-const MAIN_QUALITY_SET = new Set<ChordQualityId>(MAIN_QUALITY_IDS);
+const MAIN_QUALITY_SET = new Set<ChordQuality>(MAIN_QUALITY_IDS);
 const ROOT_ONLY_PATTERN = /^[a-g](#|b)?$/;
 
-function getCodeNameAliases(chord: ChordShape): string[] {
+function getCodeNameAliases(chord: Chord): string[] {
   const quality = qualityById[chord.quality];
 
   return [
-    chord.title,
+    chord.displayName,
+    chord.koreanName,
     `${chord.root}${quality.label}`,
     `${chord.root}${quality.shortLabel}`,
     ...quality.aliases.map((alias) => `${chord.root}${alias}`),
@@ -19,10 +20,10 @@ function getCodeNameAliases(chord: ChordShape): string[] {
 }
 
 export function useChordSearch(
-  chords: readonly ChordShape[],
+  chords: readonly Chord[],
   searchTerm: string,
-  selectedQualityId: ChordQualityId | null,
-): ChordShape[] {
+  selectedQualityId: ChordQuality | null,
+): Chord[] {
   return useMemo(() => {
     const normalizedTerm = normalizeSearchText(searchTerm);
 
@@ -53,6 +54,8 @@ export function useChordSearch(
 
       const quality = qualityById[chord.quality];
       const searchable = [
+        chord.displayName,
+        chord.koreanName,
         chord.quality,
         quality.label,
         quality.shortLabel,

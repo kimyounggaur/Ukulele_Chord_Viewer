@@ -1,13 +1,14 @@
-import type { ChordQualityId, ChordShape } from "../data/chordTypes";
+import type { Chord, ChordQuality } from "../data/types";
 import { qualityById } from "../data/chordQualities";
 import { useChordSearch } from "../hooks/useChordSearch";
 import { ChordCard } from "./ChordCard";
 import { EmptyState } from "./EmptyState";
 import { ArrowLeft } from "lucide-react";
+import { chordStorageKey } from "../lib/chordIdentity";
 
 interface ChordGridProps {
-  chords: readonly ChordShape[];
-  selectedQualityId: ChordQualityId | null;
+  chords: readonly Chord[];
+  selectedQualityId: ChordQuality | null;
   searchTerm: string;
   onSelectChord: (chordId: string) => void;
   getUploadedImageUrl: (chordId: string) => string | undefined;
@@ -52,7 +53,7 @@ export function ChordGrid({
               <ChordCard
                 key={chord.id}
                 chord={chord}
-                uploadedImageUrl={getUploadedImageUrl(chord.id)}
+                uploadedImageUrl={getUploadedImageUrl(chordStorageKey(chord))}
                 onSelect={() => onSelectChord(chord.id)}
                 featured={index === 0 && filteredChords.length > 2}
               />

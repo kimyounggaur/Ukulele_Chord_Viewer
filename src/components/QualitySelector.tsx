@@ -1,10 +1,10 @@
-import type { ChordQualityId } from "../data/chordTypes";
+import type { ChordQuality } from "../data/types";
 import { MAIN_QUALITY_IDS, qualityById } from "../data/chordQualities";
 import { QualityBubble } from "./QualityBubble";
 
 interface QualitySelectorProps {
-  selectedQualityId: ChordQualityId | null;
-  onSelectQuality: (qualityId: ChordQualityId) => void;
+  selectedQualityId: ChordQuality | null;
+  onSelectQuality: (qualityId: ChordQuality) => void;
 }
 
 export function QualitySelector({ selectedQualityId, onSelectQuality }: QualitySelectorProps) {

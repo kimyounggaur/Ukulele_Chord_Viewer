@@ -1,154 +1,51 @@
-import type { ChordQualityId } from "./chordTypes";
+import type { ChordQuality } from "./types";
 
-export interface ChordQuality {
-  id: ChordQualityId;
+export interface ChordQualityInfo {
+  id: ChordQuality;
   label: string;
   shortLabel: string;
   description: string;
   color: string;
+  darkColor: string;
   softColor: string;
   aliases: string[];
 }
 
 export const MAIN_QUALITY_IDS = [
   "major",
-  "seventh",
+  "dom7",
   "minor",
-  "minor7",
+  "min7",
   "sus4",
-  "major7",
+  "maj7",
   "sixth",
-  "seventh-sus4",
+  "dom7sus4",
   "add9",
-  "minor7-flat5",
-  "diminish",
-  "augment",
-] as const satisfies readonly ChordQualityId[];
+  "min7flat5",
+  "dim7",
+  "aug",
+] as const satisfies readonly ChordQuality[];
 
-export const chordQualities: ChordQuality[] = [
-  {
-    id: "major",
-    label: "Major",
-    shortLabel: "Major",
-    description: "bright open triads",
-    color: "#f97316",
-    softColor: "#fff7ed",
-    aliases: ["maj", "major"],
-  },
-  {
-    id: "seventh",
-    label: "7",
-    shortLabel: "7",
-    description: "dominant seventh",
-    color: "#f59e0b",
-    softColor: "#fffbeb",
-    aliases: ["7th", "dominant"],
-  },
-  {
-    id: "minor",
-    label: "minor",
-    shortLabel: "minor",
-    description: "minor triads",
-    color: "#38bdf8",
-    softColor: "#f0f9ff",
-    aliases: ["m", "minor"],
-  },
-  {
-    id: "minor7",
-    label: "minor7",
-    shortLabel: "m7",
-    description: "minor seventh",
-    color: "#22c55e",
-    softColor: "#f0fdf4",
-    aliases: ["m7", "minor 7"],
-  },
-  {
-    id: "sus4",
-    label: "sus4",
-    shortLabel: "sus4",
-    description: "suspended fourth",
-    color: "#a855f7",
-    softColor: "#faf5ff",
-    aliases: ["suspended"],
-  },
-  {
-    id: "major7",
-    label: "Major 7",
-    shortLabel: "M7",
-    description: "major seventh",
-    color: "#f43f5e",
-    softColor: "#fff1f2",
-    aliases: ["maj7", "major7", "M7"],
-  },
-  {
-    id: "sixth",
-    label: "6",
-    shortLabel: "6",
-    description: "sixth chords",
-    color: "#14b8a6",
-    softColor: "#f0fdfa",
-    aliases: ["6th", "sixth"],
-  },
-  {
-    id: "seventh-sus4",
-    label: "7sus4",
-    shortLabel: "7sus4",
-    description: "dominant suspended",
-    color: "#ec4899",
-    softColor: "#fdf2f8",
-    aliases: ["7 sus4", "sus7"],
-  },
-  {
-    id: "add9",
-    label: "add2",
-    shortLabel: "add2",
-    description: "added ninth",
-    color: "#3b82f6",
-    softColor: "#eff6ff",
-    aliases: ["add9", "add 9", "add 2"],
-  },
-  {
-    id: "minor7-flat5",
-    label: "m7(b5)",
-    shortLabel: "m7(b5)",
-    description: "half-diminished",
-    color: "#a78b7c",
-    softColor: "#faf7f5",
-    aliases: ["m7-5", "half diminished"],
-  },
-  {
-    id: "diminish",
-    label: "diminish",
-    shortLabel: "dim",
-    description: "diminished shapes",
-    color: "#64748b",
-    softColor: "#f8fafc",
-    aliases: ["dim", "diminished"],
-  },
-  {
-    id: "augment",
-    label: "Augment",
-    shortLabel: "aug",
-    description: "augmented shapes",
-    color: "#ef4444",
-    softColor: "#fff0ef",
-    aliases: ["aug", "augmented"],
-  },
-  {
-    id: "minor6",
-    label: "minor 6",
-    shortLabel: "m6",
-    description: "minor sixth source set",
-    color: "#6f8cff",
-    softColor: "#f1f4ff",
-    aliases: ["m6", "minor6"],
-  },
+export const chordQualities: ChordQualityInfo[] = [
+  { id: "major", label: "Major", shortLabel: "Major", description: "메이저", color: "#f97316", darkColor: "#FF6B6B", softColor: "#fff7ed", aliases: ["maj", "major", "메이저", "장조"] },
+  { id: "dom7", label: "7", shortLabel: "7", description: "도미넌트 세븐", color: "#f59e0b", darkColor: "#FFD93D", softColor: "#fffbeb", aliases: ["7th", "dominant", "dom7", "세븐"] },
+  { id: "minor", label: "minor", shortLabel: "m", description: "마이너", color: "#38bdf8", darkColor: "#4ECDC4", softColor: "#f0f9ff", aliases: ["m", "minor", "마이너", "단조"] },
+  { id: "min7", label: "minor7", shortLabel: "m7", description: "마이너 세븐", color: "#22c55e", darkColor: "#FF8FAB", softColor: "#f0fdf4", aliases: ["m7", "minor7", "마이너세븐"] },
+  { id: "sus4", label: "sus4", shortLabel: "sus4", description: "서스포", color: "#a855f7", darkColor: "#68D391", softColor: "#faf5ff", aliases: ["suspended", "서스포"] },
+  { id: "maj7", label: "Major 7", shortLabel: "M7", description: "메이저 세븐", color: "#f43f5e", darkColor: "#A79BFF", softColor: "#fff1f2", aliases: ["maj7", "major7", "M7", "메이저세븐"] },
+  { id: "sixth", label: "6", shortLabel: "6", description: "식스", color: "#14b8a6", darkColor: "#68D391", softColor: "#f0fdfa", aliases: ["6th", "sixth", "식스"] },
+  { id: "dom7sus4", label: "7sus4", shortLabel: "7sus4", description: "세븐 서스포", color: "#ec4899", darkColor: "#FF8FAB", softColor: "#fdf2f8", aliases: ["7 sus4", "sus7"] },
+  { id: "add9", label: "add2", shortLabel: "add2", description: "애드나인", color: "#3b82f6", darkColor: "#90CDF4", softColor: "#eff6ff", aliases: ["add9", "add 9", "add2", "add 2"] },
+  { id: "min7flat5", label: "m7(b5)", shortLabel: "m7(b5)", description: "하프 디미니시드", color: "#a78b7c", darkColor: "#A0AEC0", softColor: "#faf7f5", aliases: ["m7-5", "m7b5", "half diminished"] },
+  { id: "dim7", label: "diminish", shortLabel: "dim7", description: "디미니시드 세븐", color: "#64748b", darkColor: "#A0AEC0", softColor: "#f8fafc", aliases: ["dim", "dim7", "diminished", "디미니시"] },
+  { id: "aug", label: "Augment", shortLabel: "aug", description: "어그먼트", color: "#ef4444", darkColor: "#F6AD55", softColor: "#fff0ef", aliases: ["aug", "augmented", "어그먼트"] },
+  { id: "minor6", label: "minor 6", shortLabel: "m6", description: "마이너 식스", color: "#6f8cff", darkColor: "#A79BFF", softColor: "#f1f4ff", aliases: ["m6", "minor6", "마이너식스"] },
 ];
 
-export const qualityById = chordQualities.reduce<Record<ChordQualityId, ChordQuality>>(
-  (accumulator, quality) => {
-    accumulator[quality.id] = quality;
-    return accumulator;
+export const qualityById = chordQualities.reduce<Record<ChordQuality, ChordQualityInfo>>(
+  (result, quality) => {
+    result[quality.id] = quality;
+    return result;
   },
-  {} as Record<ChordQualityId, ChordQuality>,
+  {} as Record<ChordQuality, ChordQualityInfo>,
 );

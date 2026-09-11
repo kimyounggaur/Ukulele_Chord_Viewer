@@ -1,13 +1,14 @@
 import { ChangeEvent, type MouseEvent, useEffect, useId, useState } from "react";
 import { ImagePlus, Save, Trash2 } from "lucide-react";
-import type { ChordShape } from "../data/chordTypes";
+import type { Chord } from "../data/types";
 import {
   ACCEPTED_IMAGE_TYPES,
   getImageFileValidationError,
 } from "../lib/chordImageStorage";
+import { chordStorageKey } from "../lib/chordIdentity";
 
 interface ChordImageUploaderProps {
-  chord: ChordShape;
+  chord: Chord;
   uploadedImageUrl?: string;
   onUpload: (chordId: string, file: File) => Promise<void>;
   onDelete: (chordId: string) => Promise<void>;
@@ -67,7 +68,7 @@ export function ChordImageUploader({
 
     setPending(true);
     try {
-      await onUpload(chord.id, file);
+      await onUpload(chordStorageKey(chord), file);
       setFile(null);
       setMessage("저장됨");
     } catch (caughtError) {
@@ -80,7 +81,7 @@ export function ChordImageUploader({
   const handleDelete = async () => {
     setPending(true);
     try {
-      await onDelete(chord.id);
+      await onDelete(chordStorageKey(chord));
       setFile(null);
       setMessage("삭제됨");
     } catch (caughtError) {
@@ -93,7 +94,7 @@ export function ChordImageUploader({
   return (
     <div className="rounded-lg border border-white bg-white/88 p-3 shadow-neo">
       <div className="mb-2 flex items-center justify-between gap-2">
-        <span className="font-display text-sm font-semibold text-zinc-600">{chord.title}</span>
+        <span className="font-display text-sm font-semibold text-zinc-600">{chord.displayName}</span>
         {uploadedImageUrl ? (
           <button
             type="button"
@@ -111,7 +112,7 @@ export function ChordImageUploader({
         {previewUrl || uploadedImageUrl ? (
           <img
             src={previewUrl ?? uploadedImageUrl}
-            alt={`${chord.title} 업로드 미리보기`}
+            alt={`${chord.displayName} 업로드 미리보기`}
             className="chord-image h-full w-full p-2"
             draggable={false}
             onContextMenu={preventImageContextMenu}

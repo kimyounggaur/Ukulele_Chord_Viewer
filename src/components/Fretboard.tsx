@@ -1,16 +1,11 @@
 import type { MouseEvent } from "react";
-import type { ChordShape, UkuleleString } from "../data/chordTypes";
-import { UKULELE_TUNING } from "../data/chordTypes";
+import type { Chord } from "../data/types";
+import { UKULELE_TUNING, type UkuleleString } from "../data/chordTypes";
 
-const STRING_X: Record<UkuleleString, number> = {
-  4: 54,
-  3: 98,
-  2: 142,
-  1: 186,
-};
+const STRING_X: Record<UkuleleString, number> = { 4: 54, 3: 98, 2: 142, 1: 186 };
 
 interface FretboardProps {
-  shape: ChordShape;
+  shape: Chord;
   size?: "thumb" | "large";
 }
 
@@ -19,16 +14,14 @@ function preventImageContextMenu(event: MouseEvent) {
 }
 
 export function Fretboard({ shape, size = "thumb" }: FretboardProps) {
+  const voicing = shape.voicings[0];
   const fretTop = 72;
   const fretGap = 38;
   const fretLines = Array.from({ length: 5 }, (_, index) => fretTop + index * fretGap);
-  const topMarks = UKULELE_TUNING.map((stringInfo) => {
-    const position = shape.positions.find((item) => item.string === stringInfo.string);
-    return {
-      ...stringInfo,
-      mark: position?.muted ? "x" : position?.fret === 0 ? "o" : "",
-    };
-  });
+  const topMarks = UKULELE_TUNING.map((stringInfo, index) => ({
+    ...stringInfo,
+    mark: voicing.frets[index] < 0 ? "x" : voicing.frets[index] === 0 ? "o" : "",
+  }));
 
   return (
     <div
@@ -41,7 +34,7 @@ export function Fretboard({ shape, size = "thumb" }: FretboardProps) {
       <svg
         viewBox="0 0 240 300"
         role="img"
-        aria-label={`${shape.title} 우쿨렐레 코드 다이어그램`}
+        aria-label={shape.displayName + " 우쿨렐레 코드 다이어그램"}
         preserveAspectRatio="xMidYMid meet"
         className="max-h-full max-w-full"
         onContextMenu={preventImageContextMenu}
@@ -56,10 +49,10 @@ export function Fretboard({ shape, size = "thumb" }: FretboardProps) {
           fontWeight="700"
           fill="#38323a"
         >
-          {shape.title}
+          {shape.displayName}
         </text>
 
-        {shape.baseFret && shape.baseFret > 1 ? (
+        {voicing.baseFret > 1 ? (
           <text
             x="208"
             y="98"
@@ -68,7 +61,7 @@ export function Fretboard({ shape, size = "thumb" }: FretboardProps) {
             fontSize="16"
             fill="#8f8790"
           >
-            {shape.baseFret}fr
+            {voicing.baseFret}fr
           </text>
         ) : null}
 
@@ -90,7 +83,7 @@ export function Fretboard({ shape, size = "thumb" }: FretboardProps) {
               y1={lineY}
               x2="198"
               y2={lineY}
-              strokeWidth={index === 0 && (!shape.baseFret || shape.baseFret === 1) ? 8 : 3}
+              strokeWidth={index === 0 && voicing.baseFret === 1 ? 8 : 3}
             />
           ))}
         </g>
@@ -110,29 +103,30 @@ export function Fretboard({ shape, size = "thumb" }: FretboardProps) {
           </text>
         ))}
 
-        {shape.positions
-          .filter((position) => !position.muted && position.fret > 0)
-          .map((position) => {
-            const y = fretTop + (position.fret - 0.5) * fretGap;
-            return (
-              <g key={`${position.string}-${position.fret}-${position.finger ?? "barre"}`}>
-                <circle cx={STRING_X[position.string]} cy={y} r="15" fill="#ff7daf" />
-                {position.finger ? (
-                  <text
-                    x={STRING_X[position.string]}
-                    y={y + 6}
-                    textAnchor="middle"
-                    fontFamily="Poppins, Pretendard, sans-serif"
-                    fontSize="16"
-                    fontWeight="700"
-                    fill="#ffffff"
-                  >
-                    {position.finger}
-                  </text>
-                ) : null}
-              </g>
-            );
-          })}
+        {voicing.frets.map((fret, index) => {
+          if (fret <= 0) return null;
+          const stringInfo = UKULELE_TUNING[index];
+          const finger = voicing.fingers[index];
+          const y = fretTop + (fret - 0.5) * fretGap;
+          return (
+            <g key={stringInfo.string + "-" + fret + "-" + finger}>
+              <circle cx={STRING_X[stringInfo.string]} cy={y} r="15" fill="#ff7daf" />
+              {finger ? (
+                <text
+                  x={STRING_X[stringInfo.string]}
+                  y={y + 6}
+                  textAnchor="middle"
+                  fontFamily="Poppins, Pretendard, sans-serif"
+                  fontSize="16"
+                  fontWeight="700"
+                  fill="#ffffff"
+                >
+                  {finger}
+                </text>
+              ) : null}
+            </g>
+          );
+        })}
 
         {UKULELE_TUNING.map((stringInfo) => (
           <text

@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import type { ChordQualityId } from "./data/chordTypes";
+import type { ChordQuality } from "./data/types";
 import { staticChords } from "./data/chords";
 import { AppHeader } from "./components/AppHeader";
 import { AppShell } from "./components/AppShell";
@@ -15,7 +15,7 @@ function App() {
   useClickSound();
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedQualityId, setSelectedQualityId] = useState<ChordQualityId | null>(null);
+  const [selectedQualityId, setSelectedQualityId] = useState<ChordQuality | null>(null);
   const [selectedChordId, setSelectedChordId] = useState<string | null>(null);
   const [adminPageOpen, setAdminPageOpen] = useState(false);
   const auth = useAuth();
@@ -54,7 +54,7 @@ function App() {
     }
   }, [auth.canSearch]);
 
-  const handleSelectQuality = useCallback((qualityId: ChordQualityId) => {
+  const handleSelectQuality = useCallback((qualityId: ChordQuality) => {
     setSelectedQualityId(qualityId);
     setSelectedChordId(null);
   }, []);

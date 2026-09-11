@@ -1,8 +1,8 @@
 import type { CSSProperties } from "react";
-import type { ChordQuality } from "../data/chordQualities";
+import type { ChordQualityInfo } from "../data/chordQualities";
 
 interface QualityBubbleProps {
-  quality: ChordQuality;
+  quality: ChordQualityInfo;
   active: boolean;
   onClick: () => void;
 }

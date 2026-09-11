@@ -1,12 +1,13 @@
 import { ArrowLeft, Database, ImagePlus } from "lucide-react";
-import type { ChordShape } from "../data/chordTypes";
+import type { Chord } from "../data/types";
 import { qualityById } from "../data/chordQualities";
 import { getChordDisplayTitle } from "../lib/chordDisplay";
+import { chordStorageKey } from "../lib/chordIdentity";
 import { ChordDiagram } from "./ChordDiagram";
 import { ChordImageUploader } from "./ChordImageUploader";
 
 interface AdminPageProps {
-  chords: readonly ChordShape[];
+  chords: readonly Chord[];
   getUploadedImageUrl: (chordId: string) => string | undefined;
   onUploadImage: (chordId: string, file: File) => Promise<void>;
   onDeleteImage: (chordId: string) => Promise<void>;
@@ -20,7 +21,7 @@ export function AdminPage({
   onDeleteImage,
   onBack,
 }: AdminPageProps) {
-  const uploadedCount = chords.filter((chord) => getUploadedImageUrl(chord.id)).length;
+  const uploadedCount = chords.filter((chord) => getUploadedImageUrl(chordStorageKey(chord))).length;
 
   return (
     <section className="screen-panel px-[clamp(24px,5vw,84px)] pb-[clamp(28px,5vh,72px)]">
@@ -60,7 +61,7 @@ export function AdminPage({
         <div className="admin-card-grid">
           {chords.map((chord) => {
             const quality = qualityById[chord.quality];
-            const uploadedImageUrl = getUploadedImageUrl(chord.id);
+            const uploadedImageUrl = getUploadedImageUrl(chordStorageKey(chord));
 
             return (
               <article
