@@ -5,6 +5,7 @@ import { ChordCard } from "./ChordCard";
 import { EmptyState } from "./EmptyState";
 import { ArrowLeft } from "lucide-react";
 import { chordStorageKey } from "../lib/chordIdentity";
+import type { LayoutMode } from "../hooks/useLayoutMode";
 
 interface ChordGridProps {
   chords: readonly Chord[];
@@ -13,6 +14,7 @@ interface ChordGridProps {
   onSelectChord: (chordId: string) => void;
   getUploadedImageUrl: (chordId: string) => string | undefined;
   onBack: () => void;
+  layoutMode: LayoutMode;
 }
 
 export function ChordGrid({
@@ -22,12 +24,13 @@ export function ChordGrid({
   onSelectChord,
   getUploadedImageUrl,
   onBack,
+  layoutMode,
 }: ChordGridProps) {
   const filteredChords = useChordSearch(chords, searchTerm, selectedQualityId);
   const title = selectedQualityId ? qualityById[selectedQualityId].label : "All Chords";
 
   return (
-    <section className="screen-panel relative px-[clamp(24px,5vw,84px)] pb-[clamp(28px,5vh,72px)]">
+    <section className="screen-panel chord-grid-screen relative" data-grid-mode={layoutMode}>
       <div className="module-screen-toolbar sticky top-0 z-10 mx-auto flex w-full max-w-[1140px] flex-wrap items-center gap-3 py-3">
         <button
           type="button"
@@ -46,22 +49,23 @@ export function ChordGrid({
         </span>
       </div>
 
-      <div className="chord-grid-board mx-auto w-full max-w-[1140px]">
-        {filteredChords.length > 0 ? (
-          <div className="grid grid-cols-1 gap-[clamp(20px,2.5vw,32px)] sm:grid-cols-4">
-            {filteredChords.map((chord, index) => (
+      <div className="chord-gallery-scroll thin-scrollbar">
+        <div className="chord-grid-board mx-auto w-full max-w-[1140px]">
+          {filteredChords.length > 0 ? (
+          <div className="chord-gallery-grid">
+            {filteredChords.map((chord) => (
               <ChordCard
                 key={chord.id}
                 chord={chord}
                 uploadedImageUrl={getUploadedImageUrl(chordStorageKey(chord))}
                 onSelect={() => onSelectChord(chord.id)}
-                featured={index === 0 && filteredChords.length > 2}
               />
             ))}
           </div>
-        ) : (
-          <EmptyState />
-        )}
+          ) : (
+            <EmptyState />
+          )}
+        </div>
       </div>
 
       <button

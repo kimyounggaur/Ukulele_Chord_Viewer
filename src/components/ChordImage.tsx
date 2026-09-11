@@ -35,6 +35,7 @@ export function ChordImage({ src, alt, size = "thumb", overlay, onError, priorit
   const frameRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const hasOverlay = Boolean(overlay);
+  const fetchPriorityAttribute = { fetchpriority: priority ? "high" : "auto" };
 
   useEffect(() => {
     setCurrentSrc(src);
@@ -125,7 +126,7 @@ export function ChordImage({ src, alt, size = "thumb", overlay, onError, priorit
         alt={alt}
         loading={priority ? "eager" : "lazy"}
         decoding="async"
-        fetchPriority={priority ? "high" : "auto"}
+        {...fetchPriorityAttribute}
         className={loaded ? "chord-image is-loaded" : "chord-image"}
         draggable={false}
         onContextMenu={preventImageContextMenu}

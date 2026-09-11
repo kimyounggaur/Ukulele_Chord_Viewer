@@ -24,7 +24,7 @@ export function AdminPage({
   const uploadedCount = chords.filter((chord) => getUploadedImageUrl(chordStorageKey(chord))).length;
 
   return (
-    <section className="screen-panel px-[clamp(24px,5vw,84px)] pb-[clamp(28px,5vh,72px)]">
+    <section className="screen-panel admin-screen px-[clamp(24px,5vw,84px)] pb-[clamp(28px,5vh,72px)] thin-scrollbar">
       <div className="admin-page-shell mx-auto w-full max-w-[1280px]">
         <div className="admin-page-header">
           <button

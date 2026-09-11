@@ -1,5 +1,5 @@
 import { useState, type FormEvent, type ReactNode } from "react";
-import { Home, LayoutGrid, Lock, LogIn, LogOut, Search, ShieldCheck, UserPlus } from "lucide-react";
+import { Home, LayoutGrid, Lock, LogIn, LogOut, Maximize2, Minimize2, Search, ShieldCheck, UserPlus } from "lucide-react";
 import type { AuthAction, AuthUser } from "../hooks/useAuth";
 
 interface AppHeaderProps {
@@ -15,6 +15,8 @@ interface AppHeaderProps {
   onAdminLogin: AuthAction;
   onLogout: () => Promise<void>;
   tools?: ReactNode;
+  stageMode: boolean;
+  onToggleStage: () => Promise<void>;
 }
 
 type AuthMode = "signup" | "member-login" | "admin-login";
@@ -121,6 +123,8 @@ export function AppHeader({
   onAdminLogin,
   onLogout,
   tools,
+  stageMode,
+  onToggleStage,
 }: AppHeaderProps) {
   const [authMode, setAuthMode] = useState<AuthMode | null>(null);
   const [authMessage, setAuthMessage] = useState<string | null>(null);
@@ -216,7 +220,18 @@ export function AppHeader({
       </div>
 
       <div className="header-right-actions">
-        {tools}
+        <div className="header-utility-actions">
+          {tools}
+          <button
+            type="button"
+            className="stage-mode-button"
+            aria-label={stageMode ? "수업용 전체화면 종료" : "수업용 전체화면 시작"}
+            aria-pressed={stageMode}
+            onClick={() => void onToggleStage()}
+          >
+            {stageMode ? <Minimize2 size={18} aria-hidden="true" /> : <Maximize2 size={18} aria-hidden="true" />}
+          </button>
+        </div>
         <div className={["header-auth-controls", currentUser ? "is-authenticated" : "is-guest"].join(" ")}>
           <div className="auth-actions">
             {currentUser ? (

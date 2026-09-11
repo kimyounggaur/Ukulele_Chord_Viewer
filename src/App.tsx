@@ -11,6 +11,8 @@ import { useAuth } from "./hooks/useAuth";
 import { useClickSound } from "./hooks/useClickSound";
 import { useIndexedChordImages } from "./hooks/useIndexedChordImages";
 import { AudioSettingsControl } from "./components/AudioSettingsControl";
+import { useLayoutMode } from "./hooks/useLayoutMode";
+import { useStageMode } from "./hooks/useStageMode";
 
 function App() {
   useClickSound();
@@ -21,6 +23,8 @@ function App() {
   const [adminPageOpen, setAdminPageOpen] = useState(false);
   const auth = useAuth();
   const uploadedImages = useIndexedChordImages();
+  const { stageMode, toggleStageMode } = useStageMode();
+  const layoutMode = useLayoutMode(stageMode);
 
   const selectedChord = useMemo(
     () => staticChords.find((chord) => chord.id === selectedChordId) ?? null,
@@ -89,6 +93,7 @@ function App() {
 
   return (
     <AppShell
+      layoutMode={layoutMode}
       header={
         <AppHeader
           searchTerm={searchTerm}
@@ -103,6 +108,8 @@ function App() {
           onAdminLogin={auth.loginAdmin}
           onLogout={auth.logout}
           tools={<AudioSettingsControl />}
+          stageMode={stageMode}
+          onToggleStage={toggleStageMode}
         />
       }
     >
@@ -133,6 +140,7 @@ function App() {
           onSelectChord={handleSelectChord}
           getUploadedImageUrl={uploadedImages.getImageUrl}
           onBack={handleBackFromGrid}
+          layoutMode={layoutMode}
         />
       ) : (
         <QualitySelector

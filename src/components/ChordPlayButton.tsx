@@ -75,7 +75,7 @@ export function ChordPlayButton({ chord, compact = false, className = "" }: Chor
       aria-describedby={helpId}
       aria-pressed={isPlaying}
       title={available ? "짧게 누르면 스트럼, 길게 누르면 아르페지오" : "이 브라우저는 오디오를 지원하지 않습니다"}
-      disabled={!available}
+      aria-disabled={!available}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerCancel}

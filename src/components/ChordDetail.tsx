@@ -45,7 +45,7 @@ export function ChordDetail({
   const displayTitle = getChordDisplayTitle(chord);
 
   return (
-    <section className="screen-panel px-[clamp(24px,5vw,84px)] pb-[clamp(28px,5vh,72px)] pt-2">
+    <section className="screen-panel detail-screen px-[clamp(24px,5vw,84px)] pb-[clamp(28px,5vh,72px)] pt-2 thin-scrollbar">
       <div className="mx-auto w-full max-w-[1120px]">
         <button
           type="button"

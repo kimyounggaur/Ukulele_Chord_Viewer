@@ -6,6 +6,7 @@
 @tailwind utilities;
 
 :root {
+  --app-h: 100vh;
   color: #29262a;
   background: #fbfbfb;
   font-family: Pretendard, Poppins, system-ui, sans-serif;
@@ -13,6 +14,12 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@supports (height: 100dvh) {
+  :root {
+    --app-h: 100dvh;
+  }
 }
 
 * {
@@ -23,9 +30,11 @@ html,
 body,
 #root {
   width: 100%;
-  min-height: 100%;
+  height: var(--app-h);
+  min-height: 0;
   margin: 0;
-  overflow-x: hidden;
+  padding: 0;
+  overflow: hidden;
 }
 
 button,
@@ -38,9 +47,17 @@ button {
 }
 
 #app-root {
-  width: 100%;
-  min-height: 100dvh;
-  overflow-x: hidden;
+  width: 100vw;
+  width: 100dvw;
+  height: var(--app-h);
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding-top: env(safe-area-inset-top);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(252, 253, 255, 0.94)),
     #fbfbfb;
@@ -50,24 +67,21 @@ button {
 #app-header {
   position: relative;
   z-index: 20;
+  flex: 0 0 auto;
 }
 
 #app-main {
   width: 100%;
-  min-height: calc(100dvh - clamp(76px, 9vh, 112px));
-}
-
-.stage-16x9 {
-  width: min(100dvw, calc(100dvh * 16 / 9));
-  height: min(100dvh, calc(100dvw * 9 / 16));
-  margin: auto;
-  aspect-ratio: 16 / 9;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow: hidden;
+  display: flex;
 }
 
 .screen-panel {
   width: 100%;
-  min-height: calc(100dvh - clamp(76px, 9vh, 112px));
+  height: 100%;
+  min-height: 0;
   animation: screen-enter 220ms ease-out both;
 }
 
@@ -918,6 +932,81 @@ button {
   animation: music-note-float 2.6s 0.85s ease-in-out infinite;
 }
 
+.chord-grid-screen {
+  --gallery-columns: 6;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0 clamp(24px, 5vw, 84px) clamp(18px, 3vh, 42px);
+}
+
+.chord-grid-screen[data-grid-mode="phone-portrait"] { --gallery-columns: 3; }
+.chord-grid-screen[data-grid-mode="phone-landscape"] { --gallery-columns: 6; }
+.chord-grid-screen[data-grid-mode="tablet"] { --gallery-columns: 5; }
+.chord-grid-screen[data-grid-mode="desktop"] { --gallery-columns: 6; }
+.chord-grid-screen[data-grid-mode="stage"] { --gallery-columns: 4; }
+
+.chord-grid-screen .module-screen-toolbar {
+  flex: 0 0 auto;
+}
+
+.chord-gallery-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 2px 8px max(72px, env(safe-area-inset-bottom));
+}
+
+.chord-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--gallery-columns), minmax(0, 1fr));
+  gap: clamp(10px, 1.8vw, 28px);
+  align-items: stretch;
+}
+
+.chord-gallery-grid .chord-card-shell {
+  min-height: clamp(170px, 20vw, 260px);
+}
+
+.detail-screen,
+.admin-screen {
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.header-utility-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 7px;
+}
+
+.stage-mode-button {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 1px solid rgba(56, 189, 248, 0.24);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #0284c7;
+  box-shadow: 5px 6px 12px rgba(31, 41, 55, 0.09);
+}
+
+.stage-mode-button:hover,
+.stage-mode-button:focus-visible,
+.stage-mode-button[aria-pressed="true"] {
+  outline: none;
+  color: #0369a1;
+  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.14);
+}
+
 .chord-grid-board {
   position: relative;
   border-radius: 8px;
@@ -1022,7 +1111,7 @@ button {
   outline: none;
 }
 
-.chord-play-button:disabled {
+.chord-play-button[aria-disabled="true"] {
   cursor: not-allowed;
   color: #a8a29e;
   opacity: 0.58;
@@ -1909,4 +1998,302 @@ button {
   #app-header {
     margin-bottom: 8px;
   }
+}
+
+/* Runtime layout modes: these rules deliberately come after width-only fallbacks. */
+#app-root[data-layout-mode="phone-portrait"] #app-header {
+  max-height: 150px;
+  padding: 10px 14px 8px;
+}
+
+#app-root[data-layout-mode="phone-portrait"] .header-brand-button,
+#app-root[data-layout-mode="phone-portrait"] .header-mascot-stage {
+  display: none;
+}
+
+#app-root[data-layout-mode="phone-portrait"] .header-right-actions {
+  gap: 10px;
+}
+
+#app-root[data-layout-mode="phone-portrait"] .header-utility-actions {
+  gap: 6px;
+}
+
+#app-root[data-layout-mode="phone-portrait"] .audio-settings-trigger,
+#app-root[data-layout-mode="phone-portrait"] .stage-mode-button {
+  width: clamp(46px, 12vw, 54px);
+  height: clamp(46px, 12vw, 54px);
+}
+
+#app-root[data-layout-mode="phone-portrait"] .chord-grid-screen {
+  padding: 0 6px 6px;
+}
+
+#app-root[data-layout-mode="phone-portrait"] .chord-grid-screen .module-screen-toolbar {
+  padding: 7px 8px;
+}
+
+#app-root[data-layout-mode="phone-portrait"] .chord-gallery-scroll {
+  padding-right: 2px;
+  padding-left: 2px;
+}
+
+#app-root[data-layout-mode="phone-portrait"] .chord-gallery-grid {
+  gap: 8px;
+}
+
+#app-root[data-layout-mode="phone-portrait"] .chord-card {
+  gap: 7px;
+  min-height: 168px;
+  padding: 9px 6px;
+}
+
+#app-root[data-layout-mode="phone-portrait"] .chord-card-shell {
+  min-height: 168px;
+}
+
+#app-root[data-layout-mode="phone-portrait"] .chord-card .font-display {
+  font-size: clamp(13px, 3.7vw, 17px);
+  line-height: 1.15;
+}
+
+#app-root[data-layout-mode="phone-portrait"] .chord-card-audio {
+  right: 6px;
+  top: 7px;
+  width: 30px;
+  height: 30px;
+}
+
+#app-root[data-layout-mode="phone-portrait"] .chord-card-audio svg {
+  width: 15px;
+  height: 15px;
+}
+
+#app-root[data-layout-mode="phone-landscape"] #app-header,
+#app-root[data-layout-mode="tablet"] #app-header {
+  min-height: 62px;
+  flex-wrap: nowrap;
+  gap: 8px;
+  padding: 8px 12px;
+}
+
+#app-root[data-layout-mode="phone-landscape"] .header-mascot-stage,
+#app-root[data-layout-mode="phone-landscape"] .header-brand-button,
+#app-root[data-layout-mode="tablet"] .header-mascot-stage,
+#app-root[data-layout-mode="tablet"] .header-brand-button {
+  display: none;
+}
+
+#app-root[data-layout-mode="phone-landscape"] .header-search-row,
+#app-root[data-layout-mode="tablet"] .header-search-row {
+  min-width: 0;
+  gap: 8px;
+}
+
+#app-root[data-layout-mode="phone-landscape"] .header-search-row > label,
+#app-root[data-layout-mode="tablet"] .header-search-row > label {
+  min-width: 0;
+}
+
+#app-root[data-layout-mode="phone-landscape"] .header-search-row input,
+#app-root[data-layout-mode="tablet"] .header-search-row input {
+  height: 44px;
+  padding-right: 86px;
+}
+
+#app-root[data-layout-mode="phone-landscape"] .header-right-actions,
+#app-root[data-layout-mode="tablet"] .header-right-actions,
+#app-root[data-layout-mode="phone-landscape"] .header-auth-controls,
+#app-root[data-layout-mode="tablet"] .header-auth-controls {
+  gap: 6px;
+}
+
+#app-root[data-layout-mode="phone-landscape"] .auth-action-label,
+#app-root[data-layout-mode="tablet"] .auth-action-label {
+  display: none;
+}
+
+#app-root[data-layout-mode="phone-landscape"] .auth-chip-button,
+#app-root[data-layout-mode="phone-landscape"] .admin-header-button,
+#app-root[data-layout-mode="tablet"] .auth-chip-button,
+#app-root[data-layout-mode="tablet"] .admin-header-button {
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  min-height: 38px;
+  padding: 0;
+  border-radius: 999px;
+}
+
+#app-root[data-layout-mode="phone-landscape"] .search-lock-hint,
+#app-root[data-layout-mode="tablet"] .search-lock-hint {
+  display: none;
+}
+
+#app-root[data-layout-mode="phone-landscape"] .chord-grid-screen {
+  padding: 0 8px 6px;
+}
+
+#app-root[data-layout-mode="phone-landscape"] .chord-grid-screen .module-screen-toolbar {
+  padding: 4px 6px;
+}
+
+#app-root[data-layout-mode="phone-landscape"] .chord-grid-screen .module-screen-toolbar h1 {
+  font-size: 24px;
+}
+
+#app-root[data-layout-mode="phone-landscape"] .chord-gallery-scroll {
+  padding: 1px 2px max(48px, env(safe-area-inset-bottom));
+}
+
+#app-root[data-layout-mode="phone-landscape"] .chord-gallery-grid {
+  gap: 8px;
+}
+
+#app-root[data-layout-mode="phone-landscape"] .chord-card {
+  min-height: 150px;
+  gap: 6px;
+  padding: 8px 5px;
+}
+
+#app-root[data-layout-mode="phone-landscape"] .chord-card-shell {
+  min-height: 150px;
+}
+
+#app-root[data-layout-mode="phone-landscape"] .chord-card .font-display {
+  font-size: 13px;
+}
+
+#app-root[data-layout-mode="phone-landscape"] .chord-card-audio {
+  right: 5px;
+  top: 5px;
+  width: 28px;
+  height: 28px;
+}
+
+#app-root[data-layout-mode="phone-landscape"] .detail-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(150px, 190px);
+  gap: 12px;
+}
+
+#app-root[data-layout-mode="phone-landscape"] .detail-screen {
+  padding: 2px 12px 14px;
+}
+
+#app-root[data-layout-mode="phone-landscape"] .detail-title-row {
+  margin-bottom: 8px;
+}
+
+#app-root[data-layout-mode="phone-landscape"] .detail-title-row h1 {
+  padding: 5px 16px;
+  font-size: 27px;
+}
+
+#app-root[data-layout-mode="phone-landscape"] .detail-image-frame {
+  height: 220px;
+}
+
+#app-root[data-layout-mode="phone-landscape"] .related-chords-panel {
+  max-height: 270px;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+#app-root[data-layout-mode="tablet"] .chord-grid-screen {
+  padding-right: 18px;
+  padding-left: 18px;
+}
+
+#app-root[data-layout-mode="desktop"] #app-header {
+  min-height: clamp(76px, 9vh, 104px);
+  flex-wrap: nowrap;
+}
+
+#app-root[data-layout-mode="desktop"] .header-mascot-stage {
+  display: none;
+}
+
+@media (min-width: 1600px) {
+  #app-root[data-layout-mode="desktop"] .header-mascot-stage {
+    display: flex;
+  }
+}
+
+#app-root[data-layout-mode="stage"] #app-header {
+  min-height: 64px;
+  flex-wrap: nowrap;
+  gap: 10px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+#app-root[data-layout-mode="stage"] .header-mascot-stage,
+#app-root[data-layout-mode="stage"] .header-auth-controls,
+#app-root[data-layout-mode="stage"] .header-brand-button {
+  display: none;
+}
+
+#app-root[data-layout-mode="stage"] .header-search-row,
+#app-root[data-layout-mode="stage"] .header-search-row > label {
+  min-width: 0;
+}
+
+#app-root[data-layout-mode="stage"] .chord-grid-screen {
+  padding-right: clamp(28px, 4vw, 72px);
+  padding-left: clamp(28px, 4vw, 72px);
+}
+
+#app-root[data-layout-mode="stage"] .chord-grid-board,
+#app-root[data-layout-mode="stage"] .module-screen-toolbar {
+  max-width: 1760px;
+}
+
+#app-root[data-layout-mode="stage"] .chord-gallery-grid {
+  gap: clamp(20px, 2.2vw, 38px);
+}
+
+#app-root[data-layout-mode="stage"] .chord-card-shell {
+  min-height: clamp(300px, 38vh, 480px);
+}
+
+#app-root[data-layout-mode="stage"] .chord-card .font-display {
+  font-size: clamp(30px, 3vw, 52px);
+}
+
+#app-root[data-layout-mode="stage"] .module-screen-toolbar h1,
+#app-root[data-layout-mode="stage"] .detail-title-row h1 {
+  font-size: clamp(44px, 5vw, 78px);
+}
+
+#app-root[data-layout-mode="stage"] .detail-grid {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 1500px;
+}
+
+#app-root[data-layout-mode="stage"] .detail-image-frame {
+  height: calc(var(--app-h) - 190px);
+}
+
+#app-root[data-layout-mode="stage"] .detail-grid aside {
+  display: none;
+}
+
+.auth-modal-backdrop {
+  padding:
+    max(18px, env(safe-area-inset-top))
+    max(14px, env(safe-area-inset-right))
+    max(18px, env(safe-area-inset-bottom))
+    max(14px, env(safe-area-inset-left));
+}
+
+/* Override legacy mobile min-height and image stretching rules. */
+#app-main,
+.screen-panel {
+  min-height: 0;
+}
+
+.detail-image-frame img {
+  width: auto;
+  height: auto;
 }

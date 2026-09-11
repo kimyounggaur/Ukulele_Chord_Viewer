@@ -89,9 +89,11 @@ export async function strum(
   } = options;
   const ordered = direction === "down" ? midiNotes : [...midiNotes].reverse();
   await unlockAudio();
-  ordered.forEach((midi, index) => {
-    void pluck(midiToFreq(midi), (spreadMs * index) / 1000, 2.4, gain);
-  });
+  await Promise.all(
+    ordered.map((midi, index) =>
+      pluck(midiToFreq(midi), (spreadMs * index) / 1000, 2.4, gain),
+    ),
+  );
 }
 
 export async function arpeggio(
@@ -100,7 +102,9 @@ export async function arpeggio(
   gain = 0.2,
 ): Promise<void> {
   await unlockAudio();
-  midiNotes.forEach((midi, index) => {
-    void pluck(midiToFreq(midi), (noteMs * index) / 1000, 2.2, gain);
-  });
+  await Promise.all(
+    midiNotes.map((midi, index) =>
+      pluck(midiToFreq(midi), (noteMs * index) / 1000, 2.2, gain),
+    ),
+  );
 }

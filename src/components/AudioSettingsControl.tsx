@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Settings2, Volume2, X } from "lucide-react";
 import { useChordAudio, type StrumSpeed } from "../audio/ChordAudioProvider";
 
@@ -12,11 +12,17 @@ export function AudioSettingsControl() {
   const { available, settings, updateSettings } = useChordAudio();
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
+  const closeAndRestoreFocus = useCallback(() => {
+    setOpen(false);
+    window.requestAnimationFrame(() => triggerRef.current?.focus());
+  }, []);
 
   useEffect(() => {
     if (!open) return undefined;
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key === "Escape") closeAndRestoreFocus();
     };
     const handlePointerDown = (event: globalThis.PointerEvent) => {
       if (panelRef.current && event.target instanceof Node && !panelRef.current.contains(event.target)) {
@@ -29,11 +35,12 @@ export function AudioSettingsControl() {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("pointerdown", handlePointerDown);
     };
-  }, [open]);
+  }, [closeAndRestoreFocus, open]);
 
   return (
     <div className="audio-settings" ref={panelRef}>
       <button
+        ref={triggerRef}
         type="button"
         data-chord-audio="true"
         className="audio-settings-trigger"
@@ -48,7 +55,7 @@ export function AudioSettingsControl() {
         <div id="audio-settings-panel" className="audio-settings-panel" role="group" aria-label="코드 소리 설정">
           <div className="audio-settings-title">
             <span><Volume2 size={17} aria-hidden="true" /> 코드 소리</span>
-            <button type="button" data-chord-audio="true" onClick={() => setOpen(false)} aria-label="소리 설정 닫기">
+            <button type="button" data-chord-audio="true" onClick={closeAndRestoreFocus} aria-label="소리 설정 닫기">
               <X size={17} aria-hidden="true" />
             </button>
           </div>
