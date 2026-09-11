@@ -1,8 +1,11 @@
+import { useId, type KeyboardEvent, type Ref } from "react";
 import type { Chord } from "../data/types";
 import { qualityById } from "../data/chordQualities";
 import { getChordDisplayTitle } from "../lib/chordDisplay";
 import { ChordDiagram } from "./ChordDiagram";
 import { ChordPlayButton } from "./ChordPlayButton";
+import { describeVoicing } from "../a11y/describeVoicing";
+import { useChordAudio } from "../audio/ChordAudioProvider";
 
 interface ChordCardProps {
   chord: Chord;
@@ -10,6 +13,11 @@ interface ChordCardProps {
   onSelect: () => void;
   featured?: boolean;
   related?: boolean;
+  selectionTabIndex?: number;
+  audioTabIndex?: number;
+  selectionButtonRef?: Ref<HTMLButtonElement>;
+  onSelectionFocus?: () => void;
+  onSelectionKeyDown?: (event: KeyboardEvent<HTMLButtonElement>) => void;
 }
 
 export function ChordCard({
@@ -18,9 +26,17 @@ export function ChordCard({
   onSelect,
   featured = false,
   related = false,
+  selectionTabIndex,
+  audioTabIndex,
+  selectionButtonRef,
+  onSelectionFocus,
+  onSelectionKeyDown,
 }: ChordCardProps) {
+  const { available: audioAvailable, playChord } = useChordAudio();
+  const shortcutHelpId = useId();
   const quality = qualityById[chord.quality];
   const displayTitle = getChordDisplayTitle(chord);
+  const description = describeVoicing(chord);
   const minHeightClass = related
     ? ""
     : featured
@@ -38,8 +54,27 @@ export function ChordCard({
       ].join(" ")}
     >
       <button
+        ref={selectionButtonRef}
         type="button"
         onClick={onSelect}
+        onFocus={onSelectionFocus}
+        onKeyDown={(event) => {
+          const isArpeggioShortcut = event.shiftKey && (event.key === "Enter" || event.key === " ");
+          const isStrumShortcut = !event.altKey
+            && !event.ctrlKey
+            && !event.metaKey
+            && event.key.toLowerCase() === "p";
+          if (audioAvailable && (isArpeggioShortcut || isStrumShortcut)) {
+            event.preventDefault();
+            void playChord(chord, isArpeggioShortcut ? "arpeggio" : "strum");
+            return;
+          }
+          onSelectionKeyDown?.(event);
+        }}
+        tabIndex={selectionTabIndex}
+        aria-label={description}
+        aria-describedby={shortcutHelpId}
+        data-chord-id={chord.id}
         className={[
           related ? "related-chord-card" : "chord-card",
           featured ? "is-featured" : "",
@@ -63,7 +98,10 @@ export function ChordCard({
           <ChordDiagram chord={chord} size="sm" uploadedImageUrl={uploadedImageUrl} />
         </div>
       </button>
-      <ChordPlayButton chord={chord} compact className="chord-card-audio" />
+      <span id={shortcutHelpId} className="sr-only">
+        P 키는 스트럼 재생, Shift+Enter 또는 Shift+Space는 아르페지오 재생입니다.
+      </span>
+      <ChordPlayButton chord={chord} compact className="chord-card-audio" tabIndex={audioTabIndex} />
     </article>
   );
 }

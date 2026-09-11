@@ -1,13 +1,14 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, Ref } from "react";
 import type { ChordQualityInfo } from "../data/chordQualities";
 
 interface QualityBubbleProps {
   quality: ChordQualityInfo;
   active: boolean;
   onClick: () => void;
+  buttonRef?: Ref<HTMLButtonElement>;
 }
 
-export function QualityBubble({ quality, active, onClick }: QualityBubbleProps) {
+export function QualityBubble({ quality, active, onClick, buttonRef }: QualityBubbleProps) {
   const bubbleStyle = {
     "--quality-color": quality.color,
     "--quality-soft": quality.softColor,
@@ -15,6 +16,7 @@ export function QualityBubble({ quality, active, onClick }: QualityBubbleProps) 
 
   return (
     <button
+      ref={buttonRef}
       type="button"
       aria-pressed={active}
       onClick={onClick}

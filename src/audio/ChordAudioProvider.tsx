@@ -31,6 +31,8 @@ interface ChordAudioValue {
 const STORAGE_KEY = "ukv.audio";
 const DEFAULT_SETTINGS: ChordAudioSettings = { lowG: false, volume: 0.75, speed: "normal" };
 const SPEED_SPREAD: Record<StrumSpeed, number> = { slow: 55, normal: 28, fast: 15 };
+const STRUM_NOTE_DURATION_MS = 2400;
+const ARPEGGIO_NOTE_DURATION_MS = 2200;
 
 const ChordAudioContext = createContext<ChordAudioValue | null>(null);
 
@@ -73,6 +75,8 @@ export function ChordAudioProvider({ children }: { children: ReactNode }) {
   const playChord = useCallback(async (chord: Chord, mode: "strum" | "arpeggio" = "strum") => {
     const voicing = chord.voicings[0];
     const notes = voicingToMidi(voicing, settings.lowG);
+    visualTimers.current.forEach(window.clearTimeout);
+    visualTimers.current = [];
     if (settings.volume === 0) {
       setAnnouncement(`${chord.displayName} 코드 볼륨이 0%입니다.`);
       setActiveStrings([]);
@@ -85,18 +89,22 @@ export function ChordAudioProvider({ children }: { children: ReactNode }) {
       .map(({ index }) => index);
     const interval = mode === "arpeggio" ? 220 : SPEED_SPREAD[settings.speed];
 
-    visualTimers.current.forEach(window.clearTimeout);
-    visualTimers.current = [];
     setPlayingChordId(chord.id);
-    setAnnouncement(chord.displayName + (mode === "arpeggio" ? " 아르페지오 재생" : " 코드 재생"));
+    setAnnouncement("");
+    visualTimers.current.push(window.setTimeout(() => {
+      setAnnouncement(chord.displayName + (mode === "arpeggio" ? " 아르페지오 재생 시작" : " 코드 재생 시작"));
+    }, 0));
     playedIndices.forEach((stringIndex, order) => {
       visualTimers.current.push(window.setTimeout(() => setActiveStrings([stringIndex]), interval * order));
     });
+    const playbackDuration = interval * Math.max(playedIndices.length - 1, 0)
+      + (mode === "arpeggio" ? ARPEGGIO_NOTE_DURATION_MS : STRUM_NOTE_DURATION_MS);
     visualTimers.current.push(
       window.setTimeout(() => {
         setActiveStrings([]);
         setPlayingChordId(null);
-      }, interval * playedIndices.length + 420),
+        setAnnouncement(`${chord.displayName} 코드 재생 종료`);
+      }, playbackDuration),
     );
 
     try {
@@ -104,6 +112,8 @@ export function ChordAudioProvider({ children }: { children: ReactNode }) {
       if (mode === "arpeggio") await arpeggio(notes, 220, gain);
       else await strum(notes, { spreadMs: SPEED_SPREAD[settings.speed], gain });
     } catch {
+      visualTimers.current.forEach(window.clearTimeout);
+      visualTimers.current = [];
       setAvailable(false);
       setAnnouncement("이 브라우저에서는 코드 소리를 재생할 수 없습니다.");
       setActiveStrings([]);

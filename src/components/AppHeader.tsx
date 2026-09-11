@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { Home, LayoutGrid, Lock, LogIn, LogOut, Maximize2, Minimize2, Search, ShieldCheck, UserPlus } from "lucide-react";
 import type { AuthAction, AuthUser } from "../hooks/useAuth";
 
@@ -129,8 +129,13 @@ export function AppHeader({
   const [authMode, setAuthMode] = useState<AuthMode | null>(null);
   const [authMessage, setAuthMessage] = useState<string | null>(null);
   const [authPending, setAuthPending] = useState(false);
+  const authTitleId = useId();
+  const authModalRef = useRef<HTMLFormElement>(null);
+  const authEmailRef = useRef<HTMLInputElement>(null);
+  const authOpenerRef = useRef<HTMLElement | null>(null);
 
   const handleOpenAuth = (mode: AuthMode) => {
+    authOpenerRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     setAuthMode(mode);
     setAuthMessage(null);
   };
@@ -138,7 +143,46 @@ export function AppHeader({
   const handleCloseAuth = () => {
     setAuthMode(null);
     setAuthMessage(null);
+    window.requestAnimationFrame(() => authOpenerRef.current?.focus());
   };
+
+  useEffect(() => {
+    if (!authMode) return undefined;
+    const frame = window.requestAnimationFrame(() => authEmailRef.current?.focus());
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopPropagation();
+        handleCloseAuth();
+        return;
+      }
+      if (event.key !== "Tab" || !authModalRef.current) return;
+      const focusable = Array.from(
+        authModalRef.current.querySelectorAll<HTMLElement>(
+          "button:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex='-1'])",
+        ),
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+      if (!authModalRef.current.contains(active) || !focusable.includes(active as HTMLElement)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      } else if (event.shiftKey && active === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown, true);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      document.removeEventListener("keydown", handleKeyDown, true);
+    };
+  }, [authMode]);
 
   const handleAuthSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -181,7 +225,7 @@ export function AppHeader({
 
   return (
     <>
-      <div className="header-search-row flex min-w-0 flex-1 items-center gap-3">
+      <div className="header-search-row flex min-w-0 flex-1 items-center gap-3" role="search" aria-label="우쿨렐레 코드 검색">
       <button
         type="button"
         onClick={onHome}
@@ -202,7 +246,7 @@ export function AppHeader({
           value={searchTerm}
           onChange={(event) => onSearchChange(event.target.value)}
             disabled={!canSearch}
-            aria-label="Search ukulele chords"
+            aria-label="우쿨렐레 코드 검색"
             className="h-12 w-full rounded-full border-2 border-rose-100 bg-white/90 pl-12 pr-5 text-base font-semibold text-stone-700 shadow-neumorphic-inset outline-none transition placeholder:text-stone-300 focus:border-rose-200 focus:ring-4 focus:ring-rose-100 disabled:cursor-not-allowed disabled:bg-stone-50 disabled:text-stone-300"
             placeholder={canSearch ? "코드 검색" : "로그인 후 검색"}
         />
@@ -232,7 +276,7 @@ export function AppHeader({
             {stageMode ? <Minimize2 size={18} aria-hidden="true" /> : <Maximize2 size={18} aria-hidden="true" />}
           </button>
         </div>
-        <div className={["header-auth-controls", currentUser ? "is-authenticated" : "is-guest"].join(" ")}>
+        <nav aria-label="계정 및 관리" className={["header-auth-controls", currentUser ? "is-authenticated" : "is-guest"].join(" ")}>
           <div className="auth-actions">
             {currentUser ? (
               <>
@@ -294,7 +338,7 @@ export function AppHeader({
               <span className="auth-action-label">관리자 로그인</span>
             </button>
           ) : null}
-        </div>
+        </nav>
         <button
           type="button"
           onClick={onHome}
@@ -307,12 +351,16 @@ export function AppHeader({
       {authMode ? (
         <div className="auth-modal-backdrop" role="presentation" onMouseDown={handleCloseAuth}>
           <form
+            ref={authModalRef}
             className="auth-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={authTitleId}
             onSubmit={handleAuthSubmit}
             onMouseDown={(event) => event.stopPropagation()}
           >
             <div className="auth-modal-header">
-              <h2>{AUTH_LABELS[authMode]}</h2>
+              <h2 id={authTitleId}>{AUTH_LABELS[authMode]}</h2>
               <button type="button" onClick={handleCloseAuth} aria-label="로그인 창 닫기">
                 닫기
               </button>
@@ -320,6 +368,7 @@ export function AppHeader({
             <label>
               이메일
               <input
+                ref={authEmailRef}
                 name="email"
                 type="email"
                 autoComplete="email"
@@ -342,7 +391,11 @@ export function AppHeader({
             ) : (
               <p className="auth-modal-note">회원 로그인 후 검색 기능을 사용할 수 있습니다.</p>
             )}
-            {authMessage ? <p className="auth-modal-message">{authMessage}</p> : null}
+            {authMessage ? (
+              <p className="auth-modal-message" role="status" aria-live="polite">
+                {authMessage}
+              </p>
+            ) : null}
             <button type="submit" className="auth-submit-button" disabled={authPending}>
               {authPending ? "처리 중..." : AUTH_LABELS[authMode]}
             </button>

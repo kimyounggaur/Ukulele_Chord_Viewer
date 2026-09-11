@@ -10,7 +10,8 @@
     "verify": "tsx scripts/verify-chords.ts",
     "check:images": "tsx scripts/check-images.ts",
     "check:audio": "tsx scripts/check-audio.ts",
-    "check:layout": "tsx scripts/check-layout.ts"
+    "check:layout": "tsx scripts/check-layout.ts",
+    "check:a11y": "tsx scripts/check-a11y.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.107.0",

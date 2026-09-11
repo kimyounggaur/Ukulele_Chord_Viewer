@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import type { Chord, ChordQuality } from "../data/types";
 import { qualityById } from "../data/chordQualities";
 import { useChordSearch } from "../hooks/useChordSearch";
@@ -5,7 +6,8 @@ import { ChordCard } from "./ChordCard";
 import { EmptyState } from "./EmptyState";
 import { ArrowLeft } from "lucide-react";
 import { chordStorageKey } from "../lib/chordIdentity";
-import type { LayoutMode } from "../hooks/useLayoutMode";
+import { LAYOUT_COLUMNS, type LayoutMode } from "../hooks/useLayoutMode";
+import { useRovingChordGrid, type GridFocusRequest } from "../hooks/useRovingChordGrid";
 
 interface ChordGridProps {
   chords: readonly Chord[];
@@ -15,6 +17,7 @@ interface ChordGridProps {
   getUploadedImageUrl: (chordId: string) => string | undefined;
   onBack: () => void;
   layoutMode: LayoutMode;
+  focusRequest?: GridFocusRequest | null;
 }
 
 export function ChordGrid({
@@ -25,9 +28,24 @@ export function ChordGrid({
   getUploadedImageUrl,
   onBack,
   layoutMode,
+  focusRequest,
 }: ChordGridProps) {
   const filteredChords = useChordSearch(chords, searchTerm, selectedQualityId);
   const title = selectedQualityId ? qualityById[selectedQualityId].label : "All Chords";
+  const columns = LAYOUT_COLUMNS[layoutMode];
+  const chordIds = useMemo(() => filteredChords.map((chord) => chord.id), [filteredChords]);
+  const { activeId, setActiveId, registerButton, handleKeyDown } = useRovingChordGrid(
+    chordIds,
+    columns,
+    focusRequest,
+  );
+  const rows = useMemo(
+    () => Array.from(
+      { length: Math.ceil(filteredChords.length / columns) },
+      (_, rowIndex) => filteredChords.slice(rowIndex * columns, rowIndex * columns + columns),
+    ),
+    [columns, filteredChords],
+  );
 
   return (
     <section className="screen-panel chord-grid-screen relative" data-grid-mode={layoutMode}>
@@ -52,14 +70,35 @@ export function ChordGrid({
       <div className="chord-gallery-scroll thin-scrollbar">
         <div className="chord-grid-board mx-auto w-full max-w-[1140px]">
           {filteredChords.length > 0 ? (
-          <div className="chord-gallery-grid">
-            {filteredChords.map((chord) => (
-              <ChordCard
-                key={chord.id}
-                chord={chord}
-                uploadedImageUrl={getUploadedImageUrl(chordStorageKey(chord))}
-                onSelect={() => onSelectChord(chord.id)}
-              />
+          <div
+            className="chord-gallery-grid"
+            role="grid"
+            aria-label={`${title} 코드 목록`}
+            aria-colcount={columns}
+            aria-rowcount={rows.length}
+          >
+            {rows.map((row, rowIndex) => (
+              <div className="chord-grid-row" role="row" aria-rowindex={rowIndex + 1} key={row[0].id}>
+                {row.map((chord, columnIndex) => (
+                  <div
+                    role="gridcell"
+                    aria-colindex={columnIndex + 1}
+                    aria-rowindex={rowIndex + 1}
+                    key={chord.id}
+                  >
+                    <ChordCard
+                      chord={chord}
+                      uploadedImageUrl={getUploadedImageUrl(chordStorageKey(chord))}
+                      onSelect={() => onSelectChord(chord.id)}
+                      selectionTabIndex={activeId === chord.id ? 0 : -1}
+                      audioTabIndex={-1}
+                      selectionButtonRef={(button) => registerButton(chord.id, button)}
+                      onSelectionFocus={() => setActiveId(chord.id)}
+                      onSelectionKeyDown={(event) => handleKeyDown(event, chord.id)}
+                    />
+                  </div>
+                ))}
+              </div>
             ))}
           </div>
           ) : (
@@ -67,16 +106,6 @@ export function ChordGrid({
           )}
         </div>
       </div>
-
-      <button
-        type="button"
-        onClick={onBack}
-        aria-label="코드 종류 선택 화면으로 돌아가기"
-        className="module-back-floating"
-      >
-        <ArrowLeft size={20} aria-hidden="true" />
-        <span>뒤로</span>
-      </button>
     </section>
   );
 }

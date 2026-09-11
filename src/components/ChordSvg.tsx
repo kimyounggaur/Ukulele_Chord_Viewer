@@ -1,6 +1,7 @@
 import { useId, type CSSProperties } from "react";
 import { NOTE_NAMES_SHARP, OPEN_MIDI_HIGH_G } from "../data/theory";
 import type { Chord, ChordVoicing, StringIndex } from "../data/types";
+import { describeVoicing } from "../a11y/describeVoicing";
 
 interface ChordSvgProps {
   chord: Chord;
@@ -43,10 +44,8 @@ export function ChordSvg({
       className={className}
       style={lineStyle}
     >
-      <title id={titleId}>{chord.displayName} 우쿨렐레 코드</title>
-      <desc id={descriptionId}>
-        4번 G줄부터 1번 A줄 순서의 프렛은 {voicing.frets.join(", ")}입니다.
-      </desc>
+      <title id={titleId}>{chord.displayName} 우쿨렐레 코드 다이어그램</title>
+      <desc id={descriptionId}>{describeVoicing(chord, voicing)}</desc>
       <rect className="chord-svg-surface" x="1" y="1" width="258" height="338" rx="22" />
 
       <g className="chord-svg-grid" strokeLinecap="round">

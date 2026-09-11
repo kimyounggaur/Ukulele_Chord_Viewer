@@ -7,6 +7,13 @@
 
 :root {
   --app-h: 100vh;
+  --bg: #e8ecf3;
+  --surface: #eef1f6;
+  --shadow-light: #ffffff;
+  --shadow-dark: #c5cbd6;
+  --text: #2d3748;
+  --text-muted: #5a6879;
+  --focus-ring: #2b6cb0;
   color: #29262a;
   background: #fbfbfb;
   font-family: Pretendard, Poppins, system-ui, sans-serif;
@@ -109,6 +116,7 @@ button {
 
 .quality-selector-grid {
   display: grid;
+  list-style: none;
   width: 100%;
   max-width: 1500px;
   flex: 1;
@@ -119,6 +127,19 @@ button {
   justify-items: center;
   padding: clamp(20px, 4vh, 56px) clamp(24px, 5vw, 84px) 0;
   margin: 0 auto;
+}
+
+.quality-selector-screen > nav {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.quality-selector-item {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  list-style: none;
 }
 
 .quality-bubble-size {
@@ -533,6 +554,14 @@ button {
 .related-chords-panel {
   min-height: 0;
   max-width: 100%;
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.image-file-label:focus-within {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
 }
 
 @media (min-width: 1024px) {
@@ -833,6 +862,17 @@ button {
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 18px;
   margin-top: 18px;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-card-item {
+  min-width: 0;
+  list-style: none;
+}
+
+.admin-card-item .admin-chord-card {
+  height: 100%;
 }
 
 .admin-chord-card {
@@ -961,10 +1001,20 @@ button {
 }
 
 .chord-gallery-grid {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.8vw, 28px);
+}
+
+.chord-grid-row {
   display: grid;
   grid-template-columns: repeat(var(--gallery-columns), minmax(0, 1fr));
   gap: clamp(10px, 1.8vw, 28px);
   align-items: stretch;
+}
+
+.chord-grid-row > [role="gridcell"] {
+  min-width: 0;
 }
 
 .chord-gallery-grid .chord-card-shell {
@@ -977,6 +1027,11 @@ button {
   overflow-x: hidden;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
+}
+
+.related-chord-item {
+  flex: 0 0 auto;
+  list-style: none;
 }
 
 .header-utility-actions {
@@ -2038,7 +2093,8 @@ button {
   padding-left: 2px;
 }
 
-#app-root[data-layout-mode="phone-portrait"] .chord-gallery-grid {
+#app-root[data-layout-mode="phone-portrait"] .chord-gallery-grid,
+#app-root[data-layout-mode="phone-portrait"] .chord-grid-row {
   gap: 8px;
 }
 
@@ -2146,7 +2202,8 @@ button {
   padding: 1px 2px max(48px, env(safe-area-inset-bottom));
 }
 
-#app-root[data-layout-mode="phone-landscape"] .chord-gallery-grid {
+#app-root[data-layout-mode="phone-landscape"] .chord-gallery-grid,
+#app-root[data-layout-mode="phone-landscape"] .chord-grid-row {
   gap: 8px;
 }
 
@@ -2249,7 +2306,8 @@ button {
   max-width: 1760px;
 }
 
-#app-root[data-layout-mode="stage"] .chord-gallery-grid {
+#app-root[data-layout-mode="stage"] .chord-gallery-grid,
+#app-root[data-layout-mode="stage"] .chord-grid-row {
   gap: clamp(20px, 2.2vw, 38px);
 }
 
@@ -2296,4 +2354,247 @@ button {
 .detail-image-frame img {
   width: auto;
   height: auto;
+}
+
+.contrast-setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.contrast-switch {
+  display: inline-flex;
+  min-width: 72px;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid #a8a29e;
+  border-radius: 999px;
+  background: #f5f5f4;
+  padding: 0 10px;
+  color: #57534e;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.contrast-switch > span[aria-hidden="true"] {
+  position: relative;
+  width: 26px;
+  height: 16px;
+  border-radius: 999px;
+  background: #a8a29e;
+}
+
+.contrast-switch > span[aria-hidden="true"]::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: #ffffff;
+  transition: transform 160ms ease;
+}
+
+.contrast-switch[aria-checked="true"] {
+  border-color: #2b6cb0;
+  background: #ebf8ff;
+  color: #1a365d;
+}
+
+.contrast-switch[aria-checked="true"] > span[aria-hidden="true"] {
+  background: #2b6cb0;
+}
+
+.contrast-switch[aria-checked="true"] > span[aria-hidden="true"]::after {
+  transform: translateX(10px);
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus-ring) !important;
+  outline-offset: 3px !important;
+  border-radius: inherit;
+}
+
+[data-theme="dark"] {
+  --focus-ring: #90cdf4;
+}
+
+body[data-contrast="high"] {
+  background: #ffffff;
+  color: #1a202c;
+}
+
+body[data-contrast="high"] #app-root {
+  background: #ffffff;
+  color: #1a202c;
+}
+
+body[data-contrast="high"] * {
+  box-shadow: none !important;
+  color: #1a202c !important;
+  text-shadow: none !important;
+}
+
+body[data-contrast="high"] button:not(.auth-submit-button) {
+  border: 1px solid #4a5568 !important;
+  background: #ffffff !important;
+  color: #1a202c !important;
+  text-shadow: none !important;
+}
+
+body[data-contrast="high"] .contrast-switch[aria-checked="true"] {
+  background: #1a202c !important;
+  color: #ffffff !important;
+}
+
+body[data-contrast="high"] :is(.auth-badge, .finger-tooltip) {
+  border: 1px solid #4a5568 !important;
+  background: #ffffff !important;
+  color: #1a202c !important;
+}
+
+body[data-contrast="high"] :is(
+  .chord-card,
+  .related-chord-card,
+  .quality-bubble,
+  .chord-image-frame,
+  .detail-image-frame,
+  .audio-settings-panel,
+  .auth-modal,
+  .auth-chip-button,
+  .admin-header-button,
+  .module-back-button,
+  .audio-settings-trigger,
+  .stage-mode-button,
+  .admin-chord-card,
+  .image-file-label,
+  input,
+  select,
+  button
+) {
+  box-shadow: none !important;
+}
+
+body[data-contrast="high"] :is(
+  .chord-card,
+  .related-chord-card,
+  .chord-image-frame,
+  .detail-image-frame,
+  .audio-settings-panel,
+  .auth-modal,
+  .auth-chip-button,
+  .admin-header-button,
+  .module-back-button,
+  .audio-settings-trigger,
+  .stage-mode-button,
+  .admin-chord-card,
+  .image-file-label,
+  input,
+  select
+) {
+  border-color: #4a5568 !important;
+}
+
+body[data-contrast="high"] :is(
+  .font-display,
+  .quality-bubble-label,
+  .auth-chip-button,
+  .admin-header-button,
+  .header-brand-button,
+  .module-back-button,
+  .module-back-floating,
+  .search-lock-hint,
+  .audio-settings-panel,
+  .audio-settings-panel label,
+  .auth-modal,
+  .auth-modal label,
+  .auth-modal-note,
+  .auth-modal-message,
+  .text-stone-300,
+  .text-stone-400,
+  .text-stone-500,
+  .text-stone-700,
+  .text-stone-800,
+  .text-zinc-500,
+  .text-rose-300,
+  .text-rose-400,
+  .text-pink-400,
+  .text-pink-500
+) {
+  color: #1a202c !important;
+  text-shadow: none !important;
+}
+
+body[data-contrast="high"] :is(input, select, .chord-card, .related-chord-card, .audio-settings-panel, .auth-modal) {
+  background: #ffffff !important;
+  color: #1a202c !important;
+}
+
+body[data-contrast="high"] input::placeholder {
+  color: #4a5568 !important;
+  opacity: 1;
+}
+
+body[data-contrast="high"] :is(button[disabled], [aria-disabled="true"], input[disabled], select[disabled]) {
+  color: #4a5568 !important;
+  opacity: 1;
+}
+
+body[data-contrast="high"] .quality-bubble {
+  background: #ffffff !important;
+}
+
+body[data-contrast="high"] .quality-bubble-label,
+body[data-contrast="high"] .chord-svg-fret-label,
+body[data-contrast="high"] .chord-svg-notes {
+  fill: #1a202c;
+  color: #1a202c !important;
+}
+
+body[data-contrast="high"] .chord-svg-finger circle,
+body[data-contrast="high"] .chord-svg-barre {
+  fill: #1a202c;
+}
+
+body[data-contrast="high"] .auth-submit-button {
+  border: 1px solid #1a202c;
+  background: #1a202c !important;
+  color: #ffffff !important;
+}
+
+body[data-contrast="high"] .chord-grid-board {
+  background-color: #ffffff;
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --text: #1a202c;
+    --text-muted: #4a5568;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .chord-string-feedback {
+    display: none !important;
+  }
 }

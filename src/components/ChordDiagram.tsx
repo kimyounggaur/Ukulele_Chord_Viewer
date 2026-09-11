@@ -6,6 +6,7 @@ import { ChordImage } from "./ChordImage";
 import { ChordSvg } from "./ChordSvg";
 import { FingerHintLayer } from "./FingerHintLayer";
 import { useChordAudio } from "../audio/ChordAudioProvider";
+import { describeVoicing } from "../a11y/describeVoicing";
 
 export interface ChordDiagramProps {
   chord: Chord;
@@ -47,6 +48,7 @@ export function ChordDiagram({
   const fingerHotspots = fingerHotspotsByChordId[chord.legacyId ?? chord.id] ?? [];
   const { playingChordId, activeStrings } = useChordAudio();
   const isPlaying = playingChordId === chord.id;
+  const accessibleDescription = describeVoicing(chord, voicing);
 
   useEffect(() => {
     setSourceIndex(0);
@@ -64,7 +66,7 @@ export function ChordDiagram({
       ) : (
         <ChordImage
           src={sources[sourceIndex]}
-          alt={chord.displayName + " 우쿨렐레 코드 다이어그램"}
+          alt={accessibleDescription}
           size={size === "lg" ? "large" : "thumb"}
           priority={priority}
           onError={() => setSourceIndex((current) => current + 1)}

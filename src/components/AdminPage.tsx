@@ -58,17 +58,17 @@ export function AdminPage({
           </div>
         </div>
 
-        <div className="admin-card-grid">
+        <ul className="admin-card-grid" aria-label="코드 이미지 관리 목록">
           {chords.map((chord) => {
             const quality = qualityById[chord.quality];
             const uploadedImageUrl = getUploadedImageUrl(chordStorageKey(chord));
 
             return (
-              <article
-                key={chord.id}
-                className="admin-chord-card"
-                style={{ borderTopColor: quality.color }}
-              >
+              <li key={chord.id} className="admin-card-item">
+                <article
+                  className="admin-chord-card"
+                  style={{ borderTopColor: quality.color }}
+                >
                 <div className="flex items-center justify-between gap-2">
                   <div className="min-w-0">
                     <h2 className="truncate font-display text-lg font-extrabold text-stone-800">
@@ -97,10 +97,11 @@ export function AdminPage({
                   onUpload={onUploadImage}
                   onDelete={onDeleteImage}
                 />
-              </article>
+                </article>
+              </li>
             );
           })}
-        </div>
+        </ul>
       </div>
     </section>
   );

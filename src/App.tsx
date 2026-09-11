@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import type { ChordQuality } from "./data/types";
 import { staticChords } from "./data/chords";
 import { AppHeader } from "./components/AppHeader";
@@ -13,6 +13,7 @@ import { useIndexedChordImages } from "./hooks/useIndexedChordImages";
 import { AudioSettingsControl } from "./components/AudioSettingsControl";
 import { useLayoutMode } from "./hooks/useLayoutMode";
 import { useStageMode } from "./hooks/useStageMode";
+import type { GridFocusRequest } from "./hooks/useRovingChordGrid";
 
 function App() {
   useClickSound();
@@ -21,6 +22,10 @@ function App() {
   const [selectedQualityId, setSelectedQualityId] = useState<ChordQuality | null>(null);
   const [selectedChordId, setSelectedChordId] = useState<string | null>(null);
   const [adminPageOpen, setAdminPageOpen] = useState(false);
+  const [gridFocusRequest, setGridFocusRequest] = useState<GridFocusRequest | null>(null);
+  const [qualityFocusRequest, setQualityFocusRequest] = useState<GridFocusRequest | null>(null);
+  const focusNonceRef = useRef(0);
+  const detailOriginRef = useRef<string | null>(null);
   const auth = useAuth();
   const uploadedImages = useIndexedChordImages();
   const { stageMode, toggleStageMode } = useStageMode();
@@ -44,6 +49,9 @@ function App() {
     setSelectedQualityId(null);
     setSelectedChordId(null);
     setAdminPageOpen(false);
+    detailOriginRef.current = null;
+    setGridFocusRequest(null);
+    setQualityFocusRequest(null);
   }, []);
 
   const handleSearchChange = useCallback((value: string) => {
@@ -56,27 +64,49 @@ function App() {
       setSelectedChordId(null);
       setSelectedQualityId(null);
       setAdminPageOpen(false);
+      detailOriginRef.current = null;
+      setGridFocusRequest(null);
     }
   }, [auth.canSearch]);
 
   const handleSelectQuality = useCallback((qualityId: ChordQuality) => {
     setSelectedQualityId(qualityId);
     setSelectedChordId(null);
+    setQualityFocusRequest(null);
+    const firstChord = staticChords.find((chord) => chord.quality === qualityId);
+    if (firstChord) {
+      focusNonceRef.current += 1;
+      setGridFocusRequest({ id: firstChord.id, nonce: focusNonceRef.current });
+    }
   }, []);
 
-  const handleSelectChord = useCallback((chordId: string) => {
+  const handleSelectChordFromGrid = useCallback((chordId: string) => {
+    detailOriginRef.current = chordId;
+    setSelectedChordId(chordId);
+  }, []);
+
+  const handleSelectRelatedChord = useCallback((chordId: string) => {
     setSelectedChordId(chordId);
   }, []);
 
   const handleBackFromDetail = useCallback(() => {
     setSelectedChordId(null);
+    if (detailOriginRef.current) {
+      focusNonceRef.current += 1;
+      setGridFocusRequest({ id: detailOriginRef.current, nonce: focusNonceRef.current });
+    }
   }, []);
 
   const handleBackFromGrid = useCallback(() => {
+    if (selectedQualityId) {
+      focusNonceRef.current += 1;
+      setQualityFocusRequest({ id: selectedQualityId, nonce: focusNonceRef.current });
+    }
     setSelectedChordId(null);
     setSelectedQualityId(null);
     setSearchTerm("");
-  }, []);
+    setGridFocusRequest(null);
+  }, [selectedQualityId]);
 
   const handleOpenAdminPage = useCallback(() => {
     if (!auth.isAdmin) {
@@ -125,7 +155,7 @@ function App() {
         <ChordDetail
           chord={selectedChord}
           relatedChords={relatedChords}
-          onSelectChord={handleSelectChord}
+          onSelectChord={handleSelectRelatedChord}
           onBack={handleBackFromDetail}
           getUploadedImageUrl={uploadedImages.getImageUrl}
           onUploadImage={uploadedImages.uploadImage}
@@ -137,15 +167,17 @@ function App() {
           chords={staticChords}
           selectedQualityId={selectedQualityId}
           searchTerm={searchTerm}
-          onSelectChord={handleSelectChord}
+          onSelectChord={handleSelectChordFromGrid}
           getUploadedImageUrl={uploadedImages.getImageUrl}
           onBack={handleBackFromGrid}
           layoutMode={layoutMode}
+          focusRequest={gridFocusRequest}
         />
       ) : (
         <QualitySelector
           selectedQualityId={selectedQualityId}
           onSelectQuality={handleSelectQuality}
+          focusRequest={qualityFocusRequest}
         />
       )}
     </AppShell>

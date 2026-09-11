@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Settings2, Volume2, X } from "lucide-react";
 import { useChordAudio, type StrumSpeed } from "../audio/ChordAudioProvider";
+import { useContrastMode } from "../hooks/useContrastMode";
 
 const SPEED_OPTIONS: { value: StrumSpeed; label: string }[] = [
   { value: "slow", label: "느리게" },
@@ -10,6 +11,7 @@ const SPEED_OPTIONS: { value: StrumSpeed; label: string }[] = [
 
 export function AudioSettingsControl() {
   const { available, settings, updateSettings } = useChordAudio();
+  const { highContrast, toggleContrast } = useContrastMode();
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -22,7 +24,11 @@ export function AudioSettingsControl() {
   useEffect(() => {
     if (!open) return undefined;
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") closeAndRestoreFocus();
+      if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopPropagation();
+        closeAndRestoreFocus();
+      }
     };
     const handlePointerDown = (event: globalThis.PointerEvent) => {
       if (panelRef.current && event.target instanceof Node && !panelRef.current.contains(event.target)) {
@@ -44,7 +50,7 @@ export function AudioSettingsControl() {
         type="button"
         data-chord-audio="true"
         className="audio-settings-trigger"
-        aria-label="코드 소리 설정"
+        aria-label="앱 설정"
         aria-expanded={open}
         aria-controls="audio-settings-panel"
         onClick={() => setOpen((current) => !current)}
@@ -52,11 +58,26 @@ export function AudioSettingsControl() {
         <Settings2 size={18} aria-hidden="true" />
       </button>
       {open ? (
-        <div id="audio-settings-panel" className="audio-settings-panel" role="group" aria-label="코드 소리 설정">
+        <div id="audio-settings-panel" className="audio-settings-panel" role="group" aria-label="앱 설정">
           <div className="audio-settings-title">
-            <span><Volume2 size={17} aria-hidden="true" /> 코드 소리</span>
-            <button type="button" data-chord-audio="true" onClick={closeAndRestoreFocus} aria-label="소리 설정 닫기">
+            <span><Volume2 size={17} aria-hidden="true" /> 앱 설정</span>
+            <button type="button" data-chord-audio="true" onClick={closeAndRestoreFocus} aria-label="설정 닫기">
               <X size={17} aria-hidden="true" />
+            </button>
+          </div>
+          <div className="contrast-setting-row">
+            <span>고대비</span>
+            <button
+              type="button"
+              data-chord-audio="true"
+              className="contrast-switch"
+              role="switch"
+              aria-label="고대비 모드"
+              aria-checked={highContrast}
+              onClick={toggleContrast}
+            >
+              <span aria-hidden="true" />
+              {highContrast ? "켬" : "끔"}
             </button>
           </div>
           {!available ? <p className="audio-unavailable">이 브라우저에서는 소리를 재생할 수 없습니다.</p> : null}

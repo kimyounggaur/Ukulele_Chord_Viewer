@@ -101,7 +101,7 @@ export function ChordImageUploader({
             onClick={handleDelete}
             disabled={pending}
             className="flex h-9 w-9 items-center justify-center rounded-full border border-pink-100 bg-white text-pink-400 shadow-neo-inset transition hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-200 disabled:cursor-not-allowed disabled:opacity-50"
-            aria-label="Delete uploaded image"
+            aria-label={`${chord.displayName} 업로드 이미지 삭제`}
           >
             <Trash2 size={17} aria-hidden="true" />
           </button>
@@ -127,29 +127,30 @@ export function ChordImageUploader({
       <div className="flex gap-2">
         <label
           htmlFor={inputId}
-          className="flex h-9 flex-1 items-center justify-center rounded-full border border-pink-100 bg-white px-3 text-sm font-semibold text-pink-400 shadow-neo-inset transition hover:scale-[1.02]"
+          className="image-file-label flex h-9 flex-1 items-center justify-center rounded-full border border-pink-100 bg-white px-3 text-sm font-semibold text-pink-400 shadow-neo-inset transition hover:scale-[1.02]"
         >
-          선택
+          이미지 선택
+          <input
+            id={inputId}
+            type="file"
+            accept={ACCEPTED_IMAGE_TYPES.join(",")}
+            className="sr-only"
+            aria-label={`${chord.displayName} 이미지 파일 선택`}
+            onChange={handleChange}
+          />
         </label>
-        <input
-          id={inputId}
-          type="file"
-          accept={ACCEPTED_IMAGE_TYPES.join(",")}
-          className="sr-only"
-          onChange={handleChange}
-        />
         <button
           type="button"
           onClick={handleUpload}
           disabled={!file || pending}
           className="flex h-9 w-11 items-center justify-center rounded-full border border-pink-100 bg-white text-pink-400 shadow-neo-inset transition hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-200 disabled:cursor-not-allowed disabled:opacity-50"
-          aria-label="Save uploaded image"
+          aria-label={`${chord.displayName} 업로드 이미지 저장`}
         >
           <Save size={17} aria-hidden="true" />
         </button>
       </div>
 
-      {message ? <p className="mt-2 truncate text-xs font-medium text-zinc-400">{message}</p> : null}
+      {message ? <p className="mt-2 truncate text-xs font-medium text-zinc-500" role="status" aria-live="polite">{message}</p> : null}
     </div>
   );
 }

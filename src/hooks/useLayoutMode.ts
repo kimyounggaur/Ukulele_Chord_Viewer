@@ -2,6 +2,14 @@ import { useEffect, useState } from "react";
 
 export type LayoutMode = "phone-portrait" | "phone-landscape" | "tablet" | "desktop" | "stage";
 
+export const LAYOUT_COLUMNS: Record<LayoutMode, number> = {
+  "phone-portrait": 3,
+  "phone-landscape": 6,
+  tablet: 5,
+  desktop: 6,
+  stage: 4,
+};
+
 export function classifyLayoutMode(width: number, height: number, stage = false): LayoutMode {
   if (stage) return "stage";
   if (Math.min(width, height) < 600) {

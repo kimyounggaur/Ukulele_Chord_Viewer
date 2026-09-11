@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useId, useRef } from "react";
 import { ArrowLeft } from "lucide-react";
 import type { Chord } from "../data/types";
 import { qualityById } from "../data/chordQualities";
@@ -30,9 +30,21 @@ export function ChordDetail({
   onDeleteImage,
   adminMode,
 }: ChordDetailProps) {
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const headingId = useId();
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => headingRef.current?.focus());
+    return () => window.cancelAnimationFrame(frame);
+  }, [chord.id]);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
+      if (
+        event.key === "Escape" &&
+        !event.defaultPrevented &&
+        !document.querySelector("[aria-modal='true'], #audio-settings-panel")
+      ) {
         onBack();
       }
     };
@@ -45,11 +57,12 @@ export function ChordDetail({
   const displayTitle = getChordDisplayTitle(chord);
 
   return (
-    <section className="screen-panel detail-screen px-[clamp(24px,5vw,84px)] pb-[clamp(28px,5vh,72px)] pt-2 thin-scrollbar">
+    <section className="screen-panel detail-screen px-[clamp(24px,5vw,84px)] pb-[clamp(28px,5vh,72px)] pt-2 thin-scrollbar" aria-labelledby={headingId}>
       <div className="mx-auto w-full max-w-[1120px]">
         <button
           type="button"
           onClick={onBack}
+          aria-label={`${displayTitle} 상세에서 코드 목록으로 돌아가기`}
           className="mb-4 inline-flex h-11 items-center gap-2 rounded-full border border-rose-100 bg-white px-4 font-bold text-stone-500 shadow-neumorphic transition hover:scale-105 focus:outline-none focus-visible:ring-4 focus-visible:ring-rose-100"
         >
           <ArrowLeft size={18} aria-hidden="true" />
@@ -60,6 +73,9 @@ export function ChordDetail({
           <div className="min-w-0">
             <div className="detail-title-row">
               <h1
+                id={headingId}
+                ref={headingRef}
+                tabIndex={-1}
                 className="w-fit rounded-lg border-4 bg-white px-8 py-3 text-center font-display text-4xl font-extrabold text-stone-700 shadow-neumorphic sm:text-5xl"
                 style={{ borderColor: quality.color }}
               >
@@ -77,6 +93,7 @@ export function ChordDetail({
           </div>
 
           <aside className="flex min-h-0 flex-col gap-3">
+            <h2 className="font-display text-lg font-extrabold text-stone-700">같은 종류의 코드</h2>
             {adminMode ? (
               <ChordImageUploader
                 chord={chord}
@@ -85,17 +102,18 @@ export function ChordDetail({
                 onDelete={onDeleteImage}
               />
             ) : null}
-            <div className="related-chords-panel flex gap-3 overflow-x-auto pb-2 thin-scrollbar lg:flex-col">
+            <ul className="related-chords-panel flex gap-3 overflow-x-auto pb-2 thin-scrollbar lg:flex-col" aria-label="같은 종류의 코드">
               {relatedChords.map((relatedChord) => (
-                <ChordCard
-                  key={relatedChord.id}
-                  chord={relatedChord}
-                  uploadedImageUrl={getUploadedImageUrl(chordStorageKey(relatedChord))}
-                  onSelect={() => onSelectChord(relatedChord.id)}
-                  related
-                />
+                <li key={relatedChord.id} className="related-chord-item">
+                  <ChordCard
+                    chord={relatedChord}
+                    uploadedImageUrl={getUploadedImageUrl(chordStorageKey(relatedChord))}
+                    onSelect={() => onSelectChord(relatedChord.id)}
+                    related
+                  />
+                </li>
               ))}
-            </div>
+            </ul>
           </aside>
         </div>
       </div>
