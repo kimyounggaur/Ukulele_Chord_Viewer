@@ -1,3 +1,4 @@
+import "../../styles/phase7.css";
 import { useId, useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { copyTextToClipboard } from "../../lib/clipboard";

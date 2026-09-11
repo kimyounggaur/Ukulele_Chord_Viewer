@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   MAX_RECENT_CHORDS,
   RECENT_STORAGE_KEY,
@@ -96,9 +96,9 @@ function subscribeToRecentChords(listener: RecentChordsListener) {
 }
 
 export function useRecentChords() {
-  const [recentChordIds, setRecentChordIds] = useState<string[]>(() => [...recentChordIdsInMemory]);
+  const [recentChordIds, setRecentChordIds] = useState<string[]>(loadRecentChords);
 
-  useLayoutEffect(() => subscribeToRecentChords(setRecentChordIds), []);
+  useEffect(() => subscribeToRecentChords(setRecentChordIds), []);
 
   const addRecentChord = useCallback((chordId: string) => {
     if (!toCurrentChordId(chordId)) return false;

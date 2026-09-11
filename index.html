@@ -10,6 +10,33 @@
     />
     <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
     <link rel="apple-touch-icon" sizes="180x180" href="%BASE_URL%apple-touch-icon.png" />
+    <script>
+      (() => {
+        const firstVisibleImageByQuality = {
+          major: "chords/major/c.thumb.webp",
+          minor: "chords/minor/c.thumb.webp",
+          dom7: "chords/seventh/c.thumb.webp",
+          maj7: "chords/major7/c.thumb.webp",
+          min7: "chords/minor7/a.thumb.webp",
+          sus4: "chords/sus4/c.thumb.webp",
+          sixth: "chords/sixth/c.thumb.webp",
+          minor6: "chords/minor6/c.thumb.webp",
+          dom7sus4: "chords/seventh-sus4/c.thumb.webp",
+          add9: "chords/add9/c.thumb.webp",
+          min7flat5: "chords/minor7-flat5/c.thumb.webp",
+        };
+        const quality = /^#\/q\/([^/?]+)/.exec(window.location.hash)?.[1];
+        const image = quality && firstVisibleImageByQuality[quality];
+        if (!image) return;
+        const preload = document.createElement("link");
+        preload.rel = "preload";
+        preload.as = "image";
+        preload.type = "image/webp";
+        preload.fetchPriority = "high";
+        preload.href = new URL(image, document.baseURI).href;
+        document.head.append(preload);
+      })();
+    </script>
     <title>우쿨렐레 코드 뷰어 | Lesson Designer</title>
   </head>
   <body>

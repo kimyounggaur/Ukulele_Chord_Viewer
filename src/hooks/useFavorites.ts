@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   FAVORITES_STORAGE_KEY,
   normalizeChordIds,
@@ -83,9 +83,9 @@ function subscribeToFavorites(listener: FavoritesListener) {
 }
 
 export function useFavorites() {
-  const [favoriteIds, setFavoriteIds] = useState<string[]>(() => [...favoriteIdsInMemory]);
+  const [favoriteIds, setFavoriteIds] = useState<string[]>(loadFavorites);
 
-  useLayoutEffect(() => subscribeToFavorites(setFavoriteIds), []);
+  useEffect(() => subscribeToFavorites(setFavoriteIds), []);
 
   const isFavorite = useCallback(
     (chordId: string) => {

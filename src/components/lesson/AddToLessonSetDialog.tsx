@@ -1,3 +1,4 @@
+import "../../styles/phase7.css";
 import { useEffect, useId, useRef, useState, type FormEvent, type RefObject } from "react";
 import type { Chord } from "../../data/types";
 import { getChordDisplayTitle } from "../../lib/chordDisplay";

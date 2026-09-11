@@ -1,3 +1,4 @@
+import "../../styles/phase7.css";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { ArrowLeft, RotateCcw, Volume2 } from "lucide-react";
 import { useChordAudio } from "../../audio/ChordAudioProvider";

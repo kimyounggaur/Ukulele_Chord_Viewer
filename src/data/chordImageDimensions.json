@@ -1,0 +1,482 @@
+{
+  "chords/add9/a.png": {
+    "width": 720,
+    "height": 537,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 179
+  },
+  "chords/add9/b.png": {
+    "width": 720,
+    "height": 510,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 170
+  },
+  "chords/add9/c.png": {
+    "width": 720,
+    "height": 481,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 160
+  },
+  "chords/add9/d.png": {
+    "width": 720,
+    "height": 515,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 172
+  },
+  "chords/add9/e.png": {
+    "width": 720,
+    "height": 508,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 169
+  },
+  "chords/add9/f.png": {
+    "width": 720,
+    "height": 462,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 154
+  },
+  "chords/add9/g.png": {
+    "width": 720,
+    "height": 471,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 157
+  },
+  "chords/major/a.png": {
+    "width": 720,
+    "height": 514,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 171
+  },
+  "chords/major/b.png": {
+    "width": 720,
+    "height": 507,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 169
+  },
+  "chords/major/c.png": {
+    "width": 720,
+    "height": 544,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 181
+  },
+  "chords/major/d.png": {
+    "width": 720,
+    "height": 488,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 163
+  },
+  "chords/major/e.png": {
+    "width": 720,
+    "height": 496,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 165
+  },
+  "chords/major/f.png": {
+    "width": 720,
+    "height": 526,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 175
+  },
+  "chords/major/g.png": {
+    "width": 720,
+    "height": 411,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 137
+  },
+  "chords/major7/a.png": {
+    "width": 720,
+    "height": 509,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 170
+  },
+  "chords/major7/b.png": {
+    "width": 720,
+    "height": 510,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 170
+  },
+  "chords/major7/c.png": {
+    "width": 720,
+    "height": 523,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 174
+  },
+  "chords/major7/d.png": {
+    "width": 720,
+    "height": 580,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 193
+  },
+  "chords/major7/e.png": {
+    "width": 720,
+    "height": 535,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 178
+  },
+  "chords/major7/f.png": {
+    "width": 593,
+    "height": 483,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 195
+  },
+  "chords/major7/g.png": {
+    "width": 720,
+    "height": 465,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 155
+  },
+  "chords/minor/a.png": {
+    "width": 720,
+    "height": 540,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 180
+  },
+  "chords/minor/b.png": {
+    "width": 720,
+    "height": 512,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 171
+  },
+  "chords/minor/c.png": {
+    "width": 720,
+    "height": 459,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 153
+  },
+  "chords/minor/d.png": {
+    "width": 720,
+    "height": 461,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 154
+  },
+  "chords/minor/e.png": {
+    "width": 720,
+    "height": 521,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 174
+  },
+  "chords/minor/f.png": {
+    "width": 720,
+    "height": 457,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 152
+  },
+  "chords/minor/g.png": {
+    "width": 720,
+    "height": 413,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 138
+  },
+  "chords/minor6/a.png": {
+    "width": 720,
+    "height": 480,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 160
+  },
+  "chords/minor6/b.png": {
+    "width": 720,
+    "height": 460,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 153
+  },
+  "chords/minor6/c.png": {
+    "width": 720,
+    "height": 460,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 153
+  },
+  "chords/minor6/d.png": {
+    "width": 720,
+    "height": 460,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 153
+  },
+  "chords/minor6/e.png": {
+    "width": 720,
+    "height": 417,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 139
+  },
+  "chords/minor6/f.png": {
+    "width": 720,
+    "height": 528,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 176
+  },
+  "chords/minor6/g.png": {
+    "width": 720,
+    "height": 417,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 139
+  },
+  "chords/minor7-flat5/a.png": {
+    "width": 146,
+    "height": 109,
+    "thumbnailWidth": 146,
+    "thumbnailHeight": 109
+  },
+  "chords/minor7-flat5/b.png": {
+    "width": 720,
+    "height": 525,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 175
+  },
+  "chords/minor7-flat5/c.png": {
+    "width": 145,
+    "height": 107,
+    "thumbnailWidth": 145,
+    "thumbnailHeight": 107
+  },
+  "chords/minor7-flat5/d.png": {
+    "width": 146,
+    "height": 103,
+    "thumbnailWidth": 146,
+    "thumbnailHeight": 103
+  },
+  "chords/minor7-flat5/e.png": {
+    "width": 146,
+    "height": 98,
+    "thumbnailWidth": 146,
+    "thumbnailHeight": 98
+  },
+  "chords/minor7-flat5/f.png": {
+    "width": 146,
+    "height": 103,
+    "thumbnailWidth": 146,
+    "thumbnailHeight": 103
+  },
+  "chords/minor7-flat5/g.png": {
+    "width": 145,
+    "height": 91,
+    "thumbnailWidth": 145,
+    "thumbnailHeight": 91
+  },
+  "chords/minor7/a.png": {
+    "width": 720,
+    "height": 463,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 154
+  },
+  "chords/minor7/b.png": {
+    "width": 720,
+    "height": 513,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 171
+  },
+  "chords/minor7/c-sharp.png": {
+    "width": 720,
+    "height": 462,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 154
+  },
+  "chords/minor7/c.png": {
+    "width": 720,
+    "height": 462,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 154
+  },
+  "chords/minor7/d.png": {
+    "width": 720,
+    "height": 450,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 150
+  },
+  "chords/minor7/e.png": {
+    "width": 720,
+    "height": 421,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 140
+  },
+  "chords/minor7/f-sharp.png": {
+    "width": 720,
+    "height": 478,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 159
+  },
+  "chords/minor7/f.png": {
+    "width": 720,
+    "height": 455,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 152
+  },
+  "chords/minor7/g-sharp.png": {
+    "width": 720,
+    "height": 460,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 153
+  },
+  "chords/minor7/g.png": {
+    "width": 720,
+    "height": 402,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 134
+  },
+  "chords/seventh-sus4/a.png": {
+    "width": 720,
+    "height": 494,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 165
+  },
+  "chords/seventh-sus4/b.png": {
+    "width": 720,
+    "height": 519,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 173
+  },
+  "chords/seventh-sus4/c.png": {
+    "width": 720,
+    "height": 379,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 126
+  },
+  "chords/seventh-sus4/d.png": {
+    "width": 720,
+    "height": 463,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 154
+  },
+  "chords/seventh-sus4/e.png": {
+    "width": 720,
+    "height": 458,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 153
+  },
+  "chords/seventh-sus4/f.png": {
+    "width": 720,
+    "height": 458,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 153
+  },
+  "chords/seventh-sus4/g.png": {
+    "width": 720,
+    "height": 421,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 140
+  },
+  "chords/seventh/a.png": {
+    "width": 720,
+    "height": 445,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 148
+  },
+  "chords/seventh/b.png": {
+    "width": 720,
+    "height": 506,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 169
+  },
+  "chords/seventh/c.png": {
+    "width": 720,
+    "height": 476,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 159
+  },
+  "chords/seventh/d.png": {
+    "width": 720,
+    "height": 477,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 159
+  },
+  "chords/seventh/e.png": {
+    "width": 720,
+    "height": 535,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 178
+  },
+  "chords/seventh/f.png": {
+    "width": 720,
+    "height": 494,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 165
+  },
+  "chords/seventh/g.png": {
+    "width": 720,
+    "height": 421,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 140
+  },
+  "chords/sixth/a.png": {
+    "width": 720,
+    "height": 478,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 159
+  },
+  "chords/sixth/b.png": {
+    "width": 720,
+    "height": 460,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 153
+  },
+  "chords/sixth/c.png": {
+    "width": 720,
+    "height": 463,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 154
+  },
+  "chords/sixth/d.png": {
+    "width": 720,
+    "height": 513,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 171
+  },
+  "chords/sixth/e.png": {
+    "width": 720,
+    "height": 462,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 154
+  },
+  "chords/sixth/f.png": {
+    "width": 720,
+    "height": 450,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 150
+  },
+  "chords/sixth/g.png": {
+    "width": 720,
+    "height": 421,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 140
+  },
+  "chords/sus4/a.png": {
+    "width": 720,
+    "height": 513,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 171
+  },
+  "chords/sus4/b.png": {
+    "width": 720,
+    "height": 507,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 169
+  },
+  "chords/sus4/c.png": {
+    "width": 720,
+    "height": 504,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 168
+  },
+  "chords/sus4/d.png": {
+    "width": 720,
+    "height": 488,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 163
+  },
+  "chords/sus4/e.png": {
+    "width": 720,
+    "height": 552,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 184
+  },
+  "chords/sus4/f.png": {
+    "width": 720,
+    "height": 512,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 171
+  },
+  "chords/sus4/g.png": {
+    "width": 720,
+    "height": 417,
+    "thumbnailWidth": 240,
+    "thumbnailHeight": 139
+  }
+}

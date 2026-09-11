@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import type { Chord, ChordQuality } from "../data/types";
 import { qualityById } from "../data/chordQualities";
 import { useChordSearch } from "../hooks/useChordSearch";
@@ -28,6 +28,87 @@ interface ChordGridProps {
   onToggleFavorite: (chordId: string) => void;
   onRequestAddToSet?: (chordId: string, opener: HTMLButtonElement) => void;
 }
+
+interface ChordGridCellProps {
+  chord: Chord;
+  rowIndex: number;
+  columnIndex: number;
+  uploadedImageUrl?: string;
+  active: boolean;
+  favorite: boolean;
+  onSelectChord: (chordId: string) => void;
+  onRememberSelectedCard: (chordId: string) => void;
+  onToggleFavorite: (chordId: string, wasFavorite: boolean) => void;
+  onRequestAddToSet?: (chordId: string, opener: HTMLButtonElement) => void;
+  onRegisterButton: (chordId: string, button: HTMLButtonElement | null) => void;
+  onSelectionFocus: (chordId: string) => void;
+  onSelectionKeyDown: (event: KeyboardEvent<HTMLButtonElement>, chordId: string) => void;
+}
+
+const ChordGridCell = memo(function ChordGridCell({
+  chord,
+  rowIndex,
+  columnIndex,
+  uploadedImageUrl,
+  active,
+  favorite,
+  onSelectChord,
+  onRememberSelectedCard,
+  onToggleFavorite,
+  onRequestAddToSet,
+  onRegisterButton,
+  onSelectionFocus,
+  onSelectionKeyDown,
+}: ChordGridCellProps) {
+  const handleSelect = useCallback(() => {
+    onRememberSelectedCard(chord.id);
+    onSelectChord(chord.id);
+  }, [chord.id, onRememberSelectedCard, onSelectChord]);
+  const handleToggleFavorite = useCallback(
+    () => onToggleFavorite(chord.id, favorite),
+    [chord.id, favorite, onToggleFavorite],
+  );
+  const handleRequestAddToSet = useCallback(
+    (opener: HTMLButtonElement) => onRequestAddToSet?.(chord.id, opener),
+    [chord.id, onRequestAddToSet],
+  );
+  const handleRegisterButton = useCallback(
+    (button: HTMLButtonElement | null) => onRegisterButton(chord.id, button),
+    [chord.id, onRegisterButton],
+  );
+  const handleFocus = useCallback(
+    () => onSelectionFocus(chord.id),
+    [chord.id, onSelectionFocus],
+  );
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLButtonElement>) => onSelectionKeyDown(event, chord.id),
+    [chord.id, onSelectionKeyDown],
+  );
+
+  return (
+    <div
+      role="gridcell"
+      aria-colindex={columnIndex + 1}
+      aria-rowindex={rowIndex + 1}
+    >
+      <ChordCard
+        chord={chord}
+        uploadedImageUrl={uploadedImageUrl}
+        onSelect={handleSelect}
+        priority={rowIndex === 0 && columnIndex === 0}
+        selectionTabIndex={active ? 0 : -1}
+        audioTabIndex={-1}
+        favorite={favorite}
+        onToggleFavorite={handleToggleFavorite}
+        onRequestAddToSet={onRequestAddToSet ? handleRequestAddToSet : undefined}
+        favoriteTabIndex={-1}
+        selectionButtonRef={handleRegisterButton}
+        onSelectionFocus={handleFocus}
+        onSelectionKeyDown={handleKeyDown}
+      />
+    </div>
+  );
+});
 
 export function ChordGrid({
   chords,
@@ -61,6 +142,10 @@ export function ChordGrid({
   const favoritesFilterRef = useRef<HTMLButtonElement>(null);
   const [favoriteRemovalStatus, setFavoriteRemovalStatus] = useState("");
   const { scrollContainerRef, hasSnapshot, restoredSelectedCardId, rememberSelectedCard } = useRouteScrollMemory<HTMLDivElement>({ locationKey, visitToken });
+  // A returning history entry needs every card mounted before the scroll/focus
+  // restoration layout effects run. Only a genuinely fresh gallery visit uses
+  // the two-frame first-card startup stage.
+  const [allRowsReady, setAllRowsReady] = useState(() => hasSnapshot || Boolean(focusRequest));
   const restoredFocusRequest = useMemo<GridFocusRequest | null>(
     () => restoredSelectedCardId ? { id: restoredSelectedCardId, nonce: `route:${locationKey}` } : null,
     [locationKey, restoredSelectedCardId],
@@ -88,14 +173,27 @@ export function ChordGrid({
     ),
     [columns, filteredChords],
   );
-  const toggleFavoriteFromCard = (chordId: string) => {
-    const removesVisibleCard = favoritesOnly && isFavorite(chordId);
+  useEffect(() => {
+    let secondFrame = 0;
+    const firstFrame = window.requestAnimationFrame(() => {
+      secondFrame = window.requestAnimationFrame(() => setAllRowsReady(true));
+    });
+    return () => {
+      window.cancelAnimationFrame(firstFrame);
+      if (secondFrame) window.cancelAnimationFrame(secondFrame);
+    };
+  }, []);
+  // Paint the first meaningful card immediately, then mount the complete small list
+  // within two frames. This is a one-time startup stage, not scroll virtualization.
+  const renderedRows = allRowsReady || rows.length === 0 ? rows : [[rows[0][0]]];
+  const toggleFavoriteFromCard = useCallback((chordId: string, wasFavorite: boolean) => {
+    const removesVisibleCard = favoritesOnly && wasFavorite;
     onToggleFavorite(chordId);
     if (removesVisibleCard) {
       setFavoriteRemovalStatus(`${chordId} 코드를 즐겨찾기에서 제거했습니다.`);
       window.requestAnimationFrame(() => favoritesFilterRef.current?.focus());
     }
-  };
+  }, [favoritesOnly, onToggleFavorite]);
 
   return (
     <section className="screen-panel chord-grid-screen relative" data-grid-mode={layoutMode}>
@@ -140,35 +238,25 @@ export function ChordGrid({
             aria-colcount={columns}
             aria-rowcount={rows.length}
           >
-            {rows.map((row, rowIndex) => (
+            {renderedRows.map((row, rowIndex) => (
               <div className="chord-grid-row" role="row" aria-rowindex={rowIndex + 1} key={row[0].id}>
                 {row.map((chord, columnIndex) => (
-                  <div
-                    role="gridcell"
-                    aria-colindex={columnIndex + 1}
-                    aria-rowindex={rowIndex + 1}
+                  <ChordGridCell
                     key={chord.id}
-                  >
-                    <ChordCard
-                      chord={chord}
-                      uploadedImageUrl={getUploadedImageUrl(chordStorageKey(chord))}
-                      onSelect={() => {
-                        rememberSelectedCard(chord.id);
-                        onSelectChord(chord.id);
-                      }}
-                      selectionTabIndex={activeId === chord.id ? 0 : -1}
-                      audioTabIndex={-1}
-                      favorite={isFavorite(chord.id)}
-                      onToggleFavorite={() => toggleFavoriteFromCard(chord.id)}
-                      onRequestAddToSet={onRequestAddToSet
-                        ? (opener) => onRequestAddToSet(chord.id, opener)
-                        : undefined}
-                      favoriteTabIndex={-1}
-                      selectionButtonRef={(button) => registerButton(chord.id, button)}
-                      onSelectionFocus={() => setActiveId(chord.id)}
-                      onSelectionKeyDown={(event) => handleKeyDown(event, chord.id)}
-                    />
-                  </div>
+                    chord={chord}
+                    rowIndex={rowIndex}
+                    columnIndex={columnIndex}
+                    uploadedImageUrl={getUploadedImageUrl(chordStorageKey(chord))}
+                    active={activeId === chord.id}
+                    favorite={isFavorite(chord.id)}
+                    onSelectChord={onSelectChord}
+                    onRememberSelectedCard={rememberSelectedCard}
+                    onToggleFavorite={toggleFavoriteFromCard}
+                    onRequestAddToSet={onRequestAddToSet}
+                    onRegisterButton={registerButton}
+                    onSelectionFocus={setActiveId}
+                    onSelectionKeyDown={handleKeyDown}
+                  />
                 ))}
               </div>
             ))}

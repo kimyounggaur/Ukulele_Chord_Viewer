@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   addChordToLessonSet as addChordToLessonSetCollection,
   createLessonSet as createLessonSetCollection,
@@ -82,9 +82,9 @@ function subscribeToLessonSets(listener: LessonSetsListener) {
 }
 
 export function useLessonSets() {
-  const [lessonSets, setLessonSets] = useState<LessonSet[]>(() => [...lessonSetsInMemory]);
+  const [lessonSets, setLessonSets] = useState<LessonSet[]>(loadLessonSets);
 
-  useLayoutEffect(() => subscribeToLessonSets(setLessonSets), []);
+  useEffect(() => subscribeToLessonSets(setLessonSets), []);
 
   const createSet = useCallback((draft: LessonSetDraft) => {
     const result = createLessonSetCollection(lessonSetsInMemory, draft);

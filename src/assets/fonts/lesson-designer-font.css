@@ -1,0 +1,15 @@
+@font-face {
+  font-family: "Lesson Designer Sans KS";
+  src: url("./LessonDesignerSans-KSX1001-Supplement.woff2") format("woff2-variations");
+  font-style: normal;
+  font-weight: 45 930;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Lesson Designer Sans";
+  src: url("./LessonDesignerSans-Core.woff2") format("woff2-variations");
+  font-style: normal;
+  font-weight: 45 930;
+  font-display: swap;
+}

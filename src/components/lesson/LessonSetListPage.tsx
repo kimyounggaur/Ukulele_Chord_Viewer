@@ -1,3 +1,4 @@
+import "../../styles/phase7.css";
 import { BookOpenCheck, CalendarDays, ChevronRight, Plus, Trash2 } from "lucide-react";
 import { useId, useLayoutEffect, useRef, useState, type FormEvent } from "react";
 import type { LessonSet } from "../../lessonSets/types";

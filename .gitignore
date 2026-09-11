@@ -1,4 +1,5 @@
 node_modules/
+node_modules.incomplete/
 dist/
 screenshots/
 vite-dev.log
@@ -6,6 +7,7 @@ vite-dev.log
 
 # Local source dump used to prepare public/chords. The app commits normalized assets instead.
 코드 Source/
+코드 Source2/
 
 .env
 .env.*

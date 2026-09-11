@@ -140,6 +140,7 @@ export function ChordDetail({
                 voicingIndex={voicingIndex}
                 forcePrimitive={voicingIndex > 0}
                 size="lg"
+                priority
                 uploadedImageUrl={getUploadedImageUrl(chordStorageKey(chord))}
               />
             </div>

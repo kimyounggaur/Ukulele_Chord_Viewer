@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { User } from "@supabase/supabase-js";
-import { isSupabaseConfigured, supabase } from "../lib/supabase";
+import { getSupabaseClient, isSupabaseConfigured } from "../lib/supabase";
 
 export type AuthRole = "member" | "admin";
 
@@ -39,43 +39,65 @@ function toAuthUser(user: User | null): AuthUser | null {
   };
 }
 
-function requireSupabase(): NonNullable<typeof supabase> | null {
-  return supabase;
-}
-
 export function useAuth() {
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const client = requireSupabase();
-    if (!client) {
-      setLoading(false);
-      return undefined;
-    }
-
     let mounted = true;
+    let unsubscribe: (() => void) | undefined;
+    let timer: number | undefined;
 
-    client.auth.getSession().then(({ data }) => {
-      if (mounted) {
-        setCurrentUser(toAuthUser(data.session?.user ?? null));
-        setLoading(false);
-      }
-    });
+    const restoreSession = () => {
+      void getSupabaseClient()
+        .then(async (client) => {
+          if (!mounted) {
+            return;
+          }
 
-    const { data: listener } = client.auth.onAuthStateChange((_event, session) => {
-      setCurrentUser(toAuthUser(session?.user ?? null));
+          if (!client) {
+            setLoading(false);
+            return;
+          }
+
+          const { data: listener } = client.auth.onAuthStateChange((_event, session) => {
+            if (mounted) {
+              setCurrentUser(toAuthUser(session?.user ?? null));
+              setLoading(false);
+            }
+          });
+          unsubscribe = () => listener.subscription.unsubscribe();
+
+          const { data } = await client.auth.getSession();
+          if (mounted) {
+            setCurrentUser(toAuthUser(data.session?.user ?? null));
+            setLoading(false);
+          }
+        })
+        .catch(() => {
+          if (mounted) {
+            setLoading(false);
+          }
+        });
+    };
+
+    if (!isSupabaseConfigured) {
       setLoading(false);
-    });
+    } else {
+      timer = window.setTimeout(restoreSession, 3_000);
+    }
 
     return () => {
       mounted = false;
-      listener.subscription.unsubscribe();
+      if (timer !== undefined) {
+        window.clearTimeout(timer);
+      }
+      unsubscribe?.();
     };
   }, []);
 
   const signUp = useCallback<AuthAction>(async (email, password) => {
-    const client = requireSupabase();
+    const client = await getSupabaseClient();
     const normalizedEmail = normalizeEmail(email);
 
     if (!client) {
@@ -108,7 +130,7 @@ export function useAuth() {
   }, []);
 
   const loginMember = useCallback<AuthAction>(async (email, password) => {
-    const client = requireSupabase();
+    const client = await getSupabaseClient();
 
     if (!client) {
       return {
@@ -131,7 +153,7 @@ export function useAuth() {
   }, []);
 
   const loginAdmin = useCallback<AuthAction>(async (email, password) => {
-    const client = requireSupabase();
+    const client = await getSupabaseClient();
 
     if (!client) {
       return {
@@ -161,7 +183,7 @@ export function useAuth() {
   }, []);
 
   const logout = useCallback(async () => {
-    const client = requireSupabase();
+    const client = await getSupabaseClient();
     if (client) {
       await client.auth.signOut();
     }

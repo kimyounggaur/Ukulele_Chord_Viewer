@@ -23,6 +23,7 @@ interface AppHeaderProps {
   onOpenAdmin: () => void;
   canManage: boolean;
   currentUser: AuthUser | null;
+  authLoading: boolean;
   onSignUp: AuthAction;
   onMemberLogin: AuthAction;
   onAdminLogin: AuthAction;
@@ -34,6 +35,7 @@ interface AppHeaderProps {
   onOpenQuiz: () => void;
   currentSection: "chords" | "sets" | "quiz";
   isOnline: boolean;
+  showMascot: boolean;
 }
 
 type AuthMode = "signup" | "member-login" | "admin-login";
@@ -134,6 +136,7 @@ export function AppHeader({
   onOpenAdmin,
   canManage,
   currentUser,
+  authLoading,
   onSignUp,
   onMemberLogin,
   onAdminLogin,
@@ -145,6 +148,7 @@ export function AppHeader({
   onOpenQuiz,
   currentSection,
   isOnline,
+  showMascot,
 }: AppHeaderProps) {
   const [authMode, setAuthMode] = useState<AuthMode | null>(null);
   const [authMessage, setAuthMessage] = useState<string | null>(null);
@@ -278,9 +282,11 @@ export function AppHeader({
       </label>
       </div>
 
-      <div className="header-mascot-stage" aria-hidden="true">
-        <HeaderMascot />
-      </div>
+      {showMascot ? (
+        <div className="header-mascot-stage" aria-hidden="true">
+          <HeaderMascot />
+        </div>
+      ) : null}
 
       <div className="header-right-actions">
         <div className="header-utility-actions">
@@ -323,9 +329,13 @@ export function AppHeader({
             {stageMode ? <Minimize2 size={18} aria-hidden="true" /> : <Maximize2 size={18} aria-hidden="true" />}
           </button>
         </div>
-        <nav aria-label="계정 및 관리" className={["header-auth-controls", currentUser ? "is-authenticated" : "is-guest"].join(" ")}>
+        <nav aria-label="계정 및 관리" className={["header-auth-controls", currentUser ? "is-authenticated" : authLoading ? "is-loading" : "is-guest"].join(" ")}>
           <div className="auth-actions">
-            {currentUser ? (
+            {authLoading ? (
+              <span className="auth-badge" role="status" aria-live="polite" aria-busy="true">
+                계정 확인 중
+              </span>
+            ) : currentUser ? (
               <>
                 <span className={["auth-badge", currentUser.role === "admin" ? "is-admin" : ""].join(" ")}>
                   {currentUser.role === "admin" ? (
@@ -363,7 +373,7 @@ export function AppHeader({
               </>
             )}
           </div>
-          <div className="admin-access">
+          {!authLoading ? <div className="admin-access">
             <button
               type="button"
               aria-label={canManage ? "관리자 페이지 열기" : "관리자 로그인 열기"}
@@ -373,8 +383,8 @@ export function AppHeader({
               <LayoutGrid size={14} aria-hidden="true" />
               <span className="auth-action-label">관리자 페이지</span>
             </button>
-          </div>
-          {!currentUser ? (
+          </div> : null}
+          {!authLoading && !currentUser ? (
             <button
               type="button"
               className="auth-chip-button admin-login-button"

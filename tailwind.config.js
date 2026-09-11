@@ -4,8 +4,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        display: ["Poppins", "Pretendard", "system-ui", "sans-serif"],
-        sans: ["Pretendard", "Poppins", "system-ui", "sans-serif"],
+        display: ["Lesson Designer Sans", "Lesson Designer Sans KS", "system-ui", "sans-serif"],
+        sans: ["Lesson Designer Sans", "Lesson Designer Sans KS", "system-ui", "sans-serif"],
       },
       boxShadow: {
         neo: "7px 7px 16px rgba(31, 41, 55, 0.10), -7px -7px 16px rgba(255, 255, 255, 0.95)",

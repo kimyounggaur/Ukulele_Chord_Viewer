@@ -1,3 +1,4 @@
+import "../../styles/phase7.css";
 import { useEffect, useId, useMemo, useRef } from "react";
 import { staticChords } from "../../data/chords";
 import { getChordDisplayTitle } from "../../lib/chordDisplay";

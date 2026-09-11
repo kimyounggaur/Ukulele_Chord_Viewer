@@ -1,3 +1,4 @@
+import "../styles/quality-selector.css";
 import { useLayoutEffect, useRef } from "react";
 import type { Chord, ChordQuality } from "../data/types";
 import { MAIN_QUALITY_IDS, qualityById } from "../data/chordQualities";
@@ -46,11 +47,22 @@ export function QualitySelector({
     <section className="screen-panel quality-selector-screen" aria-labelledby="quality-selector-heading">
       <h1 id="quality-selector-heading" className="sr-only">우쿨렐레 코드 종류</h1>
       <figure className="quality-selector-art" aria-hidden="true">
-        <img
-          src={`${import.meta.env.BASE_URL}assets/ukulele-style-icon.png`}
-          alt=""
-          className="quality-selector-art-image"
-        />
+        <picture>
+          <source
+            srcSet={`${import.meta.env.BASE_URL}assets/ukulele-style-icon.webp`}
+            type="image/webp"
+          />
+          <img
+            src={`${import.meta.env.BASE_URL}assets/ukulele-style-icon.png`}
+            alt=""
+            width="512"
+            height="512"
+            loading="eager"
+            decoding="async"
+            fetchPriority="high"
+            className="quality-selector-art-image"
+          />
+        </picture>
       </figure>
       {onSelectRecent ? <RecentChordStrip chords={recentChords} onSelect={onSelectRecent} /> : null}
       <nav aria-labelledby="quality-selector-heading">
@@ -74,12 +86,21 @@ export function QualitySelector({
         </ul>
       </nav>
       <figure className="main-footer-image-wrap">
-        <img
-          src={`${import.meta.env.BASE_URL}assets/main-footer-authors.jpg`}
-          alt="칼림바 연주곡집 공동 저자 소개"
-          className="main-footer-image"
-          loading="lazy"
-        />
+        <picture>
+          <source
+            srcSet={`${import.meta.env.BASE_URL}assets/main-footer-authors.webp`}
+            type="image/webp"
+          />
+          <img
+            src={`${import.meta.env.BASE_URL}assets/main-footer-authors.jpg`}
+            alt="칼림바 연주곡집 공동 저자 소개"
+            width="979"
+            height="144"
+            className="main-footer-image"
+            loading="lazy"
+            decoding="async"
+          />
+        </picture>
       </figure>
     </section>
   );

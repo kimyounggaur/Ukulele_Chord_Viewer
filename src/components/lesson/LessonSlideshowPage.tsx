@@ -1,3 +1,4 @@
+import "../../styles/phase7.css";
 import {
   useCallback,
   useEffect,

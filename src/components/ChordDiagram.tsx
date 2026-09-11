@@ -7,6 +7,7 @@ import { ChordSvg } from "./ChordSvg";
 import { FingerHintLayer } from "./FingerHintLayer";
 import { useChordAudio } from "../audio/ChordAudioProvider";
 import { describeVoicing } from "../a11y/describeVoicing";
+import chordImageDimensions from "../data/chordImageDimensions.json";
 
 export interface ChordDiagramProps {
   chord: Chord;
@@ -26,6 +27,26 @@ function queryForcesSvg(): boolean {
   return documentQuery.get("render") === "svg" || hashQuery.get("render") === "svg";
 }
 
+interface DiagramImageSource {
+  src: string;
+  webpSrc?: string;
+  width: number;
+  height: number;
+}
+
+interface ChordImageDimensions {
+  width: number;
+  height: number;
+  thumbnailWidth: number;
+  thumbnailHeight: number;
+}
+
+const dimensionsByImage = chordImageDimensions as Record<string, ChordImageDimensions>;
+
+function replaceImageExtension(imageFile: string, suffix: string) {
+  return imageFile.replace(/\.[^.]+$/, suffix);
+}
+
 export function ChordDiagram({
   chord,
   voicingIndex = 0,
@@ -37,15 +58,29 @@ export function ChordDiagram({
   ariaHidden = false,
 }: ChordDiagramProps) {
   const voicing = chord.voicings[voicingIndex] ?? chord.voicings[0];
-  const sources = useMemo(
-    () =>
-      [uploadedImageUrl, chord.imageFile ? asset(chord.imageFile) : undefined].filter(
-        (source, index, all): source is string =>
-          Boolean(source) && all.indexOf(source) === index,
-      ),
-    [chord.imageFile, uploadedImageUrl],
-  );
+  const sources = useMemo<DiagramImageSource[]>(() => {
+    const nextSources: DiagramImageSource[] = [];
+    if (uploadedImageUrl) {
+      nextSources.push({ src: uploadedImageUrl, width: 800, height: 600 });
+    }
+
+    if (chord.imageFile) {
+      const dimensions = dimensionsByImage[chord.imageFile];
+      const useDetail = size === "lg";
+      nextSources.push({
+        src: asset(chord.imageFile),
+        webpSrc: asset(
+          replaceImageExtension(chord.imageFile, useDetail ? ".webp" : ".thumb.webp"),
+        ),
+        width: useDetail ? dimensions?.width ?? 720 : dimensions?.thumbnailWidth ?? 240,
+        height: useDetail ? dimensions?.height ?? 540 : dimensions?.thumbnailHeight ?? 180,
+      });
+    }
+
+    return nextSources;
+  }, [chord.imageFile, size, uploadedImageUrl]);
   const [sourceIndex, setSourceIndex] = useState(0);
+  const [fingerHintsReady, setFingerHintsReady] = useState(size === "lg");
   const useSvg = forcePrimitive || queryForcesSvg() || sourceIndex >= sources.length;
   const fingerHotspots = fingerHotspotsByChordId[chord.legacyId ?? chord.id] ?? [];
   const { playingChordId, activeStrings } = useChordAudio();
@@ -54,13 +89,24 @@ export function ChordDiagram({
 
   useEffect(() => {
     setSourceIndex(0);
-  }, [chord.id, uploadedImageUrl]);
+  }, [chord.id, size, uploadedImageUrl]);
+
+  useEffect(() => {
+    if (size === "lg") {
+      setFingerHintsReady(true);
+      return undefined;
+    }
+
+    const timer = window.setTimeout(() => setFingerHintsReady(true), 400);
+    return () => window.clearTimeout(timer);
+  }, [size]);
 
   return (
     <div
       className={"chord-diagram chord-diagram-" + size}
       data-renderer={useSvg ? "svg" : "image"}
       aria-hidden={ariaHidden || undefined}
+      onPointerEnter={() => setFingerHintsReady(true)}
     >
       {useSvg ? (
         <ChordSvg
@@ -71,12 +117,17 @@ export function ChordDiagram({
         />
       ) : (
         <ChordImage
-          src={sources[sourceIndex]}
+          src={sources[sourceIndex].src}
+          webpSrc={sources[sourceIndex].webpSrc}
           alt={accessibleDescription}
+          width={sources[sourceIndex].width}
+          height={sources[sourceIndex].height}
           size={size === "lg" ? "large" : "thumb"}
           priority={priority}
           onError={() => setSourceIndex((current) => current + 1)}
-          overlay={<FingerHintLayer hotspots={fingerHotspots} size={size === "lg" ? "large" : "thumb"} />}
+          overlay={fingerHintsReady && fingerHotspots.length > 0
+            ? <FingerHintLayer hotspots={fingerHotspots} size={size === "lg" ? "large" : "thumb"} />
+            : undefined}
         />
       )}
       {isPlaying ? (

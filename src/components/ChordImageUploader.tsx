@@ -113,6 +113,10 @@ export function ChordImageUploader({
           <img
             src={previewUrl ?? uploadedImageUrl}
             alt={`${chord.displayName} 업로드 미리보기`}
+            width="800"
+            height="600"
+            loading="lazy"
+            decoding="async"
             className="chord-image h-full w-full p-2"
             draggable={false}
             onContextMenu={preventImageContextMenu}

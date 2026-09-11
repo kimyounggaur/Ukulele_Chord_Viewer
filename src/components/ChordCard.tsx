@@ -1,4 +1,4 @@
-import { useId, useState, type KeyboardEvent, type Ref } from "react";
+import { memo, useId, useState, type KeyboardEvent, type Ref } from "react";
 import type { Chord } from "../data/types";
 import { qualityById } from "../data/chordQualities";
 import { getChordDisplayTitle } from "../lib/chordDisplay";
@@ -24,9 +24,10 @@ interface ChordCardProps {
   onToggleFavorite?: () => void;
   favoriteTabIndex?: number;
   onRequestAddToSet?: (opener: HTMLButtonElement) => void;
+  priority?: boolean;
 }
 
-export function ChordCard({
+export const ChordCard = memo(function ChordCard({
   chord,
   uploadedImageUrl,
   onSelect,
@@ -41,6 +42,7 @@ export function ChordCard({
   onToggleFavorite,
   favoriteTabIndex,
   onRequestAddToSet,
+  priority = false,
 }: ChordCardProps) {
   const { available: audioAvailable, playChord } = useChordAudio();
   const shortcutHelpId = useId();
@@ -142,7 +144,12 @@ export function ChordCard({
           className={related ? "related-chord-diagram min-h-0 flex-1" : "min-h-0 flex-1"}
           aria-hidden="true"
         >
-          <ChordDiagram chord={chord} size="sm" uploadedImageUrl={uploadedImageUrl} />
+          <ChordDiagram
+            chord={chord}
+            size="sm"
+            uploadedImageUrl={uploadedImageUrl}
+            priority={priority}
+          />
         </div>
       </button>
       <span id={shortcutHelpId} className="sr-only">
@@ -166,4 +173,4 @@ export function ChordCard({
       <ChordPlayButton chord={chord} compact className="chord-card-audio" tabIndex={audioTabIndex} />
     </article>
   );
-}
+});

@@ -2,8 +2,10 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 
+const BASE_PATH = "/Ukulele_Chord_Viewer/";
+
 export default defineConfig({
-  base: "/Ukulele_Chord_Viewer/",
+  base: BASE_PATH,
   plugins: [
     react(),
     VitePWA({
@@ -49,4 +51,33 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes("node_modules")) {
+            return undefined;
+          }
+
+          if (/[\\/]node_modules[\\/](@?react|react-dom|react-router|react-router-dom|scheduler)[\\/]/.test(id)) {
+            return "vendor-react";
+          }
+
+          if (id.includes("@supabase")) {
+            return "vendor-supabase";
+          }
+
+          if (id.includes("@dnd-kit")) {
+            return "vendor-dnd";
+          }
+
+          if (id.includes("qrcode")) {
+            return "vendor-qr";
+          }
+
+          return undefined;
+        },
+      },
+    },
+  },
 });

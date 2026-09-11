@@ -10,7 +10,10 @@ import {
 
 interface ChordImageProps {
   src: string;
+  webpSrc?: string;
   alt: string;
+  width?: number;
+  height?: number;
   size?: "thumb" | "large";
   overlay?: ReactNode;
   onError?: () => void;
@@ -28,20 +31,29 @@ function preventImageContextMenu(event: MouseEvent) {
   event.preventDefault();
 }
 
-export function ChordImage({ src, alt, size = "thumb", overlay, onError, priority = false }: ChordImageProps) {
-  const [currentSrc, setCurrentSrc] = useState(src);
+export function ChordImage({
+  src,
+  webpSrc,
+  alt,
+  width = 720,
+  height = 540,
+  size = "thumb",
+  overlay,
+  onError,
+  priority = false,
+}: ChordImageProps) {
   const [imageBox, setImageBox] = useState<ImageBox | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [webpFailed, setWebpFailed] = useState(false);
   const frameRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const hasOverlay = Boolean(overlay);
-  const fetchPriorityAttribute = { fetchpriority: priority ? "high" : "auto" };
 
   useEffect(() => {
-    setCurrentSrc(src);
     setImageBox(null);
     setLoaded(false);
-  }, [src]);
+    setWebpFailed(false);
+  }, [src, webpSrc]);
 
   const updateImageBox = useCallback(() => {
     const frame = frameRef.current;
@@ -108,7 +120,7 @@ export function ChordImage({ src, alt, size = "thumb", overlay, onError, priorit
       observer.disconnect();
       window.removeEventListener("resize", updateImageBox);
     };
-  }, [currentSrc, hasOverlay, updateImageBox]);
+  }, [hasOverlay, src, updateImageBox, webpFailed, webpSrc]);
 
   return (
     <div
@@ -120,22 +132,35 @@ export function ChordImage({ src, alt, size = "thumb", overlay, onError, priorit
       ].join(" ")}
     >
       {!loaded ? <div className="chord-image-skeleton" aria-hidden="true" /> : null}
-      <img
-        ref={imageRef}
-        src={currentSrc}
-        alt={alt}
-        loading={priority ? "eager" : "lazy"}
-        decoding="async"
-        {...fetchPriorityAttribute}
-        className={loaded ? "chord-image is-loaded" : "chord-image"}
-        draggable={false}
-        onContextMenu={preventImageContextMenu}
-        onLoad={() => {
-          setLoaded(true);
-          updateImageBox();
-        }}
-        onError={onError}
-      />
+      <picture className="chord-image-picture">
+        {webpSrc && !webpFailed ? <source srcSet={webpSrc} type="image/webp" /> : null}
+        <img
+          key={webpFailed ? `${src}:fallback` : `${webpSrc ?? src}:preferred`}
+          ref={imageRef}
+          src={src}
+          alt={alt}
+          width={width}
+          height={height}
+          loading={size === "thumb" ? "lazy" : priority ? "eager" : "lazy"}
+          decoding="async"
+          fetchPriority={priority ? "high" : "auto"}
+          className={loaded ? "chord-image is-loaded" : "chord-image"}
+          draggable={false}
+          onContextMenu={preventImageContextMenu}
+          onLoad={() => {
+            setLoaded(true);
+            updateImageBox();
+          }}
+          onError={() => {
+            if (webpSrc && !webpFailed) {
+              setLoaded(false);
+              setWebpFailed(true);
+              return;
+            }
+            onError?.();
+          }}
+        />
+      </picture>
       {loaded && overlay && imageBox ? (
         <div
           className="chord-image-overlay"

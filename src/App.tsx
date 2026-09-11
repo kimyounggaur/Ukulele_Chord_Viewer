@@ -1,18 +1,15 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { Suspense, lazy, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { matchPath, useLocation, useNavigate } from "react-router-dom";
+import { Settings2 } from "lucide-react";
 import type { ChordQuality } from "./data/types";
 import { staticChords } from "./data/chords";
 import { qualityById } from "./data/chordQualities";
 import { AppHeader } from "./components/AppHeader";
 import { AppShell } from "./components/AppShell";
-import { ChordDetail } from "./components/ChordDetail";
 import { ChordGrid } from "./components/ChordGrid";
-import { QualitySelector } from "./components/QualitySelector";
-import { AdminPage } from "./components/AdminPage";
 import { useAuth } from "./hooks/useAuth";
 import { useClickSound } from "./hooks/useClickSound";
 import { useIndexedChordImages } from "./hooks/useIndexedChordImages";
-import { AudioSettingsControl } from "./components/AudioSettingsControl";
 import { useLayoutMode } from "./hooks/useLayoutMode";
 import { useStageMode } from "./hooks/useStageMode";
 import { useDebouncedValue } from "./hooks/useDebouncedValue";
@@ -29,18 +26,24 @@ import {
   readRouteSegment,
   readVoicingIndex,
 } from "./routing/routes";
-import { LessonSetListPage } from "./components/lesson/LessonSetListPage";
-import { LessonSetEditorPage } from "./components/lesson/LessonSetEditorPage";
-import { LessonSlideshowPage } from "./components/lesson/LessonSlideshowPage";
-import { LessonPrintPage } from "./components/lesson/LessonPrintPage";
-import { AddToLessonSetDialog } from "./components/lesson/AddToLessonSetDialog";
-import { LessonSetShareDialog } from "./components/lesson/LessonSetShareDialog";
-import { SharedLessonSetImportPage } from "./components/lesson/SharedLessonSetImportPage";
-import { QuizPage } from "./components/quiz/QuizPage";
 import { encodeLessonSetShareData } from "./lessonSets/shareCodec";
 import type { LessonSetSharePayload } from "./lessonSets/shareCodec";
-import { PwaUpdateBanner } from "./components/PwaUpdateBanner";
 import { useOnlineStatus } from "./hooks/useOnlineStatus";
+import { useContrastMode } from "./hooks/useContrastMode";
+
+const AdminPage = lazy(() => import("./components/AdminPage").then(({ AdminPage: component }) => ({ default: component })));
+const AddToLessonSetDialog = lazy(() => import("./components/lesson/AddToLessonSetDialog").then(({ AddToLessonSetDialog: component }) => ({ default: component })));
+const AudioSettingsControl = lazy(() => import("./components/AudioSettingsControl").then(({ AudioSettingsControl: component }) => ({ default: component })));
+const ChordDetail = lazy(() => import("./components/ChordDetail").then(({ ChordDetail: component }) => ({ default: component })));
+const QualitySelector = lazy(() => import("./components/QualitySelector").then(({ QualitySelector: component }) => ({ default: component })));
+const LessonSetListPage = lazy(() => import("./components/lesson/LessonSetListPage").then(({ LessonSetListPage: component }) => ({ default: component })));
+const LessonSetEditorPage = lazy(() => import("./components/lesson/LessonSetEditorPage").then(({ LessonSetEditorPage: component }) => ({ default: component })));
+const LessonSlideshowPage = lazy(() => import("./components/lesson/LessonSlideshowPage").then(({ LessonSlideshowPage: component }) => ({ default: component })));
+const LessonPrintPage = lazy(() => import("./components/lesson/LessonPrintPage").then(({ LessonPrintPage: component }) => ({ default: component })));
+const LessonSetShareDialog = lazy(() => import("./components/lesson/LessonSetShareDialog").then(({ LessonSetShareDialog: component }) => ({ default: component })));
+const SharedLessonSetImportPage = lazy(() => import("./components/lesson/SharedLessonSetImportPage").then(({ SharedLessonSetImportPage: component }) => ({ default: component })));
+const QuizPage = lazy(() => import("./components/quiz/QuizPage").then(({ QuizPage: component }) => ({ default: component })));
+const PwaUpdateBanner = lazy(() => import("./components/PwaUpdateBanner").then(({ PwaUpdateBanner: component }) => ({ default: component })));
 
 interface AppRouteState {
   fromApp?: boolean;
@@ -68,6 +71,68 @@ function RouteError({ onHome }: { onHome: () => void }) {
   );
 }
 
+function RouteLoading() {
+  return (
+    <section
+      className="screen-panel route-loading"
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+    >
+      <span aria-hidden="true" />
+      화면을 불러오는 중입니다.
+    </section>
+  );
+}
+
+function DeferredAudioSettingsControl({
+  highContrast,
+  onToggleContrast,
+}: {
+  highContrast: boolean;
+  onToggleContrast: () => void;
+}) {
+  const [activated, setActivated] = useState(false);
+
+  if (activated) {
+    return (
+      <Suspense
+        fallback={(
+          <button
+            type="button"
+            data-chord-audio="true"
+            className="audio-settings-trigger"
+            aria-label="앱 설정을 불러오는 중"
+            aria-busy="true"
+            disabled
+            autoFocus
+          >
+            <Settings2 size={18} aria-hidden="true" />
+          </button>
+        )}
+      >
+        <AudioSettingsControl
+          initiallyOpen
+          highContrast={highContrast}
+          onToggleContrast={onToggleContrast}
+        />
+      </Suspense>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      data-chord-audio="true"
+      className="audio-settings-trigger"
+      aria-label="앱 설정"
+      onClick={() => setActivated(true)}
+    >
+      <Settings2 size={18} aria-hidden="true" />
+    </button>
+  );
+}
+
 function App() {
   useClickSound();
 
@@ -81,6 +146,7 @@ function App() {
   const [addToSetChordId, setAddToSetChordId] = useState<string | null>(null);
   const [sharingSetId, setSharingSetId] = useState<string | null>(null);
   const [lessonAnnouncement, setLessonAnnouncement] = useState("");
+  const [pwaRegistrationReady, setPwaRegistrationReady] = useState(false);
   const focusNonceRef = useRef(0);
   const focusSearchAfterGridRef = useRef(false);
   const addToSetOpenerRef = useRef<HTMLButtonElement | null>(null);
@@ -88,6 +154,7 @@ function App() {
   const addToSetLocationKeyRef = useRef<string | null>(null);
   const shareLocationKeyRef = useRef<string | null>(null);
   const auth = useAuth();
+  const { highContrast, toggleContrast } = useContrastMode();
   const uploadedImages = useIndexedChordImages();
   const { stageMode, toggleStageMode } = useStageMode();
   const layoutMode = useLayoutMode(stageMode);
@@ -96,6 +163,11 @@ function App() {
   const { recentChordIds, addRecentChord } = useRecentChords();
   const lessonSetsState = useLessonSets();
   const isOnline = useOnlineStatus();
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setPwaRegistrationReady(true), 3_000);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   const chordMatch = matchPath({ path: "/c/:chordId", end: true }, location.pathname);
   const qualityMatch = matchPath({ path: "/q/:quality", end: true }, location.pathname);
@@ -246,6 +318,10 @@ function App() {
     }
   }, [location.pathname, location.state, navigate, selectedQualityId]);
 
+  const handleToggleFavoritesOnly = useCallback(() => {
+    setFavoritesOnly((current) => !current);
+  }, []);
+
   const handleOpenAdminPage = useCallback(() => {
     if (!auth.isAdmin) return;
     setSearchTerm("");
@@ -384,20 +460,28 @@ function App() {
           onOpenAdmin={handleOpenAdminPage}
           canManage={auth.isAdmin}
           currentUser={auth.currentUser}
+          authLoading={auth.loading}
           onSignUp={auth.signUp}
           onMemberLogin={auth.loginMember}
           onAdminLogin={auth.loginAdmin}
           onLogout={auth.logout}
-          tools={<AudioSettingsControl />}
+          tools={(
+            <DeferredAudioSettingsControl
+              highContrast={highContrast}
+              onToggleContrast={toggleContrast}
+            />
+          )}
           stageMode={stageMode}
           onToggleStage={toggleStageMode}
           onOpenLessonSets={handleOpenLessonSets}
           onOpenQuiz={handleOpenQuiz}
           currentSection={currentSection}
           isOnline={isOnline}
+          showMascot={layoutMode === "desktop"}
         />
       )}
     >
+      <Suspense fallback={<RouteLoading />}>
       {adminPageOpen && auth.isAdmin ? (
         <AdminPage
           chords={staticChords}
@@ -489,7 +573,7 @@ function App() {
           onDeleteImage={uploadedImages.deleteImage}
           adminMode={auth.isAdmin}
           isFavorite={isFavorite}
-          onToggleFavorite={(chordId) => toggleFavorite(chordId)}
+          onToggleFavorite={toggleFavorite}
         />
       ) : shouldShowGrid ? (
         <ChordGrid
@@ -505,9 +589,9 @@ function App() {
           locationKey={location.key}
           visitToken={location}
           favoritesOnly={favoritesOnly}
-          onToggleFavoritesOnly={() => setFavoritesOnly((current) => !current)}
+          onToggleFavoritesOnly={handleToggleFavoritesOnly}
           isFavorite={isFavorite}
-          onToggleFavorite={(chordId) => toggleFavorite(chordId)}
+          onToggleFavorite={toggleFavorite}
           onRequestAddToSet={handleRequestAddToSet}
         />
       ) : (
@@ -520,40 +604,49 @@ function App() {
           onSelectRecent={handleSelectRecentChord}
         />
       )}
+      </Suspense>
       {addToSetChord ? (
-        <AddToLessonSetDialog
-          chord={addToSetChord}
-          lessonSets={lessonSetsState.lessonSets}
-          onAdd={(lessonSetId) => {
-            const lessonSet = lessonSetsState.lessonSets.find(({ id }) => id === lessonSetId);
-            if (lessonSet?.chordIds.includes(addToSetChord.id)) {
-              setLessonAnnouncement(`${addToSetChord.displayName} 코드는 이미 ${lessonSet.title}에 있습니다.`);
+        <Suspense fallback={null}>
+          <AddToLessonSetDialog
+            chord={addToSetChord}
+            lessonSets={lessonSetsState.lessonSets}
+            onAdd={(lessonSetId) => {
+              const lessonSet = lessonSetsState.lessonSets.find(({ id }) => id === lessonSetId);
+              if (lessonSet?.chordIds.includes(addToSetChord.id)) {
+                setLessonAnnouncement(`${addToSetChord.displayName} 코드는 이미 ${lessonSet.title}에 있습니다.`);
+                handleCloseAddToSet();
+                return;
+              }
+              lessonSetsState.addChordToSet(lessonSetId, addToSetChord.id);
+              setLessonAnnouncement(`${addToSetChord.displayName} 코드를 ${lessonSet?.title ?? "수업 세트"}에 추가했습니다.`);
               handleCloseAddToSet();
-              return;
-            }
-            lessonSetsState.addChordToSet(lessonSetId, addToSetChord.id);
-            setLessonAnnouncement(`${addToSetChord.displayName} 코드를 ${lessonSet?.title ?? "수업 세트"}에 추가했습니다.`);
-            handleCloseAddToSet();
-          }}
-          onCreateAndAdd={(title) => {
-            const lessonSet = lessonSetsState.createSet({ title, chordIds: [addToSetChord.id] });
-            setLessonAnnouncement(`${lessonSet.title} 세트를 만들고 ${addToSetChord.displayName} 코드를 추가했습니다.`);
-            handleCloseAddToSet();
-          }}
-          onClose={handleCloseAddToSet}
-        />
+            }}
+            onCreateAndAdd={(title) => {
+              const lessonSet = lessonSetsState.createSet({ title, chordIds: [addToSetChord.id] });
+              setLessonAnnouncement(`${lessonSet.title} 세트를 만들고 ${addToSetChord.displayName} 코드를 추가했습니다.`);
+              handleCloseAddToSet();
+            }}
+            onClose={handleCloseAddToSet}
+          />
+        </Suspense>
       ) : null}
       {sharingLessonSet ? (
-        <LessonSetShareDialog
-          lessonSet={sharingLessonSet}
-          shareUrl={lessonSetShareUrl}
-          onClose={handleCloseShare}
-        />
+        <Suspense fallback={null}>
+          <LessonSetShareDialog
+            lessonSet={sharingLessonSet}
+            shareUrl={lessonSetShareUrl}
+            onClose={handleCloseShare}
+          />
+        </Suspense>
       ) : null}
       <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {lessonAnnouncement}
       </p>
-      <PwaUpdateBanner />
+      {pwaRegistrationReady ? (
+        <Suspense fallback={null}>
+          <PwaUpdateBanner />
+        </Suspense>
+      ) : null}
     </AppShell>
   );
 }
