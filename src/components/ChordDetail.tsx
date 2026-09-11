@@ -65,8 +65,8 @@ export function ChordDetail({
             </h1>
             <div className="detail-image-frame rounded-lg border border-white bg-white/90 p-[clamp(10px,1.4vw,18px)] shadow-neumorphic">
               <ChordDiagram
-                shape={chord}
-                size="large"
+                chord={chord}
+                size="lg"
                 uploadedImageUrl={getUploadedImageUrl(chordStorageKey(chord))}
               />
             </div>

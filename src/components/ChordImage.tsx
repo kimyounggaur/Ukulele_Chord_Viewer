@@ -8,13 +8,13 @@ import {
   useState,
 } from "react";
 
-const PLACEHOLDER_SRC = `${import.meta.env.BASE_URL}chords/placeholders/chord-placeholder.svg`;
-
 interface ChordImageProps {
   src: string;
   alt: string;
   size?: "thumb" | "large";
   overlay?: ReactNode;
+  onError?: () => void;
+  priority?: boolean;
 }
 
 interface ImageBox {
@@ -28,9 +28,10 @@ function preventImageContextMenu(event: MouseEvent) {
   event.preventDefault();
 }
 
-export function ChordImage({ src, alt, size = "thumb", overlay }: ChordImageProps) {
+export function ChordImage({ src, alt, size = "thumb", overlay, onError, priority = false }: ChordImageProps) {
   const [currentSrc, setCurrentSrc] = useState(src);
   const [imageBox, setImageBox] = useState<ImageBox | null>(null);
+  const [loaded, setLoaded] = useState(false);
   const frameRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const hasOverlay = Boolean(overlay);
@@ -38,6 +39,7 @@ export function ChordImage({ src, alt, size = "thumb", overlay }: ChordImageProp
   useEffect(() => {
     setCurrentSrc(src);
     setImageBox(null);
+    setLoaded(false);
   }, [src]);
 
   const updateImageBox = useCallback(() => {
@@ -116,22 +118,24 @@ export function ChordImage({ src, alt, size = "thumb", overlay }: ChordImageProp
         size === "large" ? "p-3 shadow-neo" : "p-2 shadow-neo-inset",
       ].join(" ")}
     >
+      {!loaded ? <div className="chord-image-skeleton" aria-hidden="true" /> : null}
       <img
         ref={imageRef}
         src={currentSrc}
         alt={alt}
-        loading="lazy"
-        className="chord-image"
+        loading={priority ? "eager" : "lazy"}
+        decoding="async"
+        fetchPriority={priority ? "high" : "auto"}
+        className={loaded ? "chord-image is-loaded" : "chord-image"}
         draggable={false}
         onContextMenu={preventImageContextMenu}
-        onLoad={updateImageBox}
-        onError={() => {
-          if (currentSrc !== PLACEHOLDER_SRC) {
-            setCurrentSrc(PLACEHOLDER_SRC);
-          }
+        onLoad={() => {
+          setLoaded(true);
+          updateImageBox();
         }}
+        onError={onError}
       />
-      {overlay && imageBox ? (
+      {loaded && overlay && imageBox ? (
         <div
           className="chord-image-overlay"
           style={{

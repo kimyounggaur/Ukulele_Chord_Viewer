@@ -1,31 +1,73 @@
+import { useEffect, useMemo, useState } from "react";
 import type { Chord } from "../data/types";
 import { fingerHotspotsByChordId } from "../data/fingerHotspots";
+import { asset } from "../lib/asset";
 import { ChordImage } from "./ChordImage";
+import { ChordSvg } from "./ChordSvg";
 import { FingerHintLayer } from "./FingerHintLayer";
-import { Fretboard } from "./Fretboard";
 
-interface ChordDiagramProps {
-  shape: Chord;
-  size?: "thumb" | "large";
+export interface ChordDiagramProps {
+  chord: Chord;
+  voicingIndex?: number;
+  size?: "sm" | "md" | "lg";
+  forcePrimitive?: boolean;
   uploadedImageUrl?: string;
+  showNotes?: boolean;
+  priority?: boolean;
 }
 
-export function ChordDiagram({ shape, size = "thumb", uploadedImageUrl }: ChordDiagramProps) {
-  const imageSource =
-    uploadedImageUrl ??
-    (shape.imageFile ? `${import.meta.env.BASE_URL}${shape.imageFile}` : undefined);
-  const fingerHotspots = fingerHotspotsByChordId[shape.legacyId ?? shape.id] ?? [];
+function queryForcesSvg(): boolean {
+  if (typeof window === "undefined") return false;
+  const documentQuery = new URLSearchParams(window.location.search);
+  const hashQuery = new URLSearchParams(window.location.hash.split("?")[1] ?? "");
+  return documentQuery.get("render") === "svg" || hashQuery.get("render") === "svg";
+}
 
-  if (imageSource) {
-    return (
-      <ChordImage
-        src={imageSource}
-        alt={`${shape.displayName} 우쿨렐레 코드 다이어그램`}
-        size={size}
-        overlay={<FingerHintLayer hotspots={fingerHotspots} size={size} />}
-      />
-    );
-  }
+export function ChordDiagram({
+  chord,
+  voicingIndex = 0,
+  size = "sm",
+  forcePrimitive = false,
+  uploadedImageUrl,
+  showNotes = true,
+  priority = false,
+}: ChordDiagramProps) {
+  const voicing = chord.voicings[voicingIndex] ?? chord.voicings[0];
+  const sources = useMemo(
+    () =>
+      [uploadedImageUrl, chord.imageFile ? asset(chord.imageFile) : undefined].filter(
+        (source, index, all): source is string =>
+          Boolean(source) && all.indexOf(source) === index,
+      ),
+    [chord.imageFile, uploadedImageUrl],
+  );
+  const [sourceIndex, setSourceIndex] = useState(0);
+  const useSvg = forcePrimitive || queryForcesSvg() || sourceIndex >= sources.length;
+  const fingerHotspots = fingerHotspotsByChordId[chord.legacyId ?? chord.id] ?? [];
 
-  return <Fretboard shape={shape} size={size} />;
+  useEffect(() => {
+    setSourceIndex(0);
+  }, [chord.id, uploadedImageUrl]);
+
+  return (
+    <div className={"chord-diagram chord-diagram-" + size} data-renderer={useSvg ? "svg" : "image"}>
+      {useSvg ? (
+        <ChordSvg
+          chord={chord}
+          voicing={voicing}
+          showNotes={showNotes}
+          className="chord-svg"
+        />
+      ) : (
+        <ChordImage
+          src={sources[sourceIndex]}
+          alt={chord.displayName + " 우쿨렐레 코드 다이어그램"}
+          size={size === "lg" ? "large" : "thumb"}
+          priority={priority}
+          onError={() => setSourceIndex((current) => current + 1)}
+          overlay={<FingerHintLayer hotspots={fingerHotspots} size={size === "lg" ? "large" : "thumb"} />}
+        />
+      )}
+    </div>
+  );
 }

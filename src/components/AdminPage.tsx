@@ -85,8 +85,8 @@ export function AdminPage({
 
                 <div className="admin-diagram-preview">
                   <ChordDiagram
-                    shape={chord}
-                    size="thumb"
+                    chord={chord}
+                    size="sm"
                     uploadedImageUrl={uploadedImageUrl}
                   />
                 </div>

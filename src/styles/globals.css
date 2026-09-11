@@ -304,6 +304,92 @@ button {
     box-shadow 180ms ease;
 }
 
+.chord-diagram {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  color: var(--quality-color, #2b6cb0);
+}
+
+.chord-image-skeleton {
+  position: absolute;
+  inset: 8px;
+  z-index: 0;
+  border-radius: 8px;
+  background: linear-gradient(100deg, #eef1f6 20%, #ffffff 40%, #eef1f6 60%);
+  background-size: 220% 100%;
+  animation: chord-skeleton 1.2s ease-in-out infinite;
+}
+
+.chord-image-frame > .chord-image {
+  position: relative;
+  z-index: 1;
+  opacity: 0;
+}
+
+.chord-image-frame > .chord-image.is-loaded {
+  opacity: 1;
+}
+
+.chord-svg {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.chord-svg-surface {
+  fill: var(--surface, #eef1f6);
+  stroke: var(--shadow-light, #ffffff);
+  stroke-width: 2;
+}
+
+.chord-svg-grid {
+  stroke: var(--diagram-line, #2d3748);
+  stroke-width: 2.5;
+}
+
+.chord-svg-grid .chord-svg-nut {
+  stroke-width: 7;
+}
+
+.chord-svg-fret-label,
+.chord-svg-notes {
+  fill: var(--text-muted, #5a6879);
+  font-family: Poppins, Pretendard, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.chord-svg-top-mark {
+  fill: none;
+  stroke: var(--diagram-line, #2d3748);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.chord-svg-finger circle,
+.chord-svg-barre {
+  fill: var(--quality-color, #2b6cb0);
+}
+
+.chord-svg-finger text {
+  fill: #ffffff;
+  font-family: Poppins, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+@keyframes chord-skeleton {
+  to {
+    background-position: -220% 0;
+  }
+}
+
 .finger-hotspot.is-large {
   width: clamp(42px, calc(var(--finger-w) * 1.35), 72px);
   height: clamp(42px, calc(var(--finger-h) * 1.35), 72px);

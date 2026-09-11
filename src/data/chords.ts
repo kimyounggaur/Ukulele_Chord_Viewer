@@ -242,7 +242,7 @@ const dim7Patterns: Record<string, Pattern> = {
 const augPatterns: Record<string, Pattern> = {
   C: { frets: [1, 0, 0, 3], fingers: [1, 0, 0, 3] },
   D: { frets: [3, 2, 2, 1], fingers: [4, 2, 3, 1] },
-  E: { frets: [1, 0, 0, 3], fingers: [1, 0, 0, 3], baseFret: 5 },
+  E: { frets: [1, 0, 0, 3], fingers: [1, 0, 0, 3] },
   F: { frets: [2, 1, 1, 0], fingers: [3, 1, 2, 0] },
   G: { frets: [0, 3, 3, 2], fingers: [0, 3, 4, 2] },
   A: { frets: [2, 1, 1, 0], fingers: [3, 1, 2, 0] },
