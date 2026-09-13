@@ -46,6 +46,14 @@
     <link rel="apple-touch-icon" sizes="180x180" href="%BASE_URL%apple-touch-icon.png" />
     <script>
       (() => {
+        const basePath = "%BASE_URL%";
+        if (basePath !== "/" && window.location.pathname === "/") {
+          window.location.replace(`${basePath}${window.location.search}${window.location.hash}`);
+        }
+      })();
+    </script>
+    <script>
+      (() => {
         const firstVisibleImageByQuality = {
           major: "chords/major/c.thumb.webp",
           minor: "chords/minor/c.thumb.webp",

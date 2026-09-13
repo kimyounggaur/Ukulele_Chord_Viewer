@@ -143,7 +143,7 @@ export function ChordImage({
           height={height}
           loading={size === "thumb" ? "lazy" : priority ? "eager" : "lazy"}
           decoding="async"
-          fetchPriority={priority ? "high" : "auto"}
+          {...{ fetchpriority: priority ? "high" : "auto" }}
           className={loaded ? "chord-image is-loaded" : "chord-image"}
           draggable={false}
           onContextMenu={preventImageContextMenu}

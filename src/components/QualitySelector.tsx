@@ -60,7 +60,7 @@ export function QualitySelector({
             height="512"
             loading="eager"
             decoding="async"
-            fetchPriority="high"
+            {...{ fetchpriority: "high" }}
             className="quality-selector-art-image"
           />
         </picture>
